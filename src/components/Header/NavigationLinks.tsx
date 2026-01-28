@@ -4,6 +4,8 @@ import { ExternalLink, Menu, X, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { NAVIGATION_LINKS } from '@/config/navigationLinks';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
 interface NavigationLinksProps {
   className?: string;
@@ -97,6 +99,12 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
           <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
           <span>{t(NAVIGATION_LINKS.qqGroup.labelKey, { groupNumber: NAVIGATION_LINKS.qqGroup.groupNumber })}</span>
         </Button>
+
+        {/* Theme and Language Toggle */}
+        <div className="flex items-center gap-2 ml-2 pl-2 border-l">
+          <ThemeToggle />
+          <LanguageSwitcher />
+        </div>
       </nav>
 
       {/* Mobile Navigation */}
@@ -115,7 +123,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
         {/* Mobile Dropdown Menu */}
         {isMenuOpen && (
           <div
-            className="absolute right-4 top-16 bg-card/95 backdrop-blur-xl border-2 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 min-w-[200px]"
+            className="absolute right-4 top-14 bg-card/95 backdrop-blur-xl border-2 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 min-w-[200px]"
             role="navigation"
             aria-label="Main navigation"
           >
@@ -154,6 +162,21 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
               <MessageCircle className="w-4 h-4 text-muted-foreground" />
               <span>{t(NAVIGATION_LINKS.qqGroup.labelKey, { groupNumber: NAVIGATION_LINKS.qqGroup.groupNumber })}</span>
             </button>
+
+            {/* Divider */}
+            <div className="my-1 border-t" />
+
+            {/* Theme and Language */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">主题</span>
+                <ThemeToggle />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">语言</span>
+                <LanguageSwitcher />
+              </div>
+            </div>
           </div>
         )}
       </div>

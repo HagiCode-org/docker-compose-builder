@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { NAVIGATION_LINKS } from '@/config/navigationLinks';
 
 export function ConfigForm() {
   const { t } = useTranslation();
@@ -142,23 +143,29 @@ export function ConfigForm() {
           )}
 
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="imageRegistry">
-              {t('configForm.imageRegistry')} <span className="text-red-500">*</span>
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="imageRegistry">
+                {t('configForm.imageRegistry')} <span className="text-red-500">*</span>
+              </Label>
+              <div className="text-sm text-muted-foreground">
+                遇到困难？欢迎加入 QQ 群 {NAVIGATION_LINKS.qqGroup.groupNumber} 解决
+              </div>
+            </div>
             <Select
               value={config.imageRegistry}
-              onValueChange={(value: 'docker-hub' | 'azure-acr') => updateConfig('imageRegistry', value)}
+              onValueChange={(value: 'docker-hub' | 'azure-acr' | 'aliyun-acr') => updateConfig('imageRegistry', value)}
             >
               <SelectTrigger id="imageRegistry">
                 <SelectValue placeholder={t('configForm.selectImageRegistry')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="docker-hub">
+                <SelectItem value="aliyun-acr">
                   <div className="flex items-center gap-2">
-                    <span>{t('configForm.dockerHub')}</span>
-                    <Badge variant="secondary">{t('common.default')}</Badge>
+                    <span>{t('configForm.aliyunAcr')}</span>
+                    <Badge variant="secondary">{t('common.recommended')}</Badge>
                   </div>
                 </SelectItem>
+                <SelectItem value="docker-hub">{t('configForm.dockerHub')}</SelectItem>
                 <SelectItem value="azure-acr">{t('configForm.azureContainerRegistry')}</SelectItem>
               </SelectContent>
             </Select>
@@ -177,6 +184,17 @@ export function ConfigForm() {
                 <p className="text-muted-foreground">{t('configForm.azureAcrNetworkAdvice')}</p>
                 <p className="text-xs font-mono mt-1">
                   {t('configForm.imageLabel')}: {REGISTRIES['azure-acr'].imagePrefix}:{config.imageTag}
+                </p>
+              </div>
+            )}
+
+            {config.imageRegistry === 'aliyun-acr' && (
+              <div className="mt-2 p-3 bg-green-50 dark:bg-green-950 rounded-md text-sm">
+                <p className="font-medium">🚀 {t('configForm.aliyunAcrRecommended')}</p>
+                <p className="text-muted-foreground">{t('configForm.aliyunAcrDescription')}</p>
+                <p className="text-muted-foreground">{t('configForm.aliyunAcrNetworkAdvice')}</p>
+                <p className="text-xs font-mono mt-1">
+                  {t('configForm.imageLabel')}: {REGISTRIES['aliyun-acr'].imagePrefix}/hagicode:{config.imageTag}
                 </p>
               </div>
             )}

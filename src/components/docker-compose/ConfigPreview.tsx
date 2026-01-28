@@ -10,12 +10,12 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/theme-context';
 
 export function ConfigPreview() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const config = useSelector(selectConfig);
   const [copied, setCopied] = useState(false);
 
-  const yaml = useMemo(() => generateYAML(config), [config]);
+  const yaml = useMemo(() => generateYAML(config, i18n.language), [config, i18n.language]);
   const darkMode = theme === 'dark';
 
   const handleCopy = async () => {

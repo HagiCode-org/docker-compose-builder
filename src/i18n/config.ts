@@ -21,7 +21,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'zh-CN', // Default language
-    lng: localStorage.getItem('language') || undefined, // Use saved language preference
+    lng: localStorage.getItem('language') || 'zh-CN', // Use saved language preference or default to Chinese
 
     detection: {
       // Order of language detection
