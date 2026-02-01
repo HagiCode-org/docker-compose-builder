@@ -1,0 +1,13 @@
+{
+  "traitParameters": [
+    { "name": "config", "extension": "txt" }
+  ],
+  "scrubbers": [
+    {
+      "name": "timestamps",
+      "regex": "# Generated at: .*",
+      "replacement": "# Generated at: [FIXED_TIMESTAMP]"
+    }
+  ],
+  "directory": "__verify__"
+}

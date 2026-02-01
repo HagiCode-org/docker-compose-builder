@@ -13,6 +13,8 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 - **Responsive Design**: Works on both desktop and mobile devices
 - **Local Storage Persistence**: Configuration saved to localStorage for convenience
 - **One-Click Copy/Download**: Copy generated YAML to clipboard or download as file
+- **SEO Optimized**: Full search engine optimization with meta tags, Open Graph, Twitter Cards, and structured data
+- **Multi-language Support**: Internationalization (i18n) with English and Chinese support
 
 ## Quick Start
 
@@ -143,6 +145,63 @@ src/
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
+
+## SEO Configuration
+
+The application includes comprehensive SEO (Search Engine Optimization) features:
+
+### Features
+
+- **Meta Tags**: Complete HTML meta tags for title, description, keywords
+- **Open Graph**: Enhanced social media sharing on Facebook, LinkedIn, etc.
+- **Twitter Cards**: Optimized card display when sharing on Twitter
+- **Structured Data**: JSON-LD Schema.org markup for WebApplication, SoftwareApplication, and Organization
+- **Sitemap**: XML sitemap for search engine crawlers (`/sitemap.xml`)
+- **Robots.txt**: Search engine crawler configuration (`/robots.txt`)
+- **Canonical URLs**: Prevents duplicate content issues
+- **Hreflang Tags**: Multi-language SEO support
+
+### Customization
+
+SEO configuration is centralized in `src/config/seo.ts`. You can customize:
+
+- Site title and description
+- Keywords
+- Social media images
+- Default locale and alternate languages
+- Organization information
+
+### Dynamic SEO Updates
+
+SEO tags can be dynamically updated using the utility functions in `src/lib/seo/utils.ts`:
+
+```typescript
+import { updateSEO } from './lib/seo/utils';
+
+// Update SEO for specific pages
+updateSEO({
+  title: 'Custom Page Title',
+  description: 'Custom description',
+  image: '/custom-image.png'
+});
+```
+
+### Validation Tools
+
+Test your SEO implementation with these online tools:
+
+- **Google Lighthouse**: Built into Chrome DevTools - Tests SEO performance
+- **Facebook Sharing Debugger**: https://developers.facebook.com/tools/debug/
+- **Twitter Card Validator**: https://cards-dev.twitter.com/validator
+- **Google Rich Results Test**: https://search.google.com/test/rich-results
+- **Schema Markup Validator**: https://validator.schema.org/
+
+### Adding a Custom Open Graph Image
+
+To add a custom OG image:
+
+1. Create an image at `public/og-image.png` (recommended size: 1200x630px)
+2. Update the `image` property in `src/config/seo.ts`
 
 ## License
 
