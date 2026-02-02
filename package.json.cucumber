@@ -1,0 +1,24 @@
+{
+  "name": "vite-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
+    "test:verify": "vitest --reporter=verbose src/lib/docker-compose/__tests__/__verify__",
+    "test:bdd": "cucumber-js",
+    "test:bdd:update": "cucumber-js --format html:dist/cucumber-report.html",
+    "test:all": "npm run test"
+  },
+  "cucumber": {
+    "paths": ["src/lib/docker-compose/__tests__/features/**/*.feature"]
+  }
+}

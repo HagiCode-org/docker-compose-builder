@@ -1,0 +1,15 @@
+# Robots.txt for Hagicode Docker Compose Builder
+# Allow all crawlers to access the site
+
+User-agent: *
+Allow: /
+
+# Disallow certain paths if any
+# Disallow: /private/
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://hagicode-org.github.io/docker-compose-builder/sitemap.xml
+
+# Crawl-delay (optional, specifies delay between requests in seconds)
+# Crawl-delay: 1
