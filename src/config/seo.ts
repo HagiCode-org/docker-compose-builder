@@ -34,7 +34,7 @@ export const defaultSEOConfig: SEOConfig = {
     'compose builder'
   ],
   image: '/og-image.png',
-  url: 'https://hagicode-org.github.io/docker-compose-builder/',
+  url: 'https://builder.hagicode.com',
   type: 'web-application',
   locale: 'en',
   alternateLocales: ['zh-CN']
@@ -42,7 +42,7 @@ export const defaultSEOConfig: SEOConfig = {
 
 export const siteConfig = {
   name: 'Hagicode Docker Compose Builder',
-  siteUrl: 'https://hagicode-org.github.io/docker-compose-builder/',
+  siteUrl: 'https://builder.hagicode.com',
   githubUrl: 'https://github.com/newbe36524/docker-compose-builder',
   author: {
     name: 'newbe36524',

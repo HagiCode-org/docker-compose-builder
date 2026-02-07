@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 
 export const NAVIGATION_LINKS = {
   officialSite: {
-    url: 'https://hagicode-org.github.io/site/',
+    url: 'https://hagicode.com',
     labelKey: 'header.navigation.officialSite',
     icon: Globe,
     external: true,
