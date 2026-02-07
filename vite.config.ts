@@ -11,8 +11,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // GitHub Pages deployment configuration
-  base: process.env.NODE_ENV === "production" ? "/docker-compose-builder/" : "/",
+  // Base path configuration
+  // Set VITE_BASE_PATH environment variable to override (e.g., VITE_BASE_PATH=/custom-path/)
+  // - Defaults to "/" for development
+  // - Defaults to "/docker-compose-builder/" for production (GitHub Pages)
+  base: process.env.VITE_BASE_PATH || (process.env.NODE_ENV === "production" ? "/docker-compose-builder/" : "/"),
   build: {
     outDir: "dist",
     assetsDir: "assets",
