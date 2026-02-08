@@ -12,12 +12,12 @@ export function createMockConfig(
     profile: 'quick-start',
     httpPort: '8080',
     containerName: 'hagicode',
-    imageTag: 'latest',
+    imageTag: '0',
     hostOS: 'linux',
     imageRegistry: 'docker-hub',
     aspNetEnvironment: 'Production',
     timezone: 'Asia/Shanghai',
-    databaseType: 'internal',
+    databaseType: 'sqlite',
     postgresDatabase: 'hagicode',
     postgresUser: 'postgres',
     postgresPassword: 'postgres',
@@ -49,7 +49,7 @@ export function createQuickStartConfig(
     profile: 'quick-start',
     hostOS: 'linux',
     workdirCreatedByRoot: true,
-    databaseType: 'internal',
+    databaseType: 'sqlite',
     volumeType: 'named',
     ...overrides
   });

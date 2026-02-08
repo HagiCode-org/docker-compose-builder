@@ -3,7 +3,7 @@
  * Migrated from pcode-docs project
  */
 
-export type DatabaseType = 'internal' | 'external';
+export type DatabaseType = 'sqlite' | 'internal' | 'external';
 export type HostOS = 'windows' | 'linux';
 export type LicenseKeyType = 'public' | 'custom';
 export type VolumeType = 'named' | 'bind';

@@ -233,7 +233,8 @@ describe('Docker Compose Generation: Edge Cases', () => {
       // Given
       const config = createMockConfig({
         imageRegistry: 'docker-hub',
-        imageTag: 'v1.2.3'
+        imageTag: 'v1.2.3',
+        databaseType: 'internal' // Explicitly set to get postgres service
       });
 
       // When
@@ -248,7 +249,8 @@ describe('Docker Compose Generation: Edge Cases', () => {
       // Given
       const config = createMockConfig({
         imageRegistry: 'aliyun-acr',
-        imageTag: 'v2.0.0'
+        imageTag: 'v2.0.0',
+        databaseType: 'internal' // Explicitly set to get postgres service
       });
 
       // When
@@ -263,7 +265,8 @@ describe('Docker Compose Generation: Edge Cases', () => {
       // Given
       const config = createMockConfig({
         imageRegistry: 'azure-acr',
-        imageTag: 'latest'
+        imageTag: 'latest',
+        databaseType: 'internal' // Explicitly set to get postgres service
       });
 
       // When

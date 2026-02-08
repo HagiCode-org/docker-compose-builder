@@ -123,8 +123,10 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     expect(hasService(yaml, 'hagicode')).toBe(true);
     expect(hasService(yaml, 'postgres')).toBe(false);
 
-    // 验证没有顶层卷配置
-    expect(validation.parsed.volumes).toBeUndefined();
+    // 验证只有 hagicode_data 卷（没有 postgres-data）
+    expect(validation.parsed.volumes).toBeDefined();
+    expect(validation.parsed.volumes?.hagicode_data).toBeDefined();
+    expect(validation.parsed.volumes?.postgres_data).toBeUndefined();
 
     // 验证外部数据库连接字符串
     const connectionString = getServiceEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default');
@@ -158,8 +160,10 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     const postgresVolumes = getServiceVolumes(yaml, 'postgres');
     expect(postgresVolumes).toContain('/data/postgres:/bitnami/postgresql');
 
-    // 验证没有顶层卷配置（绑定挂载不需要）
-    expect(validation.parsed.volumes).toBeUndefined();
+    // 验证只有 hagicode_data 卷（没有 postgres-data，因为使用绑定挂载）
+    expect(validation.parsed.volumes).toBeDefined();
+    expect(validation.parsed.volumes?.hagicode_data).toBeDefined();
+    expect(validation.parsed.volumes?.postgres_data).toBeUndefined();
 
     // 验证 PUID/PGID
     expect(hasEnvVar(yaml, 'hagicode', 'PUID')).toBe(true);

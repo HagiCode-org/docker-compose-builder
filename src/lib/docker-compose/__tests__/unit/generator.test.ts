@@ -46,7 +46,7 @@ describe('buildAppService', () => {
     const appServiceStr = appService.join('\n');
 
     expect(appService).toContain('  hagicode:');
-    expect(appServiceStr).toContain('image: newbe36524/hagicode:latest');
+    expect(appServiceStr).toContain('image: newbe36524/hagicode:0');
     expect(appServiceStr).toContain('container_name: hagicode');
   });
 
@@ -55,7 +55,7 @@ describe('buildAppService', () => {
     const appService = buildAppService(config);
     const appServiceStr = appService.join('\n');
 
-    expect(appServiceStr).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:latest');
+    expect(appServiceStr).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:0');
   });
 
   it('should include Anthropic API configuration', () => {
@@ -275,15 +275,18 @@ describe('buildVolumesSection', () => {
     expect(volumesStr).toContain('postgres-data:');
   });
 
-  it('should not generate volumes for external database', () => {
+  it('should not generate postgres-data volume for external database', () => {
     const config = createMockConfig({ databaseType: 'external' });
     const volumes = buildVolumesSection(config);
     const volumesStr = volumes.join('\n');
 
-    expect(volumesStr).not.toContain('volumes:');
+    // hagicode_data is always present, but postgres-data should not be
+    expect(volumesStr).toContain('volumes:');
+    expect(volumesStr).toContain('hagicode_data:');
+    expect(volumesStr).not.toContain('postgres-data:');
   });
 
-  it('should not generate volumes for bind mount', () => {
+  it('should generate hagicode_data volume for bind mount (no postgres-data)', () => {
     const config = createMockConfig({
       databaseType: 'internal',
       volumeType: 'bind'
@@ -291,7 +294,10 @@ describe('buildVolumesSection', () => {
     const volumes = buildVolumesSection(config);
     const volumesStr = volumes.join('\n');
 
-    expect(volumesStr).not.toContain('volumes:');
+    // hagicode_data is always present, but postgres-data is not for bind mounts
+    expect(volumesStr).toContain('volumes:');
+    expect(volumesStr).toContain('hagicode_data:');
+    expect(volumesStr).not.toContain('postgres-data:');
   });
 });
 
@@ -325,7 +331,7 @@ describe('generateYAML', () => {
     expect(yaml).toContain('pcode-network:');
   });
 
-  it('should generate YAML without volumes for external database', () => {
+  it('should generate YAML with hagicode_data volume for external database (no postgres-data)', () => {
     const config = createMockConfig({
       databaseType: 'external',
       externalDbHost: 'external-host',
@@ -337,10 +343,12 @@ describe('generateYAML', () => {
     expect(yaml).toContain('hagicode:');
     expect(yaml).not.toContain('postgres:');
 
-    // Check that there's no top-level volumes section (after the services section)
+    // hagicode_data volume is always present, but postgres-data should not be
     const servicesEnd = yaml.indexOf('restart: unless-stopped');
     const afterServices = yaml.substring(servicesEnd);
-    expect(afterServices).not.toContain('\nvolumes:');
+    expect(afterServices).toContain('\nvolumes:');
+    expect(afterServices).toContain('hagicode_data:');
+    expect(afterServices).not.toContain('postgres-data:');
   });
 
   it('should use fixed date when provided', () => {

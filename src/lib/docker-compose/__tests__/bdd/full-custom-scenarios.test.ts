@@ -129,7 +129,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
   });
 
   describe('Scenario 5: Internal Database with Bind Mount', () => {
-    it('Given an internal database with bind mount, When generating YAML, Then volume section should not be included', () => {
+    it('Given an internal database with bind mount, When generating YAML, Then volumes section should include hagicode_data but not postgres-data', () => {
       // Given
       const config = createMockConfig({
         databaseType: 'internal',
@@ -141,10 +141,10 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       // When
       const result = generateYAML(config, 'zh-CN', FIXED_DATE);
 
-      // Then - check that there's no top-level volumes section
-      const networksIndex = result.indexOf('\nnetworks:');
-      const beforeNetworks = result.substring(0, networksIndex);
-      expect(beforeNetworks).not.toContain('\nvolumes:');
+      // Then - hagicode_data is always present, but postgres-data is not for bind mounts
+      expect(result).toContain('\nvolumes:');
+      expect(result).toContain('hagicode_data:');
+      expect(result).not.toContain('postgres-data:');
     });
 
     it('Given an internal database with bind mount, When generating YAML, Then postgres service should use bind mount', () => {
@@ -190,17 +190,17 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       expect(result).toContain('ConnectionStrings__Default: "Host=external-db.example.com;Port=5433');
     });
 
-    it('Given an external database configuration, When generating YAML, Then volumes section should not be included', () => {
+    it('Given an external database configuration, When generating YAML, Then volumes section should include hagicode_data but not postgres-data', () => {
       // Given
       const config = createExternalDbConfig();
 
       // When
       const result = generateYAML(config, 'zh-CN', FIXED_DATE);
 
-      // Then - check that there's no top-level volumes section
-      const servicesEnd = result.indexOf('restart: unless-stopped');
-      const afterServices = result.substring(servicesEnd);
-      expect(afterServices).not.toContain('\nvolumes:');
+      // Then - hagicode_data is always present, but postgres-data should not be for external db
+      expect(result).toContain('\nvolumes:');
+      expect(result).toContain('hagicode_data:');
+      expect(result).not.toContain('postgres-data:');
     });
   });
 });

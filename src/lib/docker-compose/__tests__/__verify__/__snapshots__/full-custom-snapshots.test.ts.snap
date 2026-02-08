@@ -15,12 +15,13 @@ exports[`Full Custom Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       PUID: 1000
@@ -37,6 +38,7 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      - hagicode_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,6 +66,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  hagicode_data:
   postgres-data:
 
 networks:
@@ -86,12 +89,13 @@ exports[`Full Custom Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
@@ -106,6 +110,7 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      - hagicode_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -133,6 +138,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  hagicode_data:
   postgres-data:
 
 networks:
@@ -155,12 +161,13 @@ exports[`Full Custom Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
@@ -175,6 +182,7 @@ services:
       - "8080:45000"
     volumes:
       - C:\\\\repos:/app/workdir
+      - hagicode_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -202,6 +210,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  hagicode_data:
   postgres-data:
 
 networks:
@@ -224,12 +233,13 @@ exports[`Full Custom Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       PUID: 1000
@@ -246,6 +256,7 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      - hagicode_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -272,6 +283,9 @@ services:
       - pcode-network
     restart: unless-stopped
 
+volumes:
+  hagicode_data:
+
 networks:
   pcode-network:
     driver: bridge"
@@ -292,12 +306,13 @@ exports[`Full Custom Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      Database__Provider: postgresql
       ConnectionStrings__Default: "Host=external-postgres.example.com;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
@@ -312,9 +327,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
+
+volumes:
+  hagicode_data:
 
 networks:
   pcode-network:

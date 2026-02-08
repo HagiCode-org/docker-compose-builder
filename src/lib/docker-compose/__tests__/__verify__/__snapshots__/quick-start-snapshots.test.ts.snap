@@ -15,13 +15,14 @@ exports[`Quick Start Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
+      Database__Provider: sqlite
+      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
       # Claude Code Configuration
@@ -35,34 +36,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - pcode-network
-    restart: unless-stopped
-
-  postgres:
-    image: bitnami/postgresql:latest
-    environment:
-      POSTGRES_DATABASE: hagicode
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      TZ: Asia/Shanghai
-    volumes:
-      - postgres-data:/bitnami/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  hagicode_data:
 
 networks:
   pcode-network:
@@ -84,13 +64,14 @@ exports[`Quick Start Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
+      Database__Provider: sqlite
+      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
       # Claude Code Configuration
@@ -105,34 +86,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - pcode-network
-    restart: unless-stopped
-
-  postgres:
-    image: bitnami/postgresql:latest
-    environment:
-      POSTGRES_DATABASE: hagicode
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      TZ: Asia/Shanghai
-    volumes:
-      - postgres-data:/bitnami/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  hagicode_data:
 
 networks:
   pcode-network:
@@ -154,13 +114,14 @@ exports[`Quick Start Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
+      Database__Provider: sqlite
+      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
       # Claude Code Configuration
@@ -175,34 +136,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - pcode-network
-    restart: unless-stopped
-
-  postgres:
-    image: bitnami/postgresql:latest
-    environment:
-      POSTGRES_DATABASE: hagicode
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      TZ: Asia/Shanghai
-    volumes:
-      - postgres-data:/bitnami/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  hagicode_data:
 
 networks:
   pcode-network:
@@ -224,13 +164,14 @@ exports[`Quick Start Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
+      Database__Provider: sqlite
+      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
       # Claude Code Configuration
@@ -244,34 +185,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - pcode-network
-    restart: unless-stopped
-
-  postgres:
-    image: bitnami/postgresql:latest
-    environment:
-      POSTGRES_DATABASE: hagicode
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      TZ: Asia/Shanghai
-    volumes:
-      - postgres-data:/bitnami/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  hagicode_data:
 
 networks:
   pcode-network:
@@ -293,13 +213,14 @@ exports[`Quick Start Profiles - Complete File Verification with YAML Parsing > s
 
 services:
   hagicode:
-    image: newbe36524/hagicode:latest
+    image: newbe36524/hagicode:0
     container_name: hagicode
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
+      Database__Provider: sqlite
+      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
       # Claude Code Configuration
@@ -313,34 +234,13 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - pcode-network
-    restart: unless-stopped
-
-  postgres:
-    image: bitnami/postgresql:latest
-    environment:
-      POSTGRES_DATABASE: hagicode
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      TZ: Asia/Shanghai
-    volumes:
-      - postgres-data:/bitnami/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      - hagicode_data:/app/data
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  hagicode_data:
 
 networks:
   pcode-network:
