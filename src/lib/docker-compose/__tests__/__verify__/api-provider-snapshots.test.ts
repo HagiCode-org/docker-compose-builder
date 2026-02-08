@@ -174,7 +174,9 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
   });
 
   it('should validate postgres service healthcheck structure', async () => {
-    const config = createZaiProviderConfig();
+    const config = createZaiProviderConfig({
+      databaseType: 'internal' // 明确设置内部 PostgreSQL 以测试 postgres healthcheck
+    });
     const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);

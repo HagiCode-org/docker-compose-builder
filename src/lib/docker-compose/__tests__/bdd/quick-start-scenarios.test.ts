@@ -20,7 +20,8 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       // Then: output should contain required sections
       expect(result).toContain('services:');
       expect(result).toContain('hagicode:');
-      expect(result).toContain('postgres:');
+      // Quick start now uses SQLite, so no postgres service
+      expect(result).not.toContain('postgres:');
       expect(result).toContain('volumes:');
       expect(result).toContain('networks:');
     });

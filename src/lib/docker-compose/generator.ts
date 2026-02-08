@@ -74,10 +74,15 @@ export function buildAppService(config: DockerComposeConfig): string[] {
   lines.push('      ASPNETCORE_URLS: http://+:45000');
   lines.push(`      TZ: ${config.timezone}`);
 
-  // Database connection string
-  if (config.databaseType === 'internal') {
+  // Database connection string and provider
+  if (config.databaseType === 'sqlite') {
+    lines.push('      Database__Provider: sqlite');
+    lines.push('      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"');
+  } else if (config.databaseType === 'internal') {
+    lines.push('      Database__Provider: postgresql');
     lines.push(`      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=${config.postgresDatabase};Username=${config.postgresUser};Password=${config.postgresPassword}"`);
   } else {
+    lines.push('      Database__Provider: postgresql');
     lines.push(`      ConnectionStrings__Default: "Host=${config.externalDbHost};Port=${config.externalDbPort};Database=${config.postgresDatabase};Username=${config.postgresUser};Password=${config.postgresPassword}"`);
   }
 
@@ -137,7 +142,11 @@ export function buildAppService(config: DockerComposeConfig): string[] {
     lines.push(`      - ${config.workdirPath || '/home/user/repos'}:/app/workdir`);
   }
 
-  // Depends on
+  // Application data volume (always present for all database types)
+  // Contains SQLite database file when using SQLite, or Orleans grain storage, logs, etc. for PostgreSQL
+  lines.push('      - hagicode_data:/app/data');
+
+  // Depends on (only for internal PostgreSQL)
   if (config.databaseType === 'internal') {
     lines.push('    depends_on:');
     lines.push('      postgres:');
@@ -230,10 +239,15 @@ export function buildServicesSection(config: DockerComposeConfig): string[] {
 export function buildVolumesSection(config: DockerComposeConfig): string[] {
   const lines: string[] = [];
 
+  lines.push('');
+  lines.push('volumes:');
+
+  // hagicode_data is always present (contains app data: SQLite database or Orleans grain storage, logs, etc.)
+  lines.push('  hagicode_data:');
+
+  // postgres-data volume only for internal PostgreSQL
   if (config.databaseType === 'internal' && config.volumeType === 'named') {
     const volName = config.volumeName || 'postgres-data';
-    lines.push('');
-    lines.push('volumes:');
     lines.push(`  ${volName}:`);
   }
 

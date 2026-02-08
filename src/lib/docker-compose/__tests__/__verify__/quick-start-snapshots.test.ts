@@ -29,12 +29,13 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
 
-    // 验证服务存在
+    // 验证服务存在（快速启动现在使用 SQLite，没有 postgres 服务）
     expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
+    expect(hasService(yaml, 'postgres')).toBe(false);
 
-    // 验证卷存在（内部数据库使用命名卷）
-    expect(hasVolume(yaml, 'postgres-data')).toBe(true);
+    // 验证卷存在（SQLite 只使用 hagicode_data）
+    expect(hasVolume(yaml, 'hagicode_data')).toBe(true);
+    expect(hasVolume(yaml, 'postgres-data')).toBe(false);
 
     // 验证网络存在
     expect(hasNetwork(yaml, 'pcode-network')).toBe(true);
@@ -44,9 +45,8 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_AUTH_TOKEN')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default')).toBe(true);
 
-    // 验证镜像
-    expect(getServiceImage(yaml, 'hagicode')).toBe('newbe36524/hagicode:latest');
-    expect(getServiceImage(yaml, 'postgres')).toContain('postgresql');
+    // 验证镜像（快速启动现在使用镜像标签 0）
+    expect(getServiceImage(yaml, 'hagicode')).toBe('newbe36524/hagicode:0');
 
     // 验证端口映射
     const ports = getServicePorts(yaml, 'hagicode');
@@ -69,9 +69,9 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
 
-    // 验证服务
+    // 验证服务（快速启动现在使用 SQLite，没有 postgres 服务）
     expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
+    expect(hasService(yaml, 'postgres')).toBe(false);
 
     // 验证网络
     expect(hasNetwork(yaml, 'pcode-network')).toBe(true);
@@ -156,19 +156,12 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     const parsed = validateDockerComposeStructure(yaml);
     expect(parsed.valid).toBe(true);
 
-    // 验证 hagicode 服务依赖 postgres
+    // 快速启动使用 SQLite，没有 postgres 服务，所以没有 depends_on
     const hagicodeService = parsed.parsed.services.hagicode;
-    expect(hagicodeService.depends_on).toBeDefined();
-    expect(hagicodeService.depends_on.postgres).toBeDefined();
-    expect(hagicodeService.depends_on.postgres.condition).toBe('service_healthy');
+    expect(hagicodeService.depends_on).toBeUndefined();
 
-    // 验证 postgres 的 healthcheck
-    const postgresService = parsed.parsed.services.postgres;
-    expect(postgresService.healthcheck).toBeDefined();
-    expect(postgresService.healthcheck.test).toContain('pg_isready');
-    expect(postgresService.healthcheck.interval).toBe('10s');
-    expect(postgresService.healthcheck.timeout).toBe('3s');
-    expect(postgresService.healthcheck.retries).toBe(3);
+    // 验证没有 postgres 服务
+    expect(parsed.parsed.services.postgres).toBeUndefined();
   });
 
   it('should validate network configuration', async () => {
@@ -183,9 +176,11 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(network).toBeDefined();
     expect(network.driver).toBe('bridge');
 
-    // 验证服务连接到网络
+    // 验证 hagicode 服务连接到网络
     expect(parsed.parsed.services.hagicode.networks).toContain('pcode-network');
-    expect(parsed.parsed.services.postgres.networks).toContain('pcode-network');
+
+    // 快速启动使用 SQLite，没有 postgres 服务
+    expect(parsed.parsed.services.postgres).toBeUndefined();
   });
 
   it('should validate restart policy', async () => {
@@ -197,6 +192,8 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
     // 验证重启策略
     expect(parsed.parsed.services.hagicode.restart).toBe('unless-stopped');
-    expect(parsed.parsed.services.postgres.restart).toBe('unless-stopped');
+
+    // 快速启动使用 SQLite，没有 postgres 服务
+    expect(parsed.parsed.services.postgres).toBeUndefined();
   });
 });

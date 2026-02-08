@@ -113,14 +113,12 @@ export function ConfigForm() {
           {config.profile === 'full-custom' && (
             <div className="space-y-2">
               <Label htmlFor="imageTag">{t('configForm.imageTag')}</Label>
-              <Select value={config.imageTag} onValueChange={(value) => updateConfig('imageTag', value)}>
-                <SelectTrigger id="imageTag">
-                  <SelectValue placeholder={t('configForm.selectImageTag')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="latest">latest</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                id="imageTag"
+                value={config.imageTag}
+                onChange={(e) => updateConfig('imageTag', e.target.value)}
+                placeholder="0"
+              />
             </div>
           )}
 
@@ -211,19 +209,32 @@ export function ConfigForm() {
               <Label htmlFor="databaseType">{t('configForm.databaseType')}</Label>
               <Select
                 value={config.databaseType}
-                onValueChange={(value: 'internal' | 'external') => updateConfig('databaseType', value)}
+                onValueChange={(value: 'sqlite' | 'internal' | 'external') => updateConfig('databaseType', value)}
               >
                 <SelectTrigger id="databaseType">
                   <SelectValue placeholder={t('configForm.selectDatabaseType')} />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="sqlite">SQLite</SelectItem>
                   <SelectItem value="internal">{t('configForm.internalPostgresql')}</SelectItem>
                   <SelectItem value="external">{t('configForm.externalDatabase')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {config.databaseType === 'internal' ? (
+            {config.databaseType === 'sqlite' ? (
+              <div className="p-4 bg-green-50 dark:bg-green-950 rounded-md text-sm">
+                <p className="font-medium text-green-800 dark:text-green-200">
+                  🚀 {t('configForm.sqliteDatabase')}
+                </p>
+                <p className="text-green-700 dark:text-green-300 mt-2">
+                  {t('configForm.sqliteDescription')}
+                </p>
+                <p className="text-green-700 dark:text-green-300 mt-1">
+                  {t('configForm.sqliteDataLocation')}: <code className="bg-green-100 dark:bg-green-900 px-1 rounded">/app/data/hagicode.db</code>
+                </p>
+              </div>
+            ) : config.databaseType === 'internal' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="postgresDatabase">{t('configForm.databaseName')}</Label>

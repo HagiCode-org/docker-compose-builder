@@ -2,6 +2,9 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { DockerComposeConfig } from '../../lib/docker-compose/types';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
+// Configuration version - increment to invalidate old localStorage caches
+const CONFIG_VERSION = '2.0';
+
 interface DockerComposeState {
   config: DockerComposeConfig;
   isLoading: boolean;
@@ -14,6 +17,17 @@ const getInitialConfig = (): DockerComposeConfig => {
   }
 
   try {
+    const savedVersion = localStorage.getItem('docker-compose-config-version');
+
+    // If version doesn't match, clear old config and use new defaults
+    if (savedVersion !== CONFIG_VERSION) {
+      console.log('Config version mismatch, resetting to defaults');
+      localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
+      localStorage.removeItem('docker-compose-config');
+      localStorage.setItem('docker-compose-image-registry', defaultConfig.imageRegistry);
+      return { ...defaultConfig };
+    }
+
     const savedConfig = localStorage.getItem('docker-compose-config');
     if (savedConfig) {
       return { ...defaultConfig, ...JSON.parse(savedConfig) };
@@ -49,6 +63,7 @@ const dockerComposeSlice = createSlice({
       // Save to localStorage
       if (typeof window !== 'undefined') {
         try {
+          localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
           localStorage.setItem('docker-compose-config', JSON.stringify(state.config));
           localStorage.setItem('docker-compose-image-registry', state.config.imageRegistry);
         } catch (error) {
@@ -77,9 +92,15 @@ const dockerComposeSlice = createSlice({
       const { field, value } = action.payload;
       state.config[field] = value;
 
+      // Auto-reset database type to SQLite when switching to quick-start profile
+      if (field === 'profile' && value === 'quick-start') {
+        state.config.databaseType = 'sqlite';
+      }
+
       // Save to localStorage
       if (typeof window !== 'undefined') {
         try {
+          localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
           localStorage.setItem('docker-compose-config', JSON.stringify(state.config));
           if (field === 'imageRegistry') {
             localStorage.setItem('docker-compose-image-registry', value as string);
