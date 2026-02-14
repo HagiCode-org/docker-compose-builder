@@ -37,12 +37,14 @@ services:
     volumes:
       - /home/user/repos:/app/workdir
       - hagicode_data:/app/data
+      - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
   hagicode_data:
+  claude-data:
 
 networks:
   pcode-network:
@@ -87,12 +89,14 @@ services:
     volumes:
       - /home/user/repos:/app/workdir
       - hagicode_data:/app/data
+      - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
   hagicode_data:
+  claude-data:
 
 networks:
   pcode-network:
@@ -137,12 +141,14 @@ services:
     volumes:
       - /home/user/repos:/app/workdir
       - hagicode_data:/app/data
+      - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
   hagicode_data:
+  claude-data:
 
 networks:
   pcode-network:
@@ -186,12 +192,14 @@ services:
     volumes:
       - /home/user/repos:/app/workdir
       - hagicode_data:/app/data
+      - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
   hagicode_data:
+  claude-data:
 
 networks:
   pcode-network:
@@ -235,12 +243,14 @@ services:
     volumes:
       - /home/user/repos:/app/workdir
       - hagicode_data:/app/data
+      - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
     restart: unless-stopped
 
 volumes:
   hagicode_data:
+  claude-data:
 
 networks:
   pcode-network:

@@ -31,7 +31,12 @@ export function createMockConfig(
     workdirPath: '/home/user/repos',
     workdirCreatedByRoot: true,
     puid: '1000',
-    pgid: '1000'
+    pgid: '1000',
+    // Claude Code Extended Configuration (optional - undefined by default)
+    anthropicSonnetModel: undefined,
+    anthropicOpusModel: undefined,
+    anthropicHaikuModel: undefined,
+    claudeCodeExperimentalAgentTeams: false
   };
 
   return { ...defaults, ...overrides };

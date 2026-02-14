@@ -25,4 +25,9 @@ export const defaultConfig: DockerComposeConfig = {
   workdirCreatedByRoot: false,
   puid: '1000',
   pgid: '1000',
+  // Claude Code Extended Configuration (optional)
+  anthropicSonnetModel: undefined,
+  anthropicOpusModel: undefined,
+  anthropicHaikuModel: undefined,
+  claudeCodeExperimentalAgentTeams: false,
 };

@@ -172,3 +172,28 @@ TBD - created by archiving change docker-compose-generator-migration. Update Pur
 - **AND** 当切换到 Linux 时根据用户类型（root/非 root）决定是否显示
 - **AND** 系统保留已输入的权限配置值，以便在模式间切换时不丢失用户输入
 
+### Requirement: Claude 配置数据持久化
+
+系统 SHALL 在生成的 Docker Compose 配置中为 Claude Code 的配置数据提供持久化支持，确保用户的配置、会话历史和插件数据在容器重建或重启时不会丢失。
+
+#### Scenario: Claude 配置目录卷挂载
+
+- **WHEN** 系统生成 Docker Compose 配置
+- **THEN** hagicode 服务 SHALL 包含 `/home/hagicode/.claude` 目录的卷挂载
+- **AND** 该卷 SHALL 使用命名卷 `claude-data`
+- **AND** 卷挂载路径 SHALL 与容器内 Claude Code 的配置目录完全匹配
+
+#### Scenario: Claude 配置数据命名卷声明
+
+- **WHEN** 系统生成 Docker Compose 配置的 volumes 部分
+- **THEN** 系统 SHALL 声明 `claude-data` 命名卷
+- **AND** 该命名卷 SHALL 在所有部署模式（快速体验和完整自定义）中都存在
+- **AND** 该命名卷 SHALL 在所有数据库类型配置中都存在
+
+#### Scenario: 容器重启后配置保持
+
+- **WHEN** 用户部署容器并使用 Claude Code 进行配置
+- **AND** 用户重启或重建容器
+- **THEN** Claude Code 的用户配置、会话历史和插件数据 SHALL 通过 `claude-data` 卷持久化保存
+- **AND** 容器重启后用户配置 SHALL 自动恢复
+

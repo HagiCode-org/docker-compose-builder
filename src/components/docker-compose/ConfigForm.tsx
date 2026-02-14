@@ -384,9 +384,33 @@ export function ConfigForm() {
             </Label>
             <Select
               value={config.anthropicApiProvider}
-              onValueChange={(value: 'anthropic' | 'zai' | 'custom') =>
-                updateConfig('anthropicApiProvider', value)
-              }
+              onValueChange={(value: 'anthropic' | 'zai' | 'custom') => {
+                updateConfig('anthropicApiProvider', value);
+                // Auto-set model defaults based on provider
+                if (value === 'zai') {
+                  // ZAI uses glm models
+                  updateConfig('anthropicSonnetModel', 'glm-5');
+                  updateConfig('anthropicOpusModel', 'glm-5');
+                  updateConfig('anthropicHaikuModel', 'glm-4.5-air');
+                } else if (value === 'anthropic') {
+                  // Anthropic uses Claude models (no default needed, user can choose)
+                  // Clear previous ZAI defaults
+                  if (config.anthropicSonnetModel === 'glm-5') {
+                    updateConfig('anthropicSonnetModel', undefined);
+                  }
+                  if (config.anthropicOpusModel === 'glm-5') {
+                    updateConfig('anthropicOpusModel', undefined);
+                  }
+                  if (config.anthropicHaikuModel === 'glm-4.5-air') {
+                    updateConfig('anthropicHaikuModel', undefined);
+                  }
+                } else {
+                  // Custom - clear all model defaults
+                  updateConfig('anthropicSonnetModel', undefined);
+                  updateConfig('anthropicOpusModel', undefined);
+                  updateConfig('anthropicHaikuModel', undefined);
+                }
+              }}
             >
               <SelectTrigger id="apiProvider">
                 <SelectValue placeholder={t('configForm.selectApiProvider')} />
@@ -476,6 +500,93 @@ export function ConfigForm() {
           )}
         </div>
       </div>
+
+      {/* Claude Code Extended Configuration - Only show in full-custom mode */}
+      {config.profile === 'full-custom' && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h3>
+          <p className="text-sm text-muted-foreground">
+            {t('configForm.claudeCodeExtendedConfigDescription')}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Sonnet Model */}
+            <div className="space-y-2">
+              <Label htmlFor="anthropicSonnetModel">
+                {t('configForm.anthropicSonnetModel')}
+              </Label>
+              <Input
+                id="anthropicSonnetModel"
+                type="text"
+                value={config.anthropicSonnetModel || ''}
+                onChange={(e) => updateConfig('anthropicSonnetModel', e.target.value || undefined)}
+                placeholder="claude-sonnet-4-20250514"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('configForm.anthropicSonnetModelHint')}
+              </p>
+            </div>
+
+            {/* Opus Model */}
+            <div className="space-y-2">
+              <Label htmlFor="anthropicOpusModel">
+                {t('configForm.anthropicOpusModel')}
+              </Label>
+              <Input
+                id="anthropicOpusModel"
+                type="text"
+                value={config.anthropicOpusModel || ''}
+                onChange={(e) => updateConfig('anthropicOpusModel', e.target.value || undefined)}
+                placeholder="claude-opus-4-20250514"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('configForm.anthropicOpusModelHint')}
+              </p>
+            </div>
+
+            {/* Haiku Model */}
+            <div className="space-y-2">
+              <Label htmlFor="anthropicHaikuModel">
+                {t('configForm.anthropicHaikuModel')}
+              </Label>
+              <Input
+                id="anthropicHaikuModel"
+                type="text"
+                value={config.anthropicHaikuModel || ''}
+                onChange={(e) => updateConfig('anthropicHaikuModel', e.target.value || undefined)}
+                placeholder="claude-haiku-4-20250514"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('configForm.anthropicHaikuModelHint')}
+              </p>
+            </div>
+          </div>
+
+          {/* Agent Teams */}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="claudeCodeExperimentalAgentTeams"
+                checked={config.claudeCodeExperimentalAgentTeams || false}
+                onCheckedChange={(checked) =>
+                  updateConfig('claudeCodeExperimentalAgentTeams', checked as boolean)
+                }
+              />
+              <Label htmlFor="claudeCodeExperimentalAgentTeams" className="cursor-pointer">
+                {t('configForm.claudeCodeExperimentalAgentTeams')}
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t('configForm.claudeCodeExperimentalAgentTeamsHint')}
+            </p>
+          </div>
+
+          <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-md text-sm">
+            <p className="font-medium mb-1">{t('configForm.claudeCodeExtendedConfigNote')}</p>
+            <p className="text-muted-foreground">{t('configForm.claudeCodeExtendedConfigNoteDescription')}</p>
+          </div>
+        </div>
+      )}
 
       {/* Volume Mounts */}
       <div className="space-y-4">

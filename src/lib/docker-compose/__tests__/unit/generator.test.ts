@@ -165,6 +165,91 @@ describe('buildAppService', () => {
 
     expect(appServiceStr).toContain('ConnectionStrings__Default: "Host=external-host;Port=5433;Database=testdb;Username=testuser;Password=testpass"');
   });
+
+  it('should include Claude config volume mount', () => {
+    const config = createMockConfig();
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('claude-data:/home/hagicode/.claude');
+  });
+
+  it('should include hagicode_data and claude-data volumes', () => {
+    const config = createMockConfig();
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('hagicode_data:/app/data');
+    expect(appServiceStr).toContain('claude-data:/home/hagicode/.claude');
+  });
+
+  // Claude Code Extended Configuration tests
+  it('should include ANTHROPIC_SONNET_MODEL when configured', () => {
+    const config = createMockConfig({
+      anthropicSonnetModel: 'claude-sonnet-4-20250514'
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
+  });
+
+  it('should include ANTHROPIC_OPUS_MODEL when configured', () => {
+    const config = createMockConfig({
+      anthropicOpusModel: 'claude-opus-4-20250514'
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('ANTHROPIC_OPUS_MODEL: "claude-opus-4-20250514"');
+  });
+
+  it('should include ANTHROPIC_HAIKU_MODEL when configured', () => {
+    const config = createMockConfig({
+      anthropicHaikuModel: 'claude-haiku-4-20250514'
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('ANTHROPIC_HAIKU_MODEL: "claude-haiku-4-20250514"');
+  });
+
+  it('should include CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS when configured', () => {
+    const config = createMockConfig({
+      claudeCodeExperimentalAgentTeams: true
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
+  });
+
+  it('should not include optional Claude Code config fields when not configured', () => {
+    const config = createMockConfig();
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).not.toContain('ANTHROPIC_SONNET_MODEL:');
+    expect(appServiceStr).not.toContain('ANTHROPIC_OPUS_MODEL:');
+    expect(appServiceStr).not.toContain('ANTHROPIC_HAIKU_MODEL:');
+    expect(appServiceStr).not.toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:');
+  });
+
+  it('should include all Claude Code extended config fields when configured', () => {
+    const config = createMockConfig({
+      anthropicSonnetModel: 'claude-sonnet-4-20250514',
+      anthropicOpusModel: 'claude-opus-4-20250514',
+      anthropicHaikuModel: 'claude-haiku-4-20250514',
+      claudeCodeExperimentalAgentTeams: true
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
+    expect(appServiceStr).toContain('ANTHROPIC_OPUS_MODEL: "claude-opus-4-20250514"');
+    expect(appServiceStr).toContain('ANTHROPIC_HAIKU_MODEL: "claude-haiku-4-20250514"');
+    expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
+  });
 });
 
 describe('buildPostgresService', () => {
@@ -298,6 +383,40 @@ describe('buildVolumesSection', () => {
     expect(volumesStr).toContain('volumes:');
     expect(volumesStr).toContain('hagicode_data:');
     expect(volumesStr).not.toContain('postgres-data:');
+  });
+
+  it('should generate claude-data volume for all configurations', () => {
+    const config = createMockConfig();
+    const volumes = buildVolumesSection(config);
+    const volumesStr = volumes.join('\n');
+
+    expect(volumesStr).toContain('volumes:');
+    expect(volumesStr).toContain('claude-data:');
+  });
+
+  it('should generate claude-data volume for external database', () => {
+    const config = createMockConfig({ databaseType: 'external' });
+    const volumes = buildVolumesSection(config);
+    const volumesStr = volumes.join('\n');
+
+    expect(volumesStr).toContain('volumes:');
+    expect(volumesStr).toContain('claude-data:');
+    expect(volumesStr).toContain('hagicode_data:');
+    expect(volumesStr).not.toContain('postgres-data:');
+  });
+
+  it('should generate claude-data volume for internal database with named volume', () => {
+    const config = createMockConfig({
+      databaseType: 'internal',
+      volumeType: 'named'
+    });
+    const volumes = buildVolumesSection(config);
+    const volumesStr = volumes.join('\n');
+
+    expect(volumesStr).toContain('volumes:');
+    expect(volumesStr).toContain('claude-data:');
+    expect(volumesStr).toContain('hagicode_data:');
+    expect(volumesStr).toContain('postgres-data:');
   });
 });
 

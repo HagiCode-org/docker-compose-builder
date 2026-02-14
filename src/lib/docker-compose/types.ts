@@ -122,4 +122,14 @@ export interface DockerComposeConfig {
   // Advanced
   puid: string;
   pgid: string;
+
+  // Claude Code Extended Configuration (optional)
+  /** Anthropic Sonnet model version (optional) */
+  anthropicSonnetModel?: string;
+  /** Anthropic Opus model version (optional) */
+  anthropicOpusModel?: string;
+  /** Anthropic Haiku model version (optional) */
+  anthropicHaikuModel?: string;
+  /** Enable experimental Agent Teams feature (optional) */
+  claudeCodeExperimentalAgentTeams?: boolean;
 }

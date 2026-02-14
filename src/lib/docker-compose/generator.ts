@@ -131,6 +131,20 @@ export function buildAppService(config: DockerComposeConfig): string[] {
       break;
   }
 
+  // Claude Code Extended Configuration (optional)
+  if (config.anthropicSonnetModel) {
+    lines.push(`      ANTHROPIC_SONNET_MODEL: "${config.anthropicSonnetModel}"`);
+  }
+  if (config.anthropicOpusModel) {
+    lines.push(`      ANTHROPIC_OPUS_MODEL: "${config.anthropicOpusModel}"`);
+  }
+  if (config.anthropicHaikuModel) {
+    lines.push(`      ANTHROPIC_HAIKU_MODEL: "${config.anthropicHaikuModel}"`);
+  }
+  if (config.claudeCodeExperimentalAgentTeams) {
+    lines.push(`      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "${config.claudeCodeExperimentalAgentTeams}"`);
+  }
+
   lines.push('    ports:');
   lines.push(`      - "${config.httpPort}:45000"`);
   lines.push('    volumes:');
@@ -145,6 +159,9 @@ export function buildAppService(config: DockerComposeConfig): string[] {
   // Application data volume (always present for all database types)
   // Contains SQLite database file when using SQLite, or Orleans grain storage, logs, etc. for PostgreSQL
   lines.push('      - hagicode_data:/app/data');
+
+  // Claude Code configuration volume (persists user config, session history, and plugins)
+  lines.push('      - claude-data:/home/hagicode/.claude');
 
   // Depends on (only for internal PostgreSQL)
   if (config.databaseType === 'internal') {
@@ -244,6 +261,9 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
 
   // hagicode_data is always present (contains app data: SQLite database or Orleans grain storage, logs, etc.)
   lines.push('  hagicode_data:');
+
+  // claude-data is always present (persists Claude Code configuration, session history, and plugins)
+  lines.push('  claude-data:');
 
   // postgres-data volume only for internal PostgreSQL
   if (config.databaseType === 'internal' && config.volumeType === 'named') {
