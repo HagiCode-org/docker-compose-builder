@@ -2,6 +2,11 @@
   "navigationFallback": {
     "rewrite": "index.html"
   },
+  "globalOverrides": {
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin"
+    }
+  },
   "routes": [
     {
       "route": "/assets/*",
