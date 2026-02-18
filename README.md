@@ -115,6 +115,46 @@ The generator creates a complete `docker-compose.yml` file with:
 - Health check configurations
 - Environment variables
 
+## Analytics Configuration
+
+The application integrates two analytics platforms for comprehensive user behavior tracking:
+
+### Microsoft Clarity
+
+- **Purpose**: User behavior analysis with heatmaps, session recordings, and user journeys
+- **Project ID**: `v6zgmrg1q7`
+- **Environment**: Production only
+- **Implementation**: Singleton service pattern via `src/services/clarityService.ts`
+
+### Baidu Analytics (百度统计)
+
+- **Purpose**: Web analytics for Chinese users, tracking page views, traffic sources, and user behavior
+- **Analytics ID**: `26c9739b2f3cddbe36c649e0823ee2de` (default)
+- **Environment**: Production only
+- **Implementation**: Custom React hook via `src/hooks/useBaiduAnalytics.ts`
+
+### Configuration
+
+Analytics IDs can be configured via environment variables:
+
+```bash
+# For local builds
+VITE_BAIDU_ANALYTICS_ID=your_analytics_id npm run build
+
+# For GitHub Actions (configured in repository secrets)
+BUILDER_BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
+```
+
+### Verification
+
+To verify analytics integration in production:
+
+1. Open browser DevTools (F12)
+2. Go to Network panel
+3. Check for requests to:
+   - `https://hm.baidu.com/hm.js?` (Baidu Analytics)
+4. Verify Clarity is recording sessions in the Clarity Dashboard
+
 ## Technology Stack
 
 - **React 18** with TypeScript

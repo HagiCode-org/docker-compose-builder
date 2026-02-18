@@ -11,6 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Define environment variables for build-time substitution
+  define: {
+    // VITE_BAIDU_ANALYTICS_ID: Baidu Analytics ID for builder.hagicode.com
+    // Falls back to default ID in useBaiduAnalytics hook if not set
+    'import.meta.env.VITE_BAIDU_ANALYTICS_ID': JSON.stringify(process.env.VITE_BAIDU_ANALYTICS_ID || ''),
+  },
   // Base path configuration
   // Set VITE_BASE_PATH environment variable to override (e.g., VITE_BASE_PATH=/custom-path/)
   // - Defaults to "/" for development
