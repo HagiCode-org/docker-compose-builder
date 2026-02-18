@@ -33,6 +33,30 @@
     <link rel="alternate" hreflang="en" href="https://builder.hagicode.com" />
     <link rel="alternate" hreflang="zh-CN" href="https://builder.hagicode.com?lang=zh-CN" />
     <link rel="alternate" hreflang="x-default" href="https://builder.hagicode.com" />
+
+    <!-- Baidu Analytics - Production Only -->
+    <script>
+      (function() {
+        // Default Baidu Analytics ID for builder.hagicode.com
+        // Falls back to this ID when VITE_BAIDU_ANALYTICS_ID is not configured
+        const defaultId = '26c9739b2f3cddbe36c649e0823ee2de';
+
+        // Only load in production (checked at runtime via import.meta.env.PROD)
+        // Note: In Vite builds, import.meta.env.PROD is true for production builds
+        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD) {
+          const analyticsId = import.meta.env.VITE_BAIDU_ANALYTICS_ID || defaultId;
+
+          // Prevent duplicate script loading
+          if (!document.querySelector('script[src^="https://hm.baidu.com/hm.js?"]')) {
+            var hm = document.createElement('script');
+            hm.src = 'https://hm.baidu.com/hm.js?' + analyticsId;
+            hm.async = true;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(hm, s);
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

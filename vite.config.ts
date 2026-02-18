@@ -14,7 +14,8 @@ export default defineConfig({
   // Define environment variables for build-time substitution
   define: {
     // VITE_BAIDU_ANALYTICS_ID: Baidu Analytics ID for builder.hagicode.com
-    // Falls back to default ID in useBaiduAnalytics hook if not set
+    // Falls back to default ID in index.html if not set
+    // Default: 26c9739b2f3cddbe36c649e0823ee2de
     'import.meta.env.VITE_BAIDU_ANALYTICS_ID': JSON.stringify(process.env.VITE_BAIDU_ANALYTICS_ID || ''),
   },
   // Base path configuration

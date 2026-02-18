@@ -131,7 +131,7 @@ The application integrates two analytics platforms for comprehensive user behavi
 - **Purpose**: Web analytics for Chinese users, tracking page views, traffic sources, and user behavior
 - **Analytics ID**: `26c9739b2f3cddbe36c649e0823ee2de` (default)
 - **Environment**: Production only
-- **Implementation**: Custom React hook via `src/hooks/useBaiduAnalytics.ts`
+- **Implementation**: Direct script embedding in `index.html`
 
 ### Configuration
 
@@ -142,8 +142,13 @@ Analytics IDs can be configured via environment variables:
 VITE_BAIDU_ANALYTICS_ID=your_analytics_id npm run build
 
 # For GitHub Actions (configured in repository secrets)
-BUILDER_BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
+BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
 ```
+
+**Default Analytics IDs**:
+- builder.hagicode.com: `26c9739b2f3cddbe36c649e0823ee2de`
+- docs.hagicode.com: `04ac03637b01a1f4cc0bdfa376387fe5`
+- hagicode.com: `43081dabdf7dd7249f20795e76c2f017`
 
 ### Verification
 
