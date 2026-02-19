@@ -61,21 +61,10 @@
     </script>
     -->
 
-    <!-- 51LA Analytics - Production Only -->
+    <!-- 51LA Analytics - Always loaded -->
     <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
     <script>
-      (function() {
-        // Default 51LA ID for builder.hagicode.com
-        // Falls back to this ID when VITE_51LA_ID is not configured
-        const defaultId = 'L6b88a5yK4h2Xnci';
-
-        // Only load in production (checked at runtime via import.meta.env.PROD)
-        // Note: In Vite builds, import.meta.env.PROD is true for production builds
-        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD) {
-          const laId = import.meta.env.VITE_51LA_ID || defaultId;
-          LA.init({id: laId, ck: laId, autoTrack: true, hashMode: true, screenRecord: true});
-        }
-      })();
+      LA.init({id: "L6b88a5yK4h2Xnci", ck: "L6b88a5yK4h2Xnci", autoTrack: true, hashMode: true, screenRecord: true});
     </script>
   </head>
   <body>
