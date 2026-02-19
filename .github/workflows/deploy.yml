@@ -33,7 +33,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_BAIDU_ANALYTICS_ID: ${{ secrets.BUILDER_BAIDU_ANALYTICS_ID }}
+          # VITE_BAIDU_ANALYTICS_ID: ${{ secrets.BUILDER_BAIDU_ANALYTICS_ID }} # Disabled, migrated to 51LA
+          VITE_51LA_ID: ${{ secrets.LI_51LA_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
