@@ -29,7 +29,7 @@ services:
       # ==================================================
       # Claude Code Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
-      # ANTHROPIC_URL is set for ZAI and custom providers
+      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
       # Anthropic Official API
       ANTHROPIC_AUTH_TOKEN: "test-token"
@@ -103,7 +103,7 @@ services:
       # ==================================================
       # Claude Code Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
-      # ANTHROPIC_URL is set for ZAI and custom providers
+      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
       # Anthropic Official API
       ANTHROPIC_AUTH_TOKEN: "test-token"
@@ -177,7 +177,7 @@ services:
       # ==================================================
       # Claude Code Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
-      # ANTHROPIC_URL is set for ZAI and custom providers
+      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
       # Anthropic Official API
       ANTHROPIC_AUTH_TOKEN: "test-token"
@@ -253,7 +253,7 @@ services:
       # ==================================================
       # Claude Code Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
-      # ANTHROPIC_URL is set for ZAI and custom providers
+      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
       # Anthropic Official API
       ANTHROPIC_AUTH_TOKEN: "test-token"
@@ -326,7 +326,7 @@ services:
       # ==================================================
       # Claude Code Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
-      # ANTHROPIC_URL is set for ZAI and custom providers
+      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
       # Anthropic Official API
       ANTHROPIC_AUTH_TOKEN: "test-token"
