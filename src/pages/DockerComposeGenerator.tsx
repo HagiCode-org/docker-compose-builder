@@ -1,6 +1,7 @@
 import { ConfigForm } from '@/components/docker-compose/ConfigForm';
 import { ConfigPreview } from '@/components/docker-compose/ConfigPreview';
 import { NavigationLinks } from '@/components/Header/NavigationLinks';
+import PromoBanner from '@/components/PromoBanner';
 import { useTranslation } from 'react-i18next';
 import { Dock } from 'lucide-react';
 
@@ -28,6 +29,11 @@ export function DockerComposeGenerator() {
           </div>
         </div>
       </header>
+
+      {/* Promo Banner */}
+      {/* <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <PromoBanner />
+      </div> */}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">

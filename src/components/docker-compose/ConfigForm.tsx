@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { selectConfig, setConfigField } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile } from '@/lib/docker-compose/types';
-import { REGISTRIES, ZAI_API_URL } from '@/lib/docker-compose/types';
+import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL } from '@/lib/docker-compose/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -384,24 +384,29 @@ export function ConfigForm() {
             </Label>
             <Select
               value={config.anthropicApiProvider}
-              onValueChange={(value: 'anthropic' | 'zai' | 'custom') => {
+              onValueChange={(value: 'anthropic' | 'zai' | 'aliyun' | 'custom') => {
                 updateConfig('anthropicApiProvider', value);
                 // Auto-set model defaults based on provider
                 if (value === 'zai') {
                   // ZAI uses glm models
-                  updateConfig('anthropicSonnetModel', 'glm-5');
+                  updateConfig('anthropicSonnetModel', 'glm-4.7');
                   updateConfig('anthropicOpusModel', 'glm-5');
                   updateConfig('anthropicHaikuModel', 'glm-4.5-air');
+                } else if (value === 'aliyun') {
+                  // Aliyun uses qwen and glm models
+                  updateConfig('anthropicSonnetModel', 'glm-4.7');
+                  updateConfig('anthropicOpusModel', 'qwen3-coder-next');
+                  updateConfig('anthropicHaikuModel', 'qwen3-coder-plus');
                 } else if (value === 'anthropic') {
                   // Anthropic uses Claude models (no default needed, user can choose)
-                  // Clear previous ZAI defaults
-                  if (config.anthropicSonnetModel === 'glm-5') {
+                  // Clear previous provider defaults
+                  if (config.anthropicSonnetModel === 'glm-4.7') {
                     updateConfig('anthropicSonnetModel', undefined);
                   }
-                  if (config.anthropicOpusModel === 'glm-5') {
+                  if (config.anthropicOpusModel === 'glm-5' || config.anthropicOpusModel === 'qwen3-coder-next') {
                     updateConfig('anthropicOpusModel', undefined);
                   }
-                  if (config.anthropicHaikuModel === 'glm-4.5-air') {
+                  if (config.anthropicHaikuModel === 'glm-4.5-air' || config.anthropicHaikuModel === 'qwen3-coder-plus') {
                     updateConfig('anthropicHaikuModel', undefined);
                   }
                 } else {
@@ -422,6 +427,11 @@ export function ConfigForm() {
                     <Badge variant="secondary">{t('common.default')}</Badge>
                   </div>
                 </SelectItem>
+                <SelectItem value="aliyun">
+                  <div className="flex items-center gap-2">
+                    <span>{t('configForm.aliyunDashScope')}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="anthropic">{t('configForm.anthropicOfficialApi')}</SelectItem>
                 <SelectItem value="custom">{t('configForm.customApiEndpoint')}</SelectItem>
               </SelectContent>
@@ -432,20 +442,32 @@ export function ConfigForm() {
                 href="https://www.bigmodel.cn/claude-code?ic=14BY54APZA"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
               >
-                {t('configForm.getApiToken')}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>{t('configForm.getApiToken')}</span>
+                <svg className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </a>
             )}
 
-            {config.anthropicApiProvider === 'anthropic' && (
+            {config.anthropicApiProvider === 'aliyun' && (
               <a
-                href="https://console.anthropic.com/"
+                href="https://www.aliyun.com/benefit/ai/aistar?userCode=vmx5szbq&clubBiz=subTask..12384055..10263"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
               >
-                {t('configForm.getApiToken')}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>{t('configForm.getApiToken')}</span>
+                <svg className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </a>
             )}
           </div>
@@ -484,6 +506,15 @@ export function ConfigForm() {
           {config.anthropicApiProvider === 'zai' && (
             <div className="mt-2 p-3 bg-green-50 dark:bg-green-950 rounded-md text-sm">
               <p>{t('configForm.apiEndpointAutoSet')}: {ZAI_API_URL}</p>
+            </div>
+          )}
+
+          {config.anthropicApiProvider === 'aliyun' && (
+            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
+              <p>{t('configForm.apiEndpointAutoSet')}: {ALIYUN_API_URL}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('configForm.aliyunModelsSupported')}: qwen3-coder-plus, glm-4.7, qwen3-coder-next
+              </p>
             </div>
           )}
 
@@ -579,11 +610,6 @@ export function ConfigForm() {
             <p className="text-xs text-muted-foreground">
               {t('configForm.claudeCodeExperimentalAgentTeamsHint')}
             </p>
-          </div>
-
-          <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-md text-sm">
-            <p className="font-medium mb-1">{t('configForm.claudeCodeExtendedConfigNote')}</p>
-            <p className="text-muted-foreground">{t('configForm.claudeCodeExtendedConfigNoteDescription')}</p>
           </div>
         </div>
       )}
