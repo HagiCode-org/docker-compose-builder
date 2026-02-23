@@ -1,5 +1,5 @@
 import type { DockerComposeConfig } from './types';
-import { REGISTRIES, ZAI_API_URL } from './types';
+import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL } from './types';
 
 /**
  * Build header comment section
@@ -98,7 +98,7 @@ export function buildAppService(config: DockerComposeConfig): string[] {
   lines.push('      # ==================================================');
   lines.push('      # Claude Code Configuration');
   lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
-  lines.push('      # ANTHROPIC_URL is set for ZAI and custom providers');
+  lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
   lines.push('      # ==================================================');
 
   switch (config.anthropicApiProvider) {
@@ -116,6 +116,16 @@ export function buildAppService(config: DockerComposeConfig): string[] {
         lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
         lines.push(`      ANTHROPIC_URL: "${ZAI_API_URL}"`);
         lines.push('      # API Provider: Zhipu AI (ZAI)');
+      }
+      break;
+
+    case 'aliyun':
+      if (config.anthropicAuthToken) {
+        lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
+        lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+        lines.push(`      ANTHROPIC_URL: "${ALIYUN_API_URL}"`);
+        lines.push('      # API Provider: Aliyun DashScope');
+        lines.push('      # Model mapping: Haiku → qwen3-coder-plus, Sonnet → glm-4.7, Opus → qwen3-coder-next');
       }
       break;
 

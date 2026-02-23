@@ -25,12 +25,16 @@ export type ConfigProfile = 'quick-start' | 'full-custom';
  *
  * - anthropic: Anthropic official API (only needs ANTHROPIC_AUTH_TOKEN)
  * - zai: Zhipu AI (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
+ * - aliyun: Aliyun DashScope (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - custom: Custom API (uses ANTHROPIC_AUTH_TOKEN + ANTHROPIC_URL)
  */
-export type AnthropicApiProvider = 'anthropic' | 'zai' | 'custom';
+export type AnthropicApiProvider = 'anthropic' | 'zai' | 'aliyun' | 'custom';
 
 // ZAI API URL constant
 export const ZAI_API_URL = 'https://open.bigmodel.cn/api/anthropic';
+
+// Aliyun DashScope API URL constant
+export const ALIYUN_API_URL = 'https://coding.dashscope.aliyuncs.com/apps/anthropic';
 
 /**
  * Image Registry Configuration Interface
