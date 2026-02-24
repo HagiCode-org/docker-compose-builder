@@ -393,20 +393,20 @@ export function ConfigForm() {
                   updateConfig('anthropicOpusModel', 'glm-5');
                   updateConfig('anthropicHaikuModel', 'glm-4.5-air');
                 } else if (value === 'aliyun') {
-                  // Aliyun uses qwen and glm models
+                  // Aliyun uses unified glm-4.7 model for all tiers
                   updateConfig('anthropicSonnetModel', 'glm-4.7');
-                  updateConfig('anthropicOpusModel', 'qwen3-coder-next');
-                  updateConfig('anthropicHaikuModel', 'qwen3-coder-plus');
+                  updateConfig('anthropicOpusModel', 'glm-4.7');
+                  updateConfig('anthropicHaikuModel', 'glm-4.7');
                 } else if (value === 'anthropic') {
                   // Anthropic uses Claude models (no default needed, user can choose)
                   // Clear previous provider defaults
                   if (config.anthropicSonnetModel === 'glm-4.7') {
                     updateConfig('anthropicSonnetModel', undefined);
                   }
-                  if (config.anthropicOpusModel === 'glm-5' || config.anthropicOpusModel === 'qwen3-coder-next') {
+                  if (config.anthropicOpusModel === 'glm-5' || config.anthropicOpusModel === 'qwen3-coder-next' || config.anthropicOpusModel === 'glm-4.7') {
                     updateConfig('anthropicOpusModel', undefined);
                   }
-                  if (config.anthropicHaikuModel === 'glm-4.5-air' || config.anthropicHaikuModel === 'qwen3-coder-plus') {
+                  if (config.anthropicHaikuModel === 'glm-4.5-air' || config.anthropicHaikuModel === 'qwen3-coder-plus' || config.anthropicHaikuModel === 'glm-4.7') {
                     updateConfig('anthropicHaikuModel', undefined);
                   }
                 } else {
@@ -513,7 +513,7 @@ export function ConfigForm() {
             <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
               <p>{t('configForm.apiEndpointAutoSet')}: {ALIYUN_API_URL}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {t('configForm.aliyunModelsSupported')}: qwen3-coder-plus, glm-4.7, qwen3-coder-next
+                {t('configForm.aliyunModelsSupported')}: glm-4.7 (unified model for all tiers: Haiku, Sonnet, Opus)
               </p>
             </div>
           )}

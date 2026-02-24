@@ -125,7 +125,10 @@ export function buildAppService(config: DockerComposeConfig): string[] {
         lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
         lines.push(`      ANTHROPIC_URL: "${ALIYUN_API_URL}"`);
         lines.push('      # API Provider: Aliyun DashScope');
-        lines.push('      # Model mapping: Haiku → qwen3-coder-plus, Sonnet → glm-4.7, Opus → qwen3-coder-next');
+        lines.push('      # Model mapping (unified configuration):');
+        lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
+        lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
+        lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
       }
       break;
 
