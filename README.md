@@ -77,30 +77,63 @@ This will build the application and deploy it to the `gh-pages` branch.
 - **Build failures**: Verify dependencies are installed correctly with `npm ci`
 - **Permissions**: Ensure the GitHub Actions workflow has the necessary permissions
 
-## Configuration Options
+### Configuration Options
 
-### Basic Settings
+#### Basic Settings
 - **HTTP Port**: Port for the application to listen on
 - **Container Name**: Name of the Docker container
 - **Image Tag**: Docker image tag to use
 - **Host OS**: Target operating system (Windows/Linux)
 - **Image Registry**: Docker image registry (Docker Hub/Azure ACR)
 
-### Database
+#### Database
 - **Internal PostgreSQL**: Built-in PostgreSQL service
 - **External Database**: Connect to external PostgreSQL instance
 - **Volume Type**: Named volume or bind mount for data storage
 
-### License
+#### License
 - **Public Test Key**: Default public test license
 - **Custom License Key**: Use your own license key
 
-### API Configuration
-- **Anthropic**: Official Anthropic API
+#### API Configuration
+
+The application dynamically loads provider configurations from the docs repository at `https://docs.hagicode.com/presets/claude-code/providers/`. Available providers include:
+
+- **Anthropic Official**: Official Anthropic API
 - **Zhipu AI (ZAI)**: Chinese AI provider with Anthropic-compatible API
+- **Aliyun DashScope**: Aliyun's AI service with Anthropic-compatible API
+- **MiniMax**: MiniMax AI service with Anthropic-compatible API
 - **Custom**: Custom API endpoint with Anthropic-compatible interface
 
-### Volume Mounts
+##### Provider Configuration Fallback
+
+The application uses a three-tier fallback strategy for provider configurations:
+
+1. **Primary**: Fetch from docs repository (`https://docs.hagicode.com/presets/claude-code/providers/`)
+2. **Fallback**: Use embedded backup configuration (included in code)
+3. **Legacy**: Use hardcoded constants (for backward compatibility)
+
+This ensures the application always works, even if the docs repository is temporarily unavailable.
+
+##### Environment Variable Override
+
+For local development, you can override the docs repository URL:
+
+```bash
+# Override to use local docs repository
+VITE_PRESETS_BASE_URL=http://localhost:3000 npm run dev
+
+# Or specify a different remote URL
+VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
+```
+
+The default value is `https://docs.hagicode.com`.
+
+##### Embedded Backup Synchronization
+
+The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.ts`) is synchronized with the docs repository presets. When adding new providers or updating existing ones in the docs repository, update the `EMBEDDED_BACKUP` constant to include the latest data.
+
+#### Volume Mounts
 - **Work Directory**: Path to your code repository
 - **Root User Warning**: Detection and warning for root-owned directories
 - **User Permission Mapping**: PUID/PGID configuration for Linux

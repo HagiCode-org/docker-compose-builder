@@ -1,14 +1,19 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { DockerComposeConfig } from '../../lib/docker-compose/types';
+import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoader';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.0';
+const CONFIG_VERSION = '2.1';
 
 interface DockerComposeState {
   config: DockerComposeConfig;
   isLoading: boolean;
   error: string | null;
+  // Provider configuration state
+  providers: ProviderPreset[];
+  providersLoading: boolean;
+  providersError: string | null;
 }
 
 const getInitialConfig = (): DockerComposeConfig => {
@@ -51,6 +56,9 @@ const initialState: DockerComposeState = {
   config: getInitialConfig(),
   isLoading: false,
   error: null,
+  providers: [],
+  providersLoading: false,
+  providersError: null,
 };
 
 const dockerComposeSlice = createSlice({
@@ -122,6 +130,21 @@ const dockerComposeSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+
+    // Provider configuration actions
+    setProvidersLoading: (state, action: PayloadAction<boolean>) => {
+      state.providersLoading = action.payload;
+    },
+
+    setProvidersError: (state, action: PayloadAction<string | null>) => {
+      state.providersError = action.payload;
+    },
+
+    setProviders: (state, action: PayloadAction<ProviderPreset[]>) => {
+      state.providers = action.payload;
+      state.providersLoading = false;
+      state.providersError = null;
+    },
   },
 });
 
@@ -132,6 +155,9 @@ export const {
   setLoading,
   setError,
   clearError,
+  setProvidersLoading,
+  setProvidersError,
+  setProviders,
 } = dockerComposeSlice.actions;
 
 export default dockerComposeSlice.reducer;
@@ -145,3 +171,16 @@ export const selectIsLoading = (state: { dockerCompose: DockerComposeState }) =>
 
 export const selectError = (state: { dockerCompose: DockerComposeState }) =>
   state.dockerCompose.error;
+
+// Provider configuration selectors
+export const selectProviders = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.providers;
+
+export const selectProvidersLoading = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.providersLoading;
+
+export const selectProvidersError = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.providersError;
+
+export const selectProviderById = (state: { dockerCompose: DockerComposeState }, providerId: string) =>
+  state.dockerCompose.providers.find(p => p.providerId === providerId);

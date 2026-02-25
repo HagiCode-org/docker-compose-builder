@@ -23,17 +23,28 @@ export type ConfigProfile = 'quick-start' | 'full-custom';
  * Unified use of ANTHROPIC_AUTH_TOKEN environment variable
  * Different providers are distinguished by ANTHROPIC_URL
  *
+ * Note: This is now a string type to allow for dynamic provider configurations
+ * from the docs repository. Previously hardcoded as 'anthropic' | 'zai' | 'aliyun' | 'custom'
+ *
  * - anthropic: Anthropic official API (only needs ANTHROPIC_AUTH_TOKEN)
  * - zai: Zhipu AI (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - aliyun: Aliyun DashScope (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
+ * - minimax: MiniMax (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - custom: Custom API (uses ANTHROPIC_AUTH_TOKEN + ANTHROPIC_URL)
  */
-export type AnthropicApiProvider = 'anthropic' | 'zai' | 'aliyun' | 'custom';
+export type AnthropicApiProvider = string;
 
-// ZAI API URL constant
+/**
+ * Provider Preset Configuration Interface
+ * Matches the JSON structure from the docs repository
+ * Re-exported from providerConfigLoader for convenience
+ */
+export type { ProviderPreset } from './providerConfigLoader';
+
+// Legacy hardcoded constants - kept for backward compatibility in fallback paths
+// These are now primarily used in the embedded backup configuration
+// New code should use ProviderConfigLoader to get these values
 export const ZAI_API_URL = 'https://open.bigmodel.cn/api/anthropic';
-
-// Aliyun DashScope API URL constant
 export const ALIYUN_API_URL = 'https://coding.dashscope.aliyuncs.com/apps/anthropic';
 
 /**

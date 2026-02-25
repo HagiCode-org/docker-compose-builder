@@ -1,25 +1,45 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { selectConfig, setConfigField } from '@/lib/docker-compose/slice';
+import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile } from '@/lib/docker-compose/types';
-import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL } from '@/lib/docker-compose/types';
+import { REGISTRIES } from '@/lib/docker-compose/types';
+import type { ProviderPreset } from '@/lib/docker-compose/providerConfigLoader';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Settings } from 'lucide-react';
+import { Settings, Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NAVIGATION_LINKS } from '@/config/navigationLinks';
+import { useEffect, useMemo } from 'react';
 
 export function ConfigForm() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const config = useSelector(selectConfig);
+  const providers = useSelector(selectProviders);
+  const providersLoading = useSelector(selectProvidersLoading);
+  const providersError = useSelector(selectProvidersError);
 
   const updateConfig = <K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => {
     dispatch(setConfigField({ field, value }));
   };
+
+  // Get current provider from state
+  const currentProvider = useMemo(() => {
+    return selectProviderById({ dockerCompose: { config, providers, isLoading: false, error: null, providersLoading, providersError } }, config.anthropicApiProvider);
+  }, [config.anthropicApiProvider, providers, providersLoading, providersError]);
+
+  // Initialize provider if not set and providers are loaded
+  useEffect(() => {
+    if (!providersLoading && providers.length > 0 && (!config.anthropicApiProvider || config.anthropicApiProvider === 'zai')) {
+      const recommendedProvider = providers.find(p => p.recommended && p.providerId !== 'custom') || providers[0];
+      if (recommendedProvider && recommendedProvider.providerId !== 'zai') {
+        updateConfig('anthropicApiProvider', recommendedProvider.providerId);
+      }
+    }
+  }, [providersLoading, providers, config.anthropicApiProvider, updateConfig]);
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
@@ -377,6 +397,22 @@ export function ConfigForm() {
           {t('configForm.unifiedUseOfToken')}
         </p>
 
+        {/* Provider loading state */}
+        {providersLoading && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 bg-muted rounded-md">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Loading provider configurations...</span>
+          </div>
+        )}
+
+        {/* Provider error state */}
+        {providersError && (
+          <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded-md">
+            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>Failed to load provider configurations: {providersError}</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="apiProvider">
@@ -384,79 +420,51 @@ export function ConfigForm() {
             </Label>
             <Select
               value={config.anthropicApiProvider}
-              onValueChange={(value: 'anthropic' | 'zai' | 'aliyun' | 'custom') => {
+              onValueChange={(value: string) => {
                 updateConfig('anthropicApiProvider', value);
-                // Auto-set model defaults based on provider
-                if (value === 'zai') {
-                  // ZAI uses glm models
-                  updateConfig('anthropicSonnetModel', 'glm-4.7');
-                  updateConfig('anthropicOpusModel', 'glm-5');
-                  updateConfig('anthropicHaikuModel', 'glm-4.5-air');
-                } else if (value === 'aliyun') {
-                  // Aliyun uses unified glm-4.7 model for all tiers
-                  updateConfig('anthropicSonnetModel', 'glm-4.7');
-                  updateConfig('anthropicOpusModel', 'glm-4.7');
-                  updateConfig('anthropicHaikuModel', 'glm-4.7');
-                } else if (value === 'anthropic') {
-                  // Anthropic uses Claude models (no default needed, user can choose)
-                  // Clear previous provider defaults
-                  if (config.anthropicSonnetModel === 'glm-4.7') {
-                    updateConfig('anthropicSonnetModel', undefined);
+                // Auto-set model defaults based on provider configuration
+                const provider = providers.find(p => p.providerId === value);
+                if (provider && provider.providerId !== 'custom') {
+                  // Apply model defaults from provider configuration
+                  if (provider.defaultModels.sonnet) {
+                    updateConfig('anthropicSonnetModel', provider.defaultModels.sonnet || undefined);
                   }
-                  if (config.anthropicOpusModel === 'glm-5' || config.anthropicOpusModel === 'qwen3-coder-next' || config.anthropicOpusModel === 'glm-4.7') {
-                    updateConfig('anthropicOpusModel', undefined);
+                  if (provider.defaultModels.opus) {
+                    updateConfig('anthropicOpusModel', provider.defaultModels.opus || undefined);
                   }
-                  if (config.anthropicHaikuModel === 'glm-4.5-air' || config.anthropicHaikuModel === 'qwen3-coder-plus' || config.anthropicHaikuModel === 'glm-4.7') {
-                    updateConfig('anthropicHaikuModel', undefined);
+                  if (provider.defaultModels.haiku) {
+                    updateConfig('anthropicHaikuModel', provider.defaultModels.haiku || undefined);
                   }
                 } else {
-                  // Custom - clear all model defaults
+                  // Custom or no provider defaults - clear model defaults
                   updateConfig('anthropicSonnetModel', undefined);
                   updateConfig('anthropicOpusModel', undefined);
                   updateConfig('anthropicHaikuModel', undefined);
                 }
               }}
+              disabled={providersLoading || providers.length === 0}
             >
               <SelectTrigger id="apiProvider">
                 <SelectValue placeholder={t('configForm.selectApiProvider')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="zai">
-                  <div className="flex items-center gap-2">
-                    <span>{t('configForm.zhipuAI')}</span>
-                    <Badge variant="secondary">{t('common.default')}</Badge>
-                  </div>
-                </SelectItem>
-                <SelectItem value="aliyun">
-                  <div className="flex items-center gap-2">
-                    <span>{t('configForm.aliyunDashScope')}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="anthropic">{t('configForm.anthropicOfficialApi')}</SelectItem>
-                <SelectItem value="custom">{t('configForm.customApiEndpoint')}</SelectItem>
+                {providers.map((provider) => (
+                  <SelectItem key={provider.providerId} value={provider.providerId}>
+                    <div className="flex items-center gap-2">
+                      <span>{provider.name}</span>
+                      {provider.recommended && (
+                        <Badge variant="secondary">{t('common.recommended')}</Badge>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
-            {config.anthropicApiProvider === 'zai' && (
+            {/* Referral link for current provider */}
+            {currentProvider && currentProvider.referralUrl && currentProvider.providerId !== 'custom' && (
               <a
-                href="https://www.bigmodel.cn/claude-code?ic=14BY54APZA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span>{t('configForm.getApiToken')}</span>
-                <svg className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            )}
-
-            {config.anthropicApiProvider === 'aliyun' && (
-              <a
-                href="https://www.aliyun.com/benefit/ai/aistar?userCode=vmx5szbq&clubBiz=subTask..12384055..10263.."
+                href={currentProvider.referralUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
@@ -473,6 +481,7 @@ export function ConfigForm() {
           </div>
 
           <div className="space-y-2">
+            {/* Custom API URL input - only show for custom provider */}
             {config.anthropicApiProvider === 'custom' && (
               <>
                 <Label htmlFor="anthropicUrl">{t('configForm.apiEndpointUrl')}</Label>
@@ -497,30 +506,28 @@ export function ConfigForm() {
             value={config.anthropicAuthToken}
             onChange={(e) => updateConfig('anthropicAuthToken', e.target.value)}
             placeholder={
-              config.anthropicApiProvider === 'anthropic'
+              currentProvider?.providerId === 'anthropic'
                 ? t('configForm.enterAnthropicApiToken')
                 : t('configForm.enterApiToken')
             }
           />
 
-          {config.anthropicApiProvider === 'zai' && (
-            <div className="mt-2 p-3 bg-green-50 dark:bg-green-950 rounded-md text-sm">
-              <p>{t('configForm.apiEndpointAutoSet')}: {ZAI_API_URL}</p>
-            </div>
-          )}
-
-          {config.anthropicApiProvider === 'aliyun' && (
+          {/* Provider-specific information */}
+          {currentProvider && config.anthropicApiProvider !== 'custom' && (
             <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
-              <p>{t('configForm.apiEndpointAutoSet')}: {ALIYUN_API_URL}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t('configForm.aliyunModelsSupported')}: glm-4.7 (unified model for all tiers: Haiku, Sonnet, Opus)
-              </p>
-            </div>
-          )}
-
-          {config.anthropicApiProvider === 'anthropic' && (
-            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
-              <p>{t('configForm.usingOfficialApi')}</p>
+              {currentProvider.providerId === 'anthropic' ? (
+                <p>{t('configForm.usingOfficialApi')}</p>
+              ) : (
+                <>
+                  <p>{t('configForm.apiEndpointAutoSet')}: {currentProvider.apiUrl.codingPlanForAnthropic}</p>
+                  {currentProvider.description && (
+                    <p className="text-xs text-muted-foreground mt-1">{currentProvider.description}</p>
+                  )}
+                  {currentProvider.notes && (
+                    <p className="text-xs text-muted-foreground mt-1">{currentProvider.notes}</p>
+                  )}
+                </>
+              )}
             </div>
           )}
 

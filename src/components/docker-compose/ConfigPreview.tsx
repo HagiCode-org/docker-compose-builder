@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectConfig } from '@/lib/docker-compose/slice';
+import { selectConfig, selectProviderById } from '@/lib/docker-compose/slice';
 import { generateYAML } from '@/lib/docker-compose/generator';
 import { SyntaxHighlighter } from '@/components/ui/syntax-highlighter';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,10 @@ export function ConfigPreview() {
   const config = useSelector(selectConfig);
   const [copied, setCopied] = useState(false);
 
-  const yaml = useMemo(() => generateYAML(config, i18n.language), [config, i18n.language]);
+  // Get provider configuration for YAML generation
+  const providerConfig = useSelector((state: any) => selectProviderById(state, config.anthropicApiProvider));
+
+  const yaml = useMemo(() => generateYAML(config, providerConfig, i18n.language), [config, providerConfig, i18n.language]);
   const darkMode = theme === 'dark';
 
   const handleCopy = async () => {

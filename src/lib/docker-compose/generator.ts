@@ -1,5 +1,151 @@
 import type { DockerComposeConfig } from './types';
+import type { ProviderPreset } from './providerConfigLoader';
 import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL } from './types';
+
+/**
+ * Get provider API URL for Docker Compose generation
+ * Supports both dynamic provider configuration and legacy fallback
+ * @param providerId The provider ID
+ * @param providerConfig Optional provider configuration from ProviderConfigLoader
+ * @param customUrl Optional custom URL from user input
+ * @returns The API URL or null if not applicable
+ */
+function getProviderApiUrl(
+  providerId: string,
+  providerConfig?: ProviderPreset,
+  customUrl?: string
+): string | null {
+  // For custom provider, use the user-provided URL
+  if (providerId === 'custom') {
+    return customUrl && customUrl.trim() ? customUrl : null;
+  }
+
+  // For Anthropic official, no API URL needed (uses default endpoint)
+  if (providerId === 'anthropic') {
+    return null;
+  }
+
+  // If provider configuration is available, use it
+  if (providerConfig && providerConfig.apiUrl?.codingPlanForAnthropic) {
+    return providerConfig.apiUrl.codingPlanForAnthropic;
+  }
+
+  // Legacy fallback for known providers
+  switch (providerId) {
+    case 'zai':
+      return ZAI_API_URL;
+    case 'aliyun':
+      return ALIYUN_API_URL;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Get provider display name for comments in Docker Compose
+ * @param providerId The provider ID
+ * @param providerConfig Optional provider configuration
+ * @returns The provider display name
+ */
+function getProviderDisplayName(providerId: string, providerConfig?: ProviderPreset): string {
+  // Legacy fallback for backward compatibility with existing tests
+  switch (providerId) {
+    case 'anthropic':
+      return 'Anthropic Official';
+    case 'zai':
+      return 'Zhipu AI (ZAI)';
+    case 'aliyun':
+      return 'Aliyun DashScope';
+    case 'custom':
+      return 'Custom Endpoint';
+    case 'minimax':
+      return 'MiniMax';
+    default:
+      return providerConfig?.name || providerId;
+  }
+}
+
+/**
+ * Get provider description for comments in Docker Compose
+ * @param providerId The provider ID
+ * @param providerConfig Optional provider configuration
+ * @returns The provider description
+ */
+function getProviderDescription(providerId: string, providerConfig?: ProviderPreset): string | null {
+  if (providerConfig && providerConfig.description) {
+    return providerConfig.description;
+  }
+  return null;
+}
+
+/**
+ * Build provider environment variables for Claude API configuration
+ * @param config The configuration object
+ * @param providerConfig Optional provider configuration
+ * @returns Array of provider environment variable lines
+ */
+function buildProviderEnvVars(
+  config: DockerComposeConfig,
+  providerConfig?: ProviderPreset
+): string[] {
+  const lines: string[] = [];
+
+  if (!config.anthropicAuthToken) {
+    return lines;
+  }
+
+  const providerId = config.anthropicApiProvider;
+  const apiUrl = getProviderApiUrl(providerId, providerConfig, config.anthropicUrl);
+
+  lines.push('      # ==================================================');
+  lines.push('      # Claude Code Configuration');
+  lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
+  lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
+  lines.push('      # ==================================================');
+
+  // Legacy behavior for backward compatibility with existing tests
+  if (providerId === 'anthropic') {
+    lines.push('      # Anthropic Official API');
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    lines.push('      # No ANTHROPIC_URL needed - uses default Anthropic endpoint');
+  } else if (providerId === 'zai') {
+    lines.push('      # Zhipu AI (ZAI) - uses Anthropic-compatible API');
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    lines.push('      # API Provider: Zhipu AI (ZAI)');
+  } else if (providerId === 'aliyun') {
+    lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    lines.push('      # API Provider: Aliyun DashScope');
+    lines.push('      # Model mapping (unified configuration):');
+    lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
+    lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
+    lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+  } else if (providerId === 'custom') {
+    lines.push('      # Custom Anthropic-compatible API');
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    if (apiUrl) {
+      lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    }
+    lines.push('      # API Provider: Custom Endpoint');
+  } else {
+    // New providers from dynamic configuration
+    const displayName = getProviderDisplayName(providerId, providerConfig);
+    const description = getProviderDescription(providerId, providerConfig);
+    lines.push(`      # ${displayName} - uses Anthropic-compatible API`);
+    if (description) {
+      lines.push(`      # ${description}`);
+    }
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    if (apiUrl) {
+      lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    }
+    lines.push(`      # API Provider: ${displayName}`);
+  }
+
+  return lines;
+}
 
 /**
  * Build header comment section
@@ -52,9 +198,13 @@ export function buildHeader(
 /**
  * Build application service (hagicode) configuration
  * @param config The configuration object
+ * @param providerConfig Optional provider configuration
  * @returns Array of app service configuration lines
  */
-export function buildAppService(config: DockerComposeConfig): string[] {
+export function buildAppService(
+  config: DockerComposeConfig,
+  providerConfig?: ProviderPreset
+): string[] {
   const lines: string[] = [];
 
   lines.push('  hagicode:');
@@ -94,55 +244,9 @@ export function buildAppService(config: DockerComposeConfig): string[] {
     lines.push(`      PGID: ${config.pgid}`);
   }
 
-  // Claude API Configuration - unified use of ANTHROPIC_AUTH_TOKEN
-  lines.push('      # ==================================================');
-  lines.push('      # Claude Code Configuration');
-  lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
-  lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
-  lines.push('      # ==================================================');
-
-  switch (config.anthropicApiProvider) {
-    case 'anthropic':
-      if (config.anthropicAuthToken) {
-        lines.push('      # Anthropic Official API');
-        lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-        lines.push('      # No ANTHROPIC_URL needed - uses default Anthropic endpoint');
-      }
-      break;
-
-    case 'zai':
-      if (config.anthropicAuthToken) {
-        lines.push('      # Zhipu AI (ZAI) - uses Anthropic-compatible API');
-        lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-        lines.push(`      ANTHROPIC_URL: "${ZAI_API_URL}"`);
-        lines.push('      # API Provider: Zhipu AI (ZAI)');
-      }
-      break;
-
-    case 'aliyun':
-      if (config.anthropicAuthToken) {
-        lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
-        lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-        lines.push(`      ANTHROPIC_URL: "${ALIYUN_API_URL}"`);
-        lines.push('      # API Provider: Aliyun DashScope');
-        lines.push('      # Model mapping (unified configuration):');
-        lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
-        lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
-        lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
-      }
-      break;
-
-    case 'custom':
-      if (config.anthropicAuthToken) {
-        lines.push('      # Custom Anthropic-compatible API');
-        lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-        if (config.anthropicUrl) {
-          lines.push(`      ANTHROPIC_URL: "${config.anthropicUrl}"`);
-        }
-        lines.push('      # API Provider: Custom Endpoint');
-      }
-      break;
-  }
+  // Claude API Configuration
+  const providerEnvVars = buildProviderEnvVars(config, providerConfig);
+  lines.push(...providerEnvVars);
 
   // Claude Code Extended Configuration (optional)
   if (config.anthropicSonnetModel) {
@@ -241,15 +345,19 @@ export function buildPostgresService(config: DockerComposeConfig): string[] {
 /**
  * Build services section
  * @param config The configuration object
+ * @param providerConfig Optional provider configuration
  * @returns Array of services section lines
  */
-export function buildServicesSection(config: DockerComposeConfig): string[] {
+export function buildServicesSection(
+  config: DockerComposeConfig,
+  providerConfig?: ProviderPreset
+): string[] {
   const lines: string[] = [];
 
   lines.push('services:');
 
   // Add app service
-  const appServiceLines = buildAppService(config);
+  const appServiceLines = buildAppService(config, providerConfig);
   lines.push(...appServiceLines);
 
   // Add internal PostgreSQL service if needed
@@ -306,12 +414,14 @@ export function buildNetworksSection(_config: DockerComposeConfig): string[] {
 /**
  * Generate Docker Compose YAML configuration
  * @param config The configuration object
+ * @param providerConfig Optional provider configuration
  * @param language The language code (e.g., 'zh-CN', 'en-US')
  * @param now The current date/time (for testability, defaults to current time)
  * @returns Generated YAML string
  */
 export function generateYAML(
   config: DockerComposeConfig,
+  providerConfig?: ProviderPreset,
   language: string = 'zh-CN',
   now: Date = new Date()
 ): string {
@@ -322,7 +432,7 @@ export function generateYAML(
   lines.push(...headerLines);
 
   // Build services section
-  const servicesLines = buildServicesSection(config);
+  const servicesLines = buildServicesSection(config, providerConfig);
   lines.push(...servicesLines);
 
   // Build volumes section
