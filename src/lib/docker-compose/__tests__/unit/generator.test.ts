@@ -439,7 +439,7 @@ describe('generateYAML', () => {
       databaseType: 'internal',
       volumeType: 'named'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     expect(yaml).toContain('# Hagicode Docker Compose Configuration');
     expect(yaml).toContain('services:');
@@ -456,7 +456,7 @@ describe('generateYAML', () => {
       externalDbHost: 'external-host',
       externalDbPort: '5432'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     expect(yaml).toContain('services:');
     expect(yaml).toContain('hagicode:');
@@ -473,7 +473,7 @@ describe('generateYAML', () => {
   it('should use fixed date when provided', () => {
     const config = createMockConfig();
     const fixedDate = new Date('2024-01-01T00:00:00Z');
-    const yaml = generateYAML(config, 'zh-CN', fixedDate);
+    const yaml = generateYAML(config, undefined, 'zh-CN', fixedDate);
 
     expect(yaml).toContain('2024/1/1');
   });

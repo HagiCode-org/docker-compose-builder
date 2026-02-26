@@ -21,7 +21,7 @@ import {
 describe('Quick Start Profiles - Complete File Verification with YAML Parsing', () => {
   it('should generate valid YAML structure for default quick start config (zh-CN)', async () => {
     const config = createQuickStartConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 使用 js-yaml 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -62,7 +62,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for default quick start config (en-US)', async () => {
     const config = createQuickStartConfig();
-    const yaml = generateYAML(config, 'en-US', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'en-US', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -84,7 +84,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for ZAI provider (zh-CN)', async () => {
     const config = createZaiProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -106,7 +106,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for Anthropic provider (zh-CN)', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -129,7 +129,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     const config = createCustomProviderConfig({
       anthropicUrl: 'https://custom-api.example.com'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -151,7 +151,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should parse YAML correctly and validate service dependencies', async () => {
     const config = createQuickStartConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = validateDockerComposeStructure(yaml);
     expect(parsed.valid).toBe(true);
@@ -166,7 +166,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should validate network configuration', async () => {
     const config = createQuickStartConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = validateDockerComposeStructure(yaml);
     expect(parsed.valid).toBe(true);
@@ -185,7 +185,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
   it('should validate restart policy', async () => {
     const config = createQuickStartConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = validateDockerComposeStructure(yaml);
     expect(parsed.valid).toBe(true);

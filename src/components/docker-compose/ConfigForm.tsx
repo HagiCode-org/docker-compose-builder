@@ -2,7 +2,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
-import type { ProviderPreset } from '@/lib/docker-compose/providerConfigLoader';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

@@ -23,7 +23,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       volumeType: 'named',
       volumeName: 'postgres-data'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -54,7 +54,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       volumeType: 'named',
       volumeName: 'postgres-data'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -83,7 +83,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       volumeType: 'named',
       volumeName: 'postgres-data'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -113,7 +113,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       externalDbHost: 'external-postgres.example.com',
       externalDbPort: '5432'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -146,7 +146,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       puid: '1000',
       pgid: '1000'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -179,7 +179,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       volumeType: 'bind',
       volumePath: 'C:\\\\data\\\\postgres'
     });
-    const windowsYaml = generateYAML(windowsConfig, 'zh-CN', FIXED_DATE);
+    const windowsYaml = generateYAML(windowsConfig, undefined, 'zh-CN', FIXED_DATE);
 
     const windowsValidation = validateDockerComposeStructure(windowsYaml);
     expect(windowsValidation.valid).toBe(true);
@@ -194,7 +194,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
       volumeType: 'bind',
       volumePath: '/mnt/data/postgres'
     });
-    const linuxYaml = generateYAML(linuxConfig, 'zh-CN', FIXED_DATE);
+    const linuxYaml = generateYAML(linuxConfig, undefined, 'zh-CN', FIXED_DATE);
 
     const linuxValidation = validateDockerComposeStructure(linuxYaml);
     expect(linuxValidation.valid).toBe(true);

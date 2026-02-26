@@ -15,7 +15,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createQuickStartConfig();
 
       // When: generating YAML
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then: output should contain required sections
       expect(result).toContain('services:');
@@ -31,7 +31,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createQuickStartConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('ASPNETCORE_ENVIRONMENT: Production');
@@ -48,7 +48,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then: default Linux path should be used
       expect(result).toContain('- /home/user/repos:/app/workdir');
@@ -61,7 +61,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).not.toContain('PUID:');
@@ -75,7 +75,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createZaiProviderConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('# Zhipu AI (ZAI)');
@@ -90,7 +90,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createAnthropicProviderConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('# Anthropic Official API');
@@ -107,7 +107,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('# Custom Anthropic-compatible API');
@@ -122,7 +122,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createQuickStartConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('# 支持信息');
@@ -134,7 +134,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const config = createQuickStartConfig();
 
       // When
-      const result = generateYAML(config, 'en-US', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'en-US', FIXED_DATE);
 
       // Then
       expect(result).toContain('# Support Information');

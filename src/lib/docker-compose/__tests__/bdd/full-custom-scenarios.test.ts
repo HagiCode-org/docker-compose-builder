@@ -15,7 +15,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       const config = createWindowsConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- C:\\\\repos:/app/workdir');
@@ -30,7 +30,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- C:\\\\data\\\\postgres:/bitnami/postgresql');
@@ -46,7 +46,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).not.toContain('PUID:');
@@ -61,7 +61,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /home/user/repos:/app/workdir');
@@ -74,7 +74,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       const config = createLinuxNonRootConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('PUID: 1000');
@@ -86,7 +86,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       const config = createLinuxNonRootConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('environment:');
@@ -105,7 +105,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('volumes:');
@@ -121,7 +121,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- custom-postgres-vol:/bitnami/postgresql');
@@ -139,7 +139,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then - hagicode_data is always present, but postgres-data is not for bind mounts
       expect(result).toContain('\nvolumes:');
@@ -156,7 +156,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /custom/data/postgres:/bitnami/postgresql');
@@ -169,7 +169,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       const config = createExternalDbConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('hagicode:');
@@ -184,7 +184,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('ConnectionStrings__Default: "Host=external-db.example.com;Port=5433');
@@ -195,7 +195,7 @@ describe('Docker Compose Generation: Full Custom Profile', () => {
       const config = createExternalDbConfig();
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then - hagicode_data is always present, but postgres-data should not be for external db
       expect(result).toContain('\nvolumes:');

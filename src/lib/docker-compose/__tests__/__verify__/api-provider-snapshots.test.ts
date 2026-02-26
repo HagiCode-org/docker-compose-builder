@@ -18,7 +18,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     const config = createAnthropicProviderConfig({
       anthropicAuthToken: 'sk-ant-test-key'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -43,7 +43,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     const config = createZaiProviderConfig({
       anthropicAuthToken: 'test-zai-key'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -70,7 +70,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
       anthropicAuthToken: 'custom-api-key',
       anthropicUrl: 'https://custom-ai-proxy.example.com/v1'
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
@@ -94,7 +94,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
 
   it('should validate that YAML can be parsed without errors', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     // 验证可以解析且没有错误
     expect(() => parseDockerComposeYAML(yaml)).not.toThrow();
@@ -107,7 +107,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
 
   it('should validate environment variable types', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);
     const env = parsed.services.hagicode.environment;
@@ -123,7 +123,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
 
   it('should validate ports array structure', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);
     const ports = parsed.services.hagicode.ports;
@@ -141,7 +141,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
 
   it('should validate volumes array structure', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);
     const volumes = parsed.services.hagicode.volumes;
@@ -159,7 +159,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
 
   it('should validate networks structure', async () => {
     const config = createAnthropicProviderConfig();
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);
     const networks = parsed.networks;
@@ -177,7 +177,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     const config = createZaiProviderConfig({
       databaseType: 'internal' // 明确设置内部 PostgreSQL 以测试 postgres healthcheck
     });
-    const yaml = generateYAML(config, 'zh-CN', FIXED_DATE);
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const parsed = parseDockerComposeYAML(yaml);
     const healthcheck = parsed.services.postgres.healthcheck;

@@ -12,7 +12,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /home/user/repos:/app/workdir');
@@ -27,7 +27,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- postgres-data:/bitnami/postgresql');
@@ -44,7 +44,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /data/postgres:/bitnami/postgresql');
@@ -59,7 +59,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- "1:45000"');
@@ -72,7 +72,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- "65535:45000"');
@@ -85,7 +85,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- "80:45000"');
@@ -98,7 +98,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- "443:45000"');
@@ -117,7 +117,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- C:\\\\My\\\\Projects:/app/workdir');
@@ -135,7 +135,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /var/projects:/app/workdir');
@@ -150,7 +150,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('- /home/user/my-projects_2024:/app/workdir');
@@ -166,7 +166,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('POSTGRES_PASSWORD: P@ssw0rd!#$%');
@@ -180,7 +180,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('ANTHROPIC_AUTH_TOKEN: "sk-ant-api123_ABC-DEF.xyz"');
@@ -193,7 +193,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('License__Activation__LicenseKey: "ABCD-1234-EFGH-5678"');
@@ -208,7 +208,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('container_name: hagicode-2024-prod');
@@ -221,7 +221,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('container_name: hagicode_prod_v1');
@@ -238,7 +238,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('image: newbe36524/hagicode:v1.2.3');
@@ -254,7 +254,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:v2.0.0');
@@ -270,7 +270,7 @@ describe('Docker Compose Generation: Edge Cases', () => {
       });
 
       // When
-      const result = generateYAML(config, 'zh-CN', FIXED_DATE);
+      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
       expect(result).toContain('image: hagicode.azurecr.io/hagicode:latest');
