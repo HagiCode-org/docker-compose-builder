@@ -71,7 +71,7 @@ function getProviderDisplayName(providerId: string, providerConfig?: ProviderPre
  * @param providerConfig Optional provider configuration
  * @returns The provider description
  */
-function getProviderDescription(providerId: string, providerConfig?: ProviderPreset): string | null {
+function getProviderDescription(_providerId: string, providerConfig?: ProviderPreset): string | null {
   if (providerConfig && providerConfig.description) {
     return providerConfig.description;
   }

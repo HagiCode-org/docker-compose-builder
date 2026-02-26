@@ -245,7 +245,7 @@ export class ProviderConfigLoader {
     results.forEach((result, index) => {
       if (result.status === 'fulfilled' && result.value) {
         validPresets.push(result.value);
-      } else {
+      } else if (result.status === 'rejected') {
         console.warn(`[ProviderConfigLoader] Failed to fetch provider ${knownProviders[index]}:`, result.reason);
       }
     });
@@ -294,25 +294,33 @@ export class ProviderConfigLoader {
       throw new Error(`Invalid provider data ${data.providerId}: missing or invalid name`);
     }
 
-    if (!data.apiUrl || typeof data.apiUrl !== 'object' || !data.apiUrl.codingPlanForAnthropic) {
+    if (!data.apiUrl || typeof data.apiUrl !== 'object') {
       throw new Error(`Invalid provider data ${data.providerId}: missing or invalid apiUrl`);
     }
+
+    const apiUrl = data.apiUrl as Record<string, unknown>;
+    if (!apiUrl.codingPlanForAnthropic) {
+      throw new Error(`Invalid provider data ${data.providerId}: missing or invalid apiUrl.codingPlanForAnthropic`);
+    }
+
+    // Extract defaultModels with proper typing
+    const defaultModels = (data.defaultModels || {}) as Record<string, unknown>;
 
     // Construct provider preset with defaults for optional fields
     return {
       providerId: data.providerId as string,
       name: data.name as string,
-      description: data.description as string || '',
-      category: data.category as string || 'other',
+      description: (data.description as string) || '',
+      category: (data.category as string) || 'other',
       apiUrl: {
-        codingPlanForAnthropic: (data.apiUrl as Record<string, string>).codingPlanForAnthropic
+        codingPlanForAnthropic: (apiUrl.codingPlanForAnthropic as string)
       },
       recommended: data.recommended === true,
       region: data.region as string | undefined,
       defaultModels: {
-        sonnet: data.defaultModels?.sonnet as string | null ?? null,
-        opus: data.defaultModels?.opus as string | null ?? null,
-        haiku: data.defaultModels?.haiku as string | null ?? null
+        sonnet: (defaultModels.sonnet as string | null) ?? null,
+        opus: (defaultModels.opus as string | null) ?? null,
+        haiku: (defaultModels.haiku as string | null) ?? null
       },
       supportedModels: Array.isArray(data.supportedModels) ? data.supportedModels as string[] : undefined,
       features: Array.isArray(data.features) ? data.features as string[] : undefined,

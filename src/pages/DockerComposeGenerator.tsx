@@ -1,7 +1,6 @@
 import { ConfigForm } from '@/components/docker-compose/ConfigForm';
 import { ConfigPreview } from '@/components/docker-compose/ConfigPreview';
 import { NavigationLinks } from '@/components/Header/NavigationLinks';
-import PromoBanner from '@/components/PromoBanner';
 import { useTranslation } from 'react-i18next';
 import { Dock } from 'lucide-react';
 
