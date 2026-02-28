@@ -1,6 +1,6 @@
 import type { DockerComposeConfig } from './types';
 import type { ProviderPreset } from './providerConfigLoader';
-import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL } from './types';
+import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL, VOLCENGINE_API_URL } from './types';
 
 /**
  * Get provider API URL for Docker Compose generation
@@ -36,6 +36,8 @@ function getProviderApiUrl(
       return ZAI_API_URL;
     case 'aliyun':
       return ALIYUN_API_URL;
+    case 'volcengine':
+      return VOLCENGINE_API_URL;
     default:
       return null;
   }
@@ -60,6 +62,8 @@ function getProviderDisplayName(providerId: string, providerConfig?: ProviderPre
       return 'Custom Endpoint';
     case 'minimax':
       return 'MiniMax';
+    case 'volcengine':
+      return '火山引擎 Coding Plan';
     default:
       return providerConfig?.name || providerId;
   }
@@ -118,6 +122,15 @@ function buildProviderEnvVars(
     lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
     lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
     lines.push('      # API Provider: Aliyun DashScope');
+    lines.push('      # Model mapping (unified configuration):');
+    lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
+    lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
+    lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+  } else if (providerId === 'volcengine') {
+    lines.push('      # 火山引擎 Coding Plan - uses Anthropic-compatible API');
+    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    lines.push('      # API Provider: 火山引擎 Coding Plan');
     lines.push('      # Model mapping (unified configuration):');
     lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
     lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
