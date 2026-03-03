@@ -1,0 +1,62 @@
+version: "1.0"
+name: "docker-compose-builder-web"
+displayName: "Docker Compose Builder Web"
+description: "Web interface for Docker Compose builder with API endpoints and frontend services"
+indexedAt: "2026-03-03"
+generatedBy: "claude-code"
+
+quickRef:
+  catalogs:
+    - id: "entryPoints"
+      title: "Entry Points"
+      desc: "Main entry points for the application"
+    - id: "configFiles"
+      title: "Config Files"
+      desc: "Key configuration files"
+    - id: "directories"
+      title: "Directories"
+      desc: "Important directory structure"
+    - id: "features"
+      title: "Feature Modules"
+      desc: "Main feature modules of the project"
+
+  entryPoints:
+    - title: "Web Entry Point"
+      desc: "Application web entry"
+      path: "index.html"
+
+  configFiles:
+    - title: "Vite Configuration"
+      desc: "Vite build configuration"
+      path: "vite.config.ts"
+    - title: "Package Configuration"
+      desc: "NPM package dependencies"
+      path: "package.json"
+    - title: "Tailwind Configuration"
+      desc: "Tailwind CSS styling configuration"
+      path: "tailwind.config.js"
+    - title: "Verify Configuration"
+      desc: "Build verification settings"
+      path: "verify.config.json"
+
+  directories:
+    - title: "Source Code"
+      desc: "Application source code"
+      path: "src"
+    - title: "Public Assets"
+      desc: "Static assets"
+      path: "public"
+    - title: "Build Tools"
+      desc: "Build and packaging tools"
+      path: "buildTools"
+
+  features:
+    - title: "Docker Compose Builder"
+      desc: "Docker Compose file generation"
+      path: "src"
+    - title: "Web Interface"
+      desc: "User interface for builder"
+      path: "src/components"
+    - title: "API Integration"
+      desc: "Backend API communication"
+      path: "src/services"
