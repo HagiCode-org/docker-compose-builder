@@ -2,7 +2,7 @@ version: "1.0"
 name: "docker-compose-builder-web"
 displayName: "Docker Compose Builder Web"
 description: "Docker Compose 配置生成器 - React 19 + Redux Toolkit + Tailwind CSS 4"
-indexedAt: "2026-03-04"
+indexedAt: "2026-03-05"
 generatedBy: "claude-code"
 
 quickRef:
