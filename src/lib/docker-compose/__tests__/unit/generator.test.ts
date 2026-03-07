@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   buildHeader,
   buildAppService,
+  buildCaddyService,
+  buildCaddyfile,
   buildPostgresService,
   buildServicesSection,
   buildVolumesSection,
@@ -263,6 +265,19 @@ describe('buildAppService', () => {
     expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
   });
 
+  it('should hide app public port mapping when HTTPS is enabled', () => {
+    const config = createMockConfig({
+      enableHttps: true,
+      httpsPort: '443',
+      lanIp: '192.168.1.100',
+    });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appServiceStr).not.toContain('ports:');
+    expect(appServiceStr).not.toContain('"8080:45000"');
+  });
+
   // Runtime Provider tests
   describe('Runtime Provider', () => {
     it('should output ANTHROPIC_* variables when runtimeProvider is claude', () => {
@@ -337,6 +352,48 @@ describe('buildAppService', () => {
 
       expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
     });
+  });
+});
+
+describe('HTTPS proxy generation', () => {
+  it('should build Caddy service when HTTPS is enabled', () => {
+    const config = createMockConfig({
+      enableHttps: true,
+      httpsPort: '8443',
+      lanIp: '192.168.1.100',
+    });
+    const lines = buildCaddyService(config).join('\n');
+
+    expect(lines).toContain('https-proxy:');
+    expect(lines).toContain('image: caddy:2-alpine');
+    expect(lines).toContain('"8443:443"');
+    expect(lines).toContain('caddy_data:/data');
+  });
+
+  it('should generate Caddyfile with tls internal and reverse proxy', () => {
+    const config = createMockConfig({
+      enableHttps: true,
+      httpsPort: '443',
+      lanIp: '192.168.1.100',
+    });
+    const caddyfile = buildCaddyfile(config);
+
+    expect(caddyfile).toContain('tls internal');
+    expect(caddyfile).toContain('reverse_proxy hagicode:45000');
+    expect(caddyfile).toContain('redir https://{host}{uri} permanent');
+  });
+
+  it('should include Caddy service and Caddy volumes in generated YAML', () => {
+    const config = createMockConfig({
+      enableHttps: true,
+      httpsPort: '443',
+      lanIp: '192.168.1.100',
+    });
+    const yaml = generateYAML(config);
+
+    expect(yaml).toContain('https-proxy:');
+    expect(yaml).toContain('caddy_data:');
+    expect(yaml).toContain('caddy_config:');
   });
 });
 
@@ -510,8 +567,7 @@ describe('buildVolumesSection', () => {
 
 describe('buildNetworksSection', () => {
   it('should generate networks section', () => {
-    const config = createMockConfig();
-    const networks = buildNetworksSection(config);
+    const networks = buildNetworksSection();
     const networksStr = networks.join('\n');
 
     expect(networksStr).toContain('networks:');

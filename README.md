@@ -8,11 +8,13 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 - **Docker Compose YAML Generation**: Automatic YAML file generation based on user input
 - **Multiple Database Options**: Support for internal PostgreSQL or external database connections
 - **API Provider Configuration**: Choose from Anthropic, Zhipu AI, or custom API endpoints
+- **LAN HTTPS Support**: Optional Caddy reverse proxy with `tls internal`
 - **Volume Management**: Configure volume mounts for data persistence
 - **User Permissions**: Linux user permission mapping (PUID/PGID) support
 - **Responsive Design**: Works on both desktop and mobile devices
 - **Local Storage Persistence**: Configuration saved to localStorage for convenience
 - **One-Click Copy/Download**: Copy generated YAML to clipboard or download as file
+- **Caddyfile Copy Workflow**: Preview and copy Caddyfile (no file download)
 - **SEO Optimized**: Full search engine optimization with meta tags, Open Graph, Twitter Cards, and structured data
 - **Multi-language Support**: Internationalization (i18n) with English and Chinese support
 
@@ -137,6 +139,13 @@ The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.
 - **Work Directory**: Path to your code repository
 - **Root User Warning**: Detection and warning for root-owned directories
 - **User Permission Mapping**: PUID/PGID configuration for Linux
+
+#### HTTPS (Full Custom mode only)
+- **Enable HTTPS Proxy**: Toggle Caddy reverse proxy generation
+- **HTTPS Port**: Default `443`, supports custom ports
+- **LAN IP Address**: Used for generated Caddy listener
+- **Caddyfile Preview + Copy**: Copy content and save as `Caddyfile` alongside `docker-compose.yml`
+- **Guide**: See `docs/https-certificate-guide.md`
 
 ## Generated Docker Compose File
 

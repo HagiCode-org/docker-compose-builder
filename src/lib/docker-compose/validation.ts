@@ -1,4 +1,5 @@
 import type { DockerComposeConfig } from './types';
+import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
 
 /**
  * Validation errors interface
@@ -21,6 +22,24 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     errors.push({ field: 'httpPort', message: 'HTTP port must be a valid number' });
   } else if (parseInt(config.httpPort) < 1 || parseInt(config.httpPort) > 65535) {
     errors.push({ field: 'httpPort', message: 'HTTP port must be between 1 and 65535' });
+  }
+
+  // Validate HTTPS configuration
+  if (config.enableHttps) {
+    if (!config.httpsPort || Number.isNaN(parseInt(config.httpsPort))) {
+      errors.push({ field: 'httpsPort', message: 'HTTPS port must be a valid number' });
+    } else if (parseInt(config.httpsPort) < 1 || parseInt(config.httpsPort) > 65535) {
+      errors.push({ field: 'httpsPort', message: 'HTTPS port must be between 1 and 65535' });
+    }
+
+    const parsedLanIp = parseHostWithOptionalPort(config.lanIp || '');
+    if (!parsedLanIp) {
+      errors.push({ field: 'lanIp', message: 'LAN IP must be a valid IPv4/IPv6 address' });
+    }
+
+    if (hasPortConflict(config.httpPort, config.httpsPort)) {
+      errors.push({ field: 'httpsPort', message: 'HTTPS port cannot be the same as HTTP port' });
+    }
   }
 
   // Validate container name

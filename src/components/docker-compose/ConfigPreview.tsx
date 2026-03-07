@@ -2,6 +2,9 @@ import { useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectConfig, selectProviderById } from '@/lib/docker-compose/slice';
 import { generateYAML } from '@/lib/docker-compose/generator';
+import { copyToClipboard, downloadComposeYaml } from '@/lib/docker-compose/exportUtils';
+import { validateConfig } from '@/lib/docker-compose/validation';
+import type { RootState } from '@/lib/store';
 import { SyntaxHighlighter } from '@/components/ui/syntax-highlighter';
 import { Button } from '@/components/ui/button';
 import { Copy, Download, Check, FileCode } from 'lucide-react';
@@ -16,14 +19,16 @@ export function ConfigPreview() {
   const [copied, setCopied] = useState(false);
 
   // Get provider configuration for YAML generation
-  const providerConfig = useSelector((state: any) => selectProviderById(state, config.anthropicApiProvider));
+  const providerConfig = useSelector((state: RootState) => selectProviderById(state, config.anthropicApiProvider));
 
   const yaml = useMemo(() => generateYAML(config, providerConfig, i18n.language), [config, providerConfig, i18n.language]);
+  const validationErrors = useMemo(() => validateConfig(config), [config]);
+  const exportDisabled = validationErrors.length > 0;
   const darkMode = theme === 'dark';
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(yaml);
+      await copyToClipboard(yaml);
       setCopied(true);
       toast.success(t('configPreview.yamlCopiedSuccess'));
       setTimeout(() => setCopied(false), 2000);
@@ -34,15 +39,11 @@ export function ConfigPreview() {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([yaml], { type: 'text/yaml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'docker-compose.yml';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    if (exportDisabled) {
+      toast.error(t('configPreview.invalidConfigCannotExport'));
+      return;
+    }
+    downloadComposeYaml(yaml);
     toast.success(t('configPreview.downloadSuccess'));
   };
 
@@ -63,6 +64,7 @@ export function ConfigPreview() {
             size="sm"
             variant="secondary"
             onClick={handleCopy}
+            disabled={exportDisabled}
             className="flex items-center gap-2 hover:bg-accent transition-colors duration-200"
           >
             {copied ? (
@@ -77,6 +79,7 @@ export function ConfigPreview() {
           <Button
             size="sm"
             onClick={handleDownload}
+            disabled={exportDisabled}
             className="flex items-center gap-2 hover:opacity-90 transition-opacity duration-200"
           >
             <Download className="w-4 h-4" />
@@ -117,6 +120,11 @@ export function ConfigPreview() {
       <div className="text-xs text-muted-foreground space-y-1 px-1">
         <p>{t('configPreview.generatedAt')} {new Date().toLocaleString()}</p>
         <p>{t('configPreview.basedOnSettings')}</p>
+        {exportDisabled && (
+          <p className="text-amber-600 dark:text-amber-400">
+            {t('configPreview.invalidConfigCannotExport')}
+          </p>
+        )}
       </div>
     </div>
   );

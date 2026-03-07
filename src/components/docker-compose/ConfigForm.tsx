@@ -2,16 +2,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile, RuntimeProvider } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
+import type { RootState } from '@/lib/store';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { HttpsConfigPanel } from '@/components/docker-compose/HttpsConfigPanel';
 import { Settings, Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NAVIGATION_LINKS } from '@/config/navigationLinks';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { validateConfig } from '@/lib/docker-compose/validation';
 
 export function ConfigForm() {
   const { t } = useTranslation();
@@ -21,14 +24,14 @@ export function ConfigForm() {
   const providersLoading = useSelector(selectProvidersLoading);
   const providersError = useSelector(selectProvidersError);
 
-  const updateConfig = <K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => {
+  const updateConfig = useCallback(<K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => {
     dispatch(setConfigField({ field, value }));
-  };
+  }, [dispatch]);
 
   // Get current provider from state
-  const currentProvider = useMemo(() => {
-    return selectProviderById({ dockerCompose: { config, providers, isLoading: false, error: null, providersLoading, providersError } }, config.anthropicApiProvider);
-  }, [config.anthropicApiProvider, providers, providersLoading, providersError]);
+  const currentProvider = useSelector((state: RootState) =>
+    selectProviderById(state, config.anthropicApiProvider)
+  );
 
   // Initialize provider if not set and providers are loaded
   useEffect(() => {
@@ -39,6 +42,11 @@ export function ConfigForm() {
       }
     }
   }, [providersLoading, providers, config.anthropicApiProvider, updateConfig]);
+
+  const validationMap = useMemo(() => {
+    const entries = validateConfig(config).map((error) => [error.field, error.message] as const);
+    return Object.fromEntries(entries);
+  }, [config]);
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
@@ -218,6 +226,14 @@ export function ConfigForm() {
           </div>
         </div>
       </div>
+
+      {config.profile === 'full-custom' && (
+        <HttpsConfigPanel
+          config={config}
+          updateConfig={updateConfig}
+          validationErrors={validationMap}
+        />
+      )}
 
       {/* AI Provider Configuration */}
       <div className="space-y-4">

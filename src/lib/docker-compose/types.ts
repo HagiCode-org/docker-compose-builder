@@ -113,6 +113,9 @@ export interface DockerComposeConfig {
 
   // Basic settings
   httpPort: string;
+  enableHttps: boolean;
+  httpsPort: string;
+  lanIp: string;
   containerName: string;
   imageTag: string;
   hostOS: HostOS;

@@ -56,6 +56,54 @@ describe('validateConfig', () => {
     });
   });
 
+  describe('HTTPS validation', () => {
+    it('should accept valid HTTPS configuration', () => {
+      const config = createMockConfig({
+        enableHttps: true,
+        httpsPort: '443',
+        lanIp: '192.168.1.100',
+      });
+      const errors = validateConfig(config);
+
+      const httpsErrors = errors.filter(e => e.field === 'httpsPort' || e.field === 'lanIp');
+      expect(httpsErrors).toHaveLength(0);
+    });
+
+    it('should reject invalid HTTPS port', () => {
+      const config = createMockConfig({
+        enableHttps: true,
+        httpsPort: '70000',
+      });
+      const errors = validateConfig(config);
+
+      const httpsErrors = errors.filter(e => e.field === 'httpsPort');
+      expect(httpsErrors.length).toBeGreaterThan(0);
+    });
+
+    it('should reject invalid LAN IP', () => {
+      const config = createMockConfig({
+        enableHttps: true,
+        lanIp: 'not-ip',
+      });
+      const errors = validateConfig(config);
+
+      const ipErrors = errors.filter(e => e.field === 'lanIp');
+      expect(ipErrors).toHaveLength(1);
+    });
+
+    it('should reject when HTTPS port equals HTTP port', () => {
+      const config = createMockConfig({
+        enableHttps: true,
+        httpPort: '45000',
+        httpsPort: '45000',
+      });
+      const errors = validateConfig(config);
+
+      const httpsErrors = errors.filter(e => e.field === 'httpsPort');
+      expect(httpsErrors.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('Container name validation', () => {
     it('should accept valid container name', () => {
       const config = createMockConfig({ containerName: 'hagicode' });

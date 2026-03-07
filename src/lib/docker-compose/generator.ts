@@ -306,8 +306,10 @@ export function buildAppService(
     }
   }
 
-  lines.push('    ports:');
-  lines.push(`      - "${config.httpPort}:45000"`);
+  if (!config.enableHttps) {
+    lines.push('    ports:');
+    lines.push(`      - "${config.httpPort}:45000"`);
+  }
   lines.push('    volumes:');
 
   // Work directory mapping
@@ -331,6 +333,85 @@ export function buildAppService(
     lines.push('        condition: service_healthy');
   }
 
+  lines.push('    networks:');
+  lines.push('      - pcode-network');
+  lines.push('    restart: unless-stopped');
+
+  return lines;
+}
+
+/**
+ * Build Caddyfile content for LAN HTTPS reverse proxy
+ * @param config The configuration object
+ * @returns Caddyfile content as string
+ */
+export function buildCaddyfile(config: DockerComposeConfig): string {
+  const host = config.lanIp || '127.0.0.1';
+  const httpsPort = config.httpsPort || '443';
+  const httpsListener = httpsPort === '443' ? host : `${host}:${httpsPort}`;
+
+  const lines = [
+    '# Auto-generated Caddyfile for Hagicode HTTPS',
+    '# Copy this content to ./Caddyfile next to docker-compose.yml',
+    '',
+    `${httpsListener} {`,
+    '  tls internal',
+    '',
+    '  handle /health {',
+    '    respond "OK" 200',
+    '  }',
+    '',
+    '  reverse_proxy hagicode:45000 {',
+    '    header_up Host {host}',
+    '    header_up X-Forwarded-For {remote_host}',
+    '    header_up X-Forwarded-Proto {scheme}',
+    '  }',
+    '}',
+    ''
+  ];
+
+  if (httpsPort === '443') {
+    lines.push('http://{host} {');
+    lines.push('  redir https://{host}{uri} permanent');
+    lines.push('}');
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Build Caddy reverse proxy service configuration
+ * @param config The configuration object
+ * @returns Array of Caddy service configuration lines
+ */
+export function buildCaddyService(config: DockerComposeConfig): string[] {
+  const lines: string[] = [];
+
+  lines.push('');
+  lines.push('  https-proxy:');
+  lines.push('    image: caddy:2-alpine');
+  lines.push('    container_name: https-proxy');
+  lines.push('    ports:');
+  lines.push(`      - "${config.httpsPort}:443"`);
+  if ((config.httpsPort || '443') === '443') {
+    lines.push('      - "80:80"');
+  }
+  lines.push('    volumes:');
+  lines.push('      - ./Caddyfile:/etc/caddy/Caddyfile:ro');
+  lines.push('      - caddy_data:/data');
+  lines.push('      - caddy_config:/config');
+  lines.push('    depends_on:');
+  lines.push('      - hagicode');
+  lines.push('    healthcheck:');
+  lines.push('      test: ["CMD-SHELL", "wget --spider --no-check-certificate https://localhost:443/health || exit 1"]');
+  lines.push('      interval: 30s');
+  lines.push('      timeout: 10s');
+  lines.push('      retries: 3');
+  lines.push('    logging:');
+  lines.push('      options:');
+  lines.push('        max-size: "10m"');
+  lines.push('        max-file: "3"');
   lines.push('    networks:');
   lines.push('      - pcode-network');
   lines.push('    restart: unless-stopped');
@@ -404,6 +485,11 @@ export function buildServicesSection(
   const appServiceLines = buildAppService(config, providerConfig);
   lines.push(...appServiceLines);
 
+  if (config.enableHttps) {
+    const caddyServiceLines = buildCaddyService(config);
+    lines.push(...caddyServiceLines);
+  }
+
   // Add internal PostgreSQL service if needed
   if (config.databaseType === 'internal') {
     const postgresServiceLines = buildPostgresService(config);
@@ -430,6 +516,11 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
   // claude-data is always present (persists Claude Code configuration, session history, and plugins)
   lines.push('  claude-data:');
 
+  if (config.enableHttps) {
+    lines.push('  caddy_data:');
+    lines.push('  caddy_config:');
+  }
+
   // postgres-data volume only for internal PostgreSQL
   if (config.databaseType === 'internal' && config.volumeType === 'named') {
     const volName = config.volumeName || 'postgres-data';
@@ -441,10 +532,9 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
 
 /**
  * Build networks section
- * @param _config The configuration object (unused but kept for consistency)
  * @returns Array of networks section lines
  */
-export function buildNetworksSection(_config: DockerComposeConfig): string[] {
+export function buildNetworksSection(): string[] {
   const lines: string[] = [];
 
   lines.push('');
@@ -484,7 +574,7 @@ export function generateYAML(
   lines.push(...volumesLines);
 
   // Build networks section
-  const networksLines = buildNetworksSection(config);
+  const networksLines = buildNetworksSection();
   lines.push(...networksLines);
 
   return lines.join('\n');
