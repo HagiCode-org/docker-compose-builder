@@ -40,14 +40,26 @@ describe('buildHeader', () => {
 });
 
 describe('buildAppService', () => {
-  it('should generate app service with default registry', () => {
-    const config = createMockConfig({ imageRegistry: 'docker-hub' });
+  it('should generate app service with ClaudeCodeCli as default provider', () => {
+    const config = createMockConfig({ runtimeProvider: 'claude', imageRegistry: 'docker-hub' });
     const appService = buildAppService(config);
     const appServiceStr = appService.join('\n');
 
     expect(appService).toContain('  hagicode:');
     expect(appServiceStr).toContain('image: newbe36524/hagicode:0');
     expect(appServiceStr).toContain('container_name: hagicode');
+    expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "ClaudeCodeCli"');
+  });
+
+  it('should generate app service with CodexCli as default provider', () => {
+    const config = createMockConfig({ runtimeProvider: 'codex', imageRegistry: 'docker-hub' });
+    const appService = buildAppService(config);
+    const appServiceStr = appService.join('\n');
+
+    expect(appService).toContain('  hagicode:');
+    expect(appServiceStr).toContain('image: newbe36524/hagicode:0');
+    expect(appServiceStr).toContain('container_name: hagicode');
+    expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "CodexCli"');
   });
 
   it('should generate app service with Aliyun registry', () => {
@@ -249,6 +261,82 @@ describe('buildAppService', () => {
     expect(appServiceStr).toContain('ANTHROPIC_OPUS_MODEL: "claude-opus-4-20250514"');
     expect(appServiceStr).toContain('ANTHROPIC_HAIKU_MODEL: "claude-haiku-4-20250514"');
     expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
+  });
+
+  // Runtime Provider tests
+  describe('Runtime Provider', () => {
+    it('should output ANTHROPIC_* variables when runtimeProvider is claude', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'claude',
+        anthropicAuthToken: 'test-token',
+        codexApiKey: 'codex-key'
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('# Claude Runtime Configuration');
+      expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
+      expect(appServiceStr).not.toContain('CODEX_API_KEY');
+    });
+
+    it('should output CODEX_* variables when runtimeProvider is codex', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-codex-key',
+        codexBaseUrl: 'https://api.example.com',
+        anthropicAuthToken: 'test-token'
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('# Codex Runtime Configuration');
+      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
+      expect(appServiceStr).toContain('CODEX_BASE_URL: "https://api.example.com"');
+      expect(appServiceStr).toContain('# Compatibility alias: OPENAI_API_KEY = CODEX_API_KEY');
+      expect(appServiceStr).toContain('# Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+      expect(appServiceStr).not.toContain('ANTHROPIC_AUTH_TOKEN');
+    });
+
+    it('should output CODEX_* variables without base URL when not provided', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-codex-key',
+        codexBaseUrl: undefined
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
+      expect(appServiceStr).toContain('# CODEX_BASE_URL: optional, uses default if not set');
+      // Check that actual CODEX_BASE_URL env var is not set (only the comment)
+      expect(appServiceStr).not.toMatch(/^\s*CODEX_BASE_URL:.*$/m);
+    });
+
+    it('should not include Claude Code extended config for Codex provider', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-codex-key',
+        anthropicSonnetModel: 'claude-sonnet-4-20250514',
+        anthropicOpusModel: 'claude-opus-4-20250514'
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).not.toContain('ANTHROPIC_SONNET_MODEL:');
+      expect(appServiceStr).not.toContain('ANTHROPIC_OPUS_MODEL:');
+    });
+
+    it('should include Claude Code extended config for Claude provider', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'claude',
+        anthropicAuthToken: 'test-token',
+        anthropicSonnetModel: 'claude-sonnet-4-20250514'
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
+    });
   });
 });
 

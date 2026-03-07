@@ -10,6 +10,7 @@ export function createMockConfig(
 ): DockerComposeConfig {
   const defaults: DockerComposeConfig = {
     profile: 'quick-start',
+    runtimeProvider: 'claude',
     httpPort: '8080',
     containerName: 'hagicode',
     imageTag: '0',
@@ -28,6 +29,8 @@ export function createMockConfig(
     anthropicApiProvider: 'anthropic',
     anthropicAuthToken: 'test-token',
     anthropicUrl: '',
+    codexApiKey: '',
+    codexBaseUrl: undefined,
     workdirPath: '/home/user/repos',
     workdirCreatedByRoot: true,
     puid: '1000',

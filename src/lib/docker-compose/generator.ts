@@ -83,9 +83,10 @@ function getProviderDescription(_providerId: string, providerConfig?: ProviderPr
 }
 
 /**
- * Build provider environment variables for Claude API configuration
+ * Build provider environment variables based on runtime provider
+ * Supports both Claude and Codex runtime providers with mutually exclusive output
  * @param config The configuration object
- * @param providerConfig Optional provider configuration
+ * @param providerConfig Optional provider configuration (only for Claude)
  * @returns Array of provider environment variable lines
  */
 function buildProviderEnvVars(
@@ -94,67 +95,91 @@ function buildProviderEnvVars(
 ): string[] {
   const lines: string[] = [];
 
-  if (!config.anthropicAuthToken) {
-    return lines;
-  }
+  // Mutually exclusive output based on runtimeProvider
+  if (config.runtimeProvider === 'codex') {
+    // Codex runtime configuration
+    lines.push('      # ==================================================');
+    lines.push('      # Codex Runtime Configuration');
+    lines.push('      # Uses CODEX_* environment variables');
+    lines.push('      # OPENAI_* variables are accepted as compatibility aliases');
+    lines.push('      # ==================================================');
 
-  const providerId = config.anthropicApiProvider;
-  const apiUrl = getProviderApiUrl(providerId, providerConfig, config.anthropicUrl);
-
-  lines.push('      # ==================================================');
-  lines.push('      # Claude Code Configuration');
-  lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
-  lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
-  lines.push('      # ==================================================');
-
-  // Legacy behavior for backward compatibility with existing tests
-  if (providerId === 'anthropic') {
-    lines.push('      # Anthropic Official API');
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    lines.push('      # No ANTHROPIC_URL needed - uses default Anthropic endpoint');
-  } else if (providerId === 'zai') {
-    lines.push('      # Zhipu AI (ZAI) - uses Anthropic-compatible API');
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-    lines.push('      # API Provider: Zhipu AI (ZAI)');
-  } else if (providerId === 'aliyun') {
-    lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-    lines.push('      # API Provider: Aliyun DashScope');
-    lines.push('      # Model mapping (unified configuration):');
-    lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
-    lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
-    lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
-  } else if (providerId === 'volcengine') {
-    lines.push('      # 火山引擎 Coding Plan - uses Anthropic-compatible API');
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-    lines.push('      # API Provider: 火山引擎 Coding Plan');
-    lines.push('      # Model mapping (unified configuration):');
-    lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
-    lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
-    lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
-  } else if (providerId === 'custom') {
-    lines.push('      # Custom Anthropic-compatible API');
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    if (apiUrl) {
-      lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+    if (config.codexApiKey) {
+      lines.push(`      CODEX_API_KEY: "${config.codexApiKey}"`);
+      lines.push('      # Compatibility alias: OPENAI_API_KEY = CODEX_API_KEY');
     }
-    lines.push('      # API Provider: Custom Endpoint');
+
+    if (config.codexBaseUrl && config.codexBaseUrl.trim()) {
+      lines.push(`      CODEX_BASE_URL: "${config.codexBaseUrl}"`);
+      lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+    } else {
+      lines.push('      # CODEX_BASE_URL: optional, uses default if not set');
+      lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+    }
   } else {
-    // New providers from dynamic configuration
-    const displayName = getProviderDisplayName(providerId, providerConfig);
-    const description = getProviderDescription(providerId, providerConfig);
-    lines.push(`      # ${displayName} - uses Anthropic-compatible API`);
-    if (description) {
-      lines.push(`      # ${description}`);
+    // Claude runtime configuration (default)
+    if (!config.anthropicAuthToken) {
+      return lines;
     }
-    lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-    if (apiUrl) {
+
+    const providerId = config.anthropicApiProvider;
+    const apiUrl = getProviderApiUrl(providerId, providerConfig, config.anthropicUrl);
+
+    lines.push('      # ==================================================');
+    lines.push('      # Claude Runtime Configuration');
+    lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
+    lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
+    lines.push('      # ==================================================');
+
+    // Legacy behavior for backward compatibility with existing tests
+    if (providerId === 'anthropic') {
+      lines.push('      # Anthropic Official API');
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+      lines.push('      # No ANTHROPIC_URL needed - uses default Anthropic endpoint');
+    } else if (providerId === 'zai') {
+      lines.push('      # Zhipu AI (ZAI) - uses Anthropic-compatible API');
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
       lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+      lines.push('      # API Provider: Zhipu AI (ZAI)');
+    } else if (providerId === 'aliyun') {
+      lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+      lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+      lines.push('      # API Provider: Aliyun DashScope');
+      lines.push('      # Model mapping (unified configuration):');
+      lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
+      lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
+      lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+    } else if (providerId === 'volcengine') {
+      lines.push('      # 火山引擎 Coding Plan - uses Anthropic-compatible API');
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+      lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+      lines.push('      # API Provider: 火山引擎 Coding Plan');
+      lines.push('      # Model mapping (unified configuration):');
+      lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
+      lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
+      lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+    } else if (providerId === 'custom') {
+      lines.push('      # Custom Anthropic-compatible API');
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+      if (apiUrl) {
+        lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+      }
+      lines.push('      # API Provider: Custom Endpoint');
+    } else {
+      // New providers from dynamic configuration
+      const displayName = getProviderDisplayName(providerId, providerConfig);
+      const description = getProviderDescription(providerId, providerConfig);
+      lines.push(`      # ${displayName} - uses Anthropic-compatible API`);
+      if (description) {
+        lines.push(`      # ${description}`);
+      }
+      lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
+      if (apiUrl) {
+        lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
+      }
+      lines.push(`      # API Provider: ${displayName}`);
     }
-    lines.push(`      # API Provider: ${displayName}`);
   }
 
   return lines;
@@ -237,6 +262,10 @@ export function buildAppService(
   lines.push('      ASPNETCORE_URLS: http://+:45000');
   lines.push(`      TZ: ${config.timezone}`);
 
+  // Set default provider based on runtimeProvider
+  const defaultProvider = config.runtimeProvider === 'codex' ? 'CodexCli' : 'ClaudeCodeCli';
+  lines.push(`      AI__Providers__DefaultProvider: "${defaultProvider}"`);
+
   // Database connection string and provider
   if (config.databaseType === 'sqlite') {
     lines.push('      Database__Provider: sqlite');
@@ -257,22 +286,24 @@ export function buildAppService(
     lines.push(`      PGID: ${config.pgid}`);
   }
 
-  // Claude API Configuration
+  // Runtime provider configuration (Claude or Codex)
   const providerEnvVars = buildProviderEnvVars(config, providerConfig);
   lines.push(...providerEnvVars);
 
-  // Claude Code Extended Configuration (optional)
-  if (config.anthropicSonnetModel) {
-    lines.push(`      ANTHROPIC_SONNET_MODEL: "${config.anthropicSonnetModel}"`);
-  }
-  if (config.anthropicOpusModel) {
-    lines.push(`      ANTHROPIC_OPUS_MODEL: "${config.anthropicOpusModel}"`);
-  }
-  if (config.anthropicHaikuModel) {
-    lines.push(`      ANTHROPIC_HAIKU_MODEL: "${config.anthropicHaikuModel}"`);
-  }
-  if (config.claudeCodeExperimentalAgentTeams) {
-    lines.push(`      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "${config.claudeCodeExperimentalAgentTeams}"`);
+  // Claude Code Extended Configuration (only for Claude runtime)
+  if (config.runtimeProvider === 'claude') {
+    if (config.anthropicSonnetModel) {
+      lines.push(`      ANTHROPIC_SONNET_MODEL: "${config.anthropicSonnetModel}"`);
+    }
+    if (config.anthropicOpusModel) {
+      lines.push(`      ANTHROPIC_OPUS_MODEL: "${config.anthropicOpusModel}"`);
+    }
+    if (config.anthropicHaikuModel) {
+      lines.push(`      ANTHROPIC_HAIKU_MODEL: "${config.anthropicHaikuModel}"`);
+    }
+    if (config.claudeCodeExperimentalAgentTeams) {
+      lines.push(`      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "${config.claudeCodeExperimentalAgentTeams}"`);
+    }
   }
 
   lines.push('    ports:');

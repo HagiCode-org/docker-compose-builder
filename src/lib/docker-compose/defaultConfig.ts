@@ -2,6 +2,7 @@ import type { DockerComposeConfig } from './types';
 
 export const defaultConfig: DockerComposeConfig = {
   profile: 'quick-start',
+  runtimeProvider: 'claude',
   httpPort: '45000',
   containerName: 'hagicode-app',
   imageTag: '0',
@@ -21,6 +22,9 @@ export const defaultConfig: DockerComposeConfig = {
   anthropicApiProvider: 'zai',
   anthropicAuthToken: '',
   anthropicUrl: '',
+  // Codex Runtime Configuration (default to empty strings)
+  codexApiKey: '',
+  codexBaseUrl: undefined,
   workdirPath: '',
   workdirCreatedByRoot: false,
   puid: '1000',

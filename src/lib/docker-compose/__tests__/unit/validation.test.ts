@@ -251,19 +251,21 @@ describe('validateConfig', () => {
   });
 
   describe('Anthropic API validation', () => {
-    it('should require API token', () => {
+    it('should require API token for Claude provider', () => {
       const config = createMockConfig({
+        runtimeProvider: 'claude',
         anthropicAuthToken: ''
       });
       const errors = validateConfig(config);
 
       const tokenErrors = errors.filter(e => e.field === 'anthropicAuthToken');
       expect(tokenErrors).toHaveLength(1);
-      expect(tokenErrors[0].message).toContain('API token is required');
+      expect(tokenErrors[0].message).toContain('API token is required for Claude provider');
     });
 
-    it('should require API URL for custom provider', () => {
+    it('should require API URL for custom Claude provider', () => {
       const config = createMockConfig({
+        runtimeProvider: 'claude',
         anthropicApiProvider: 'custom',
         anthropicUrl: ''
       });
@@ -271,11 +273,12 @@ describe('validateConfig', () => {
 
       const urlErrors = errors.filter(e => e.field === 'anthropicUrl');
       expect(urlErrors).toHaveLength(1);
-      expect(urlErrors[0].message).toContain('API endpoint URL is required for custom provider');
+      expect(urlErrors[0].message).toContain('API endpoint URL is required for custom Claude provider');
     });
 
-    it('should not require API URL for Anthropic provider', () => {
+    it('should not require API URL for Anthropic Claude provider', () => {
       const config = createMockConfig({
+        runtimeProvider: 'claude',
         anthropicApiProvider: 'anthropic',
         anthropicUrl: ''
       });
@@ -283,6 +286,80 @@ describe('validateConfig', () => {
 
       const urlErrors = errors.filter(e => e.field === 'anthropicUrl');
       expect(urlErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Codex runtime provider validation', () => {
+    it('should require CODEX_API_KEY for Codex provider', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: ''
+      });
+      const errors = validateConfig(config);
+
+      const keyErrors = errors.filter(e => e.field === 'codexApiKey');
+      expect(keyErrors).toHaveLength(1);
+      expect(keyErrors[0].message).toContain('CODEX_API_KEY is required for Codex provider');
+    });
+
+    it('should accept valid Codex configuration with CODEX_BASE_URL', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-api-key',
+        codexBaseUrl: 'https://api.example.com/v1',
+        anthropicAuthToken: '' // Not required for Codex
+      });
+      const errors = validateConfig(config);
+
+      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
+      expect(codexErrors).toHaveLength(0);
+    });
+
+    it('should accept valid Codex configuration without CODEX_BASE_URL', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-api-key',
+        anthropicAuthToken: '' // Not required for Codex
+      });
+      const errors = validateConfig(config);
+
+      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
+      expect(codexErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Runtime provider switching validation', () => {
+    it('should validate only Codex fields when runtimeProvider is codex', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'codex',
+        codexApiKey: 'test-key',
+        anthropicAuthToken: '', // Should not be validated for Codex
+        anthropicApiProvider: 'custom',
+        anthropicUrl: '' // Should not be validated for Codex
+      });
+      const errors = validateConfig(config);
+
+      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
+      const claudeErrors = errors.filter(e => e.field.startsWith('anthropic'));
+
+      expect(codexErrors).toHaveLength(0);
+      expect(claudeErrors).toHaveLength(0);
+    });
+
+    it('should validate only Claude fields when runtimeProvider is claude', () => {
+      const config = createMockConfig({
+        runtimeProvider: 'claude',
+        anthropicAuthToken: 'test-token',
+        codexApiKey: '', // Should not be validated for Claude
+        codexBaseUrl: '' // Should not be validated for Claude
+      });
+      const errors = validateConfig(config);
+
+      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
+      const claudeErrors = errors.filter(e => e.field.startsWith('anthropic'));
+
+      expect(codexErrors).toHaveLength(0);
+      expect(claudeErrors).toHaveLength(0);
     });
   });
 

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
-import type { DockerComposeConfig, ConfigProfile } from '@/lib/docker-compose/types';
+import type { DockerComposeConfig, ConfigProfile, RuntimeProvider } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -219,6 +219,231 @@ export function ConfigForm() {
         </div>
       </div>
 
+      {/* AI Provider Configuration */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">{t('configForm.aiProviderConfig')}</h3>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="runtimeProvider">
+              {t('configForm.provider')} <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={config.runtimeProvider}
+              onValueChange={(value: RuntimeProvider) => updateConfig('runtimeProvider', value)}
+            >
+              <SelectTrigger id="runtimeProvider">
+                <SelectValue placeholder={t('configForm.selectProvider')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="claude">Claude</SelectItem>
+                <SelectItem value="codex">Codex</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Claude Configuration Subform */}
+          {config.runtimeProvider === 'claude' && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.claudeConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.unifiedUseOfToken')}
+              </p>
+
+              {/* Provider loading state */}
+              {providersLoading && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 bg-muted rounded-md">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Loading provider configurations...</span>
+                </div>
+              )}
+
+              {/* Provider error state */}
+              {providersError && (
+                <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded-md">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>Failed to load provider configurations: {providersError}</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="apiProvider">
+                    {t('configForm.apiProvider')} <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={config.anthropicApiProvider}
+                    onValueChange={(value: string) => {
+                      updateConfig('anthropicApiProvider', value);
+                      // Auto-set model defaults based on provider configuration
+                      const provider = providers.find(p => p.providerId === value);
+                      if (provider && provider.providerId !== 'custom') {
+                        // Apply model defaults from provider configuration
+                        if (provider.defaultModels.sonnet) {
+                          updateConfig('anthropicSonnetModel', provider.defaultModels.sonnet || undefined);
+                        }
+                        if (provider.defaultModels.opus) {
+                          updateConfig('anthropicOpusModel', provider.defaultModels.opus || undefined);
+                        }
+                        if (provider.defaultModels.haiku) {
+                          updateConfig('anthropicHaikuModel', provider.defaultModels.haiku || undefined);
+                        }
+                      } else {
+                        // Custom or no provider defaults - clear model defaults
+                        updateConfig('anthropicSonnetModel', undefined);
+                        updateConfig('anthropicOpusModel', undefined);
+                        updateConfig('anthropicHaikuModel', undefined);
+                      }
+                    }}
+                    disabled={providersLoading || providers.length === 0}
+                  >
+                    <SelectTrigger id="apiProvider">
+                      <SelectValue placeholder={t('configForm.selectApiProvider')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {providers.map((provider) => (
+                        <SelectItem key={provider.providerId} value={provider.providerId}>
+                          <div className="flex items-center gap-2">
+                            <span>{provider.name}</span>
+                            {provider.recommended && (
+                              <Badge variant="secondary">{t('common.recommended')}</Badge>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Referral link for current provider */}
+                  {currentProvider && currentProvider.referralUrl && currentProvider.providerId !== 'custom' && (
+                    <a
+                      href={currentProvider.referralUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>{t('configForm.getApiToken')}</span>
+                      <svg className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  {/* Custom API URL input - only show for custom provider */}
+                  {config.anthropicApiProvider === 'custom' && (
+                    <>
+                      <Label htmlFor="anthropicUrl">{t('configForm.apiEndpointUrl')} <span className="text-red-500">*</span></Label>
+                      <Input
+                        id="anthropicUrl"
+                        value={config.anthropicUrl}
+                        onChange={(e) => updateConfig('anthropicUrl', e.target.value)}
+                        placeholder="https://api.example.com/v1"
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="anthropicAuthToken">
+                  {t('configForm.apiToken')} <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="anthropicAuthToken"
+                  type="text"
+                  value={config.anthropicAuthToken}
+                  onChange={(e) => updateConfig('anthropicAuthToken', e.target.value)}
+                  placeholder={
+                    currentProvider?.providerId === 'anthropic'
+                      ? t('configForm.enterAnthropicApiToken')
+                      : t('configForm.enterApiToken')
+                  }
+                />
+
+                {/* Provider-specific information */}
+                {currentProvider && config.anthropicApiProvider !== 'custom' && (
+                  <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
+                    {currentProvider.providerId === 'anthropic' ? (
+                      <p>{t('configForm.usingOfficialApi')}</p>
+                    ) : (
+                      <>
+                        <p>{t('configForm.apiEndpointAutoSet')}: {currentProvider.apiUrl.codingPlanForAnthropic}</p>
+                        {currentProvider.description && (
+                          <p className="text-xs text-muted-foreground mt-1">{currentProvider.description}</p>
+                        )}
+                        {currentProvider.notes && (
+                          <p className="text-xs text-muted-foreground mt-1">{currentProvider.notes}</p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {config.anthropicApiProvider === 'custom' && (
+                  <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm">
+                    <p>{t('configForm.usingCustomEndpoint')}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Codex Configuration Subform */}
+          {config.runtimeProvider === 'codex' && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.codexConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.codexDescription')}
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="codexApiKey">
+                    CODEX_API_KEY <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="codexApiKey"
+                    type="text"
+                    value={config.codexApiKey}
+                    onChange={(e) => updateConfig('codexApiKey', e.target.value)}
+                    placeholder="Enter your CODEX_API_KEY"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="codexBaseUrl">
+                    CODEX_BASE_URL ({t('configForm.optional')})
+                  </Label>
+                  <Input
+                    id="codexBaseUrl"
+                    type="text"
+                    value={config.codexBaseUrl || ''}
+                    onChange={(e) => updateConfig('codexBaseUrl', e.target.value || undefined)}
+                    placeholder="https://api.example.com/v1"
+                  />
+                </div>
+
+                {/* Compatibility alias hint */}
+                <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
+                  <p className="font-medium mb-1">{t('configForm.compatibilityAliasHint')}</p>
+                  <p className="text-muted-foreground">
+                    {t('configForm.codexCompatibilityDescription')}
+                  </p>
+                  <p className="text-xs font-mono mt-1">
+                    OPENAI_API_KEY = CODEX_API_KEY<br />
+                    OPENAI_BASE_URL = CODEX_BASE_URL
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Database Configuration */}
       {config.profile === 'full-custom' && (
         <div className="space-y-4">
@@ -389,157 +614,8 @@ export function ConfigForm() {
       </div>
       )}
 
-      {/* Claude API Configuration */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">{t('configForm.claudeApiConfig')}</h3>
-        <p className="text-sm text-muted-foreground">
-          {t('configForm.unifiedUseOfToken')}
-        </p>
-
-        {/* Provider loading state */}
-        {providersLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 bg-muted rounded-md">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Loading provider configurations...</span>
-          </div>
-        )}
-
-        {/* Provider error state */}
-        {providersError && (
-          <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded-md">
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span>Failed to load provider configurations: {providersError}</span>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="apiProvider">
-              {t('configForm.apiProvider')} <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={config.anthropicApiProvider}
-              onValueChange={(value: string) => {
-                updateConfig('anthropicApiProvider', value);
-                // Auto-set model defaults based on provider configuration
-                const provider = providers.find(p => p.providerId === value);
-                if (provider && provider.providerId !== 'custom') {
-                  // Apply model defaults from provider configuration
-                  if (provider.defaultModels.sonnet) {
-                    updateConfig('anthropicSonnetModel', provider.defaultModels.sonnet || undefined);
-                  }
-                  if (provider.defaultModels.opus) {
-                    updateConfig('anthropicOpusModel', provider.defaultModels.opus || undefined);
-                  }
-                  if (provider.defaultModels.haiku) {
-                    updateConfig('anthropicHaikuModel', provider.defaultModels.haiku || undefined);
-                  }
-                } else {
-                  // Custom or no provider defaults - clear model defaults
-                  updateConfig('anthropicSonnetModel', undefined);
-                  updateConfig('anthropicOpusModel', undefined);
-                  updateConfig('anthropicHaikuModel', undefined);
-                }
-              }}
-              disabled={providersLoading || providers.length === 0}
-            >
-              <SelectTrigger id="apiProvider">
-                <SelectValue placeholder={t('configForm.selectApiProvider')} />
-              </SelectTrigger>
-              <SelectContent>
-                {providers.map((provider) => (
-                  <SelectItem key={provider.providerId} value={provider.providerId}>
-                    <div className="flex items-center gap-2">
-                      <span>{provider.name}</span>
-                      {provider.recommended && (
-                        <Badge variant="secondary">{t('common.recommended')}</Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Referral link for current provider */}
-            {currentProvider && currentProvider.referralUrl && currentProvider.providerId !== 'custom' && (
-              <a
-                href={currentProvider.referralUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 group"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span>{t('configForm.getApiToken')}</span>
-                <svg className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            {/* Custom API URL input - only show for custom provider */}
-            {config.anthropicApiProvider === 'custom' && (
-              <>
-                <Label htmlFor="anthropicUrl">{t('configForm.apiEndpointUrl')}</Label>
-                <Input
-                  id="anthropicUrl"
-                  value={config.anthropicUrl}
-                  onChange={(e) => updateConfig('anthropicUrl', e.target.value)}
-                  placeholder="https://api.example.com/v1"
-                />
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="anthropicAuthToken">
-            {t('configForm.apiToken')} <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="anthropicAuthToken"
-            type="text"
-            value={config.anthropicAuthToken}
-            onChange={(e) => updateConfig('anthropicAuthToken', e.target.value)}
-            placeholder={
-              currentProvider?.providerId === 'anthropic'
-                ? t('configForm.enterAnthropicApiToken')
-                : t('configForm.enterApiToken')
-            }
-          />
-
-          {/* Provider-specific information */}
-          {currentProvider && config.anthropicApiProvider !== 'custom' && (
-            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
-              {currentProvider.providerId === 'anthropic' ? (
-                <p>{t('configForm.usingOfficialApi')}</p>
-              ) : (
-                <>
-                  <p>{t('configForm.apiEndpointAutoSet')}: {currentProvider.apiUrl.codingPlanForAnthropic}</p>
-                  {currentProvider.description && (
-                    <p className="text-xs text-muted-foreground mt-1">{currentProvider.description}</p>
-                  )}
-                  {currentProvider.notes && (
-                    <p className="text-xs text-muted-foreground mt-1">{currentProvider.notes}</p>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-
-          {config.anthropicApiProvider === 'custom' && (
-            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm">
-              <p>{t('configForm.usingCustomEndpoint')}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Claude Code Extended Configuration - Only show in full-custom mode */}
-      {config.profile === 'full-custom' && (
+      {/* Claude Code Extended Configuration - Only show in full-custom mode and when runtimeProvider is claude */}
+      {config.profile === 'full-custom' && config.runtimeProvider === 'claude' && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h3>
           <p className="text-sm text-muted-foreground">

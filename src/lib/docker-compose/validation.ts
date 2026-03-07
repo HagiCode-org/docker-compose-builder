@@ -79,14 +79,22 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     }
   }
 
-  // Validate Anthropic API configuration
-  if (!config.anthropicAuthToken || config.anthropicAuthToken.trim() === '') {
-    errors.push({ field: 'anthropicAuthToken', message: 'API token is required' });
-  }
+  // Validate runtime provider configuration
+  if (config.runtimeProvider === 'claude') {
+    // Validate Anthropic API configuration for Claude provider
+    if (!config.anthropicAuthToken || config.anthropicAuthToken.trim() === '') {
+      errors.push({ field: 'anthropicAuthToken', message: 'API token is required for Claude provider' });
+    }
 
-  if (config.anthropicApiProvider === 'custom') {
-    if (!config.anthropicUrl || config.anthropicUrl.trim() === '') {
-      errors.push({ field: 'anthropicUrl', message: 'API endpoint URL is required for custom provider' });
+    if (config.anthropicApiProvider === 'custom') {
+      if (!config.anthropicUrl || config.anthropicUrl.trim() === '') {
+        errors.push({ field: 'anthropicUrl', message: 'API endpoint URL is required for custom Claude provider' });
+      }
+    }
+  } else if (config.runtimeProvider === 'codex') {
+    // Validate Codex API configuration
+    if (!config.codexApiKey || config.codexApiKey.trim() === '') {
+      errors.push({ field: 'codexApiKey', message: 'CODEX_API_KEY is required for Codex provider' });
     }
   }
 

@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.1';
+const CONFIG_VERSION = '2.2';
 
 interface DockerComposeState {
   config: DockerComposeConfig;

@@ -21,11 +21,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -72,11 +73,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -124,11 +126,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================

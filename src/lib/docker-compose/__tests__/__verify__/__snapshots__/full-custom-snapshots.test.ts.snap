@@ -21,13 +21,14 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       PUID: 1000
       PGID: 1000
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -97,11 +98,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -171,11 +173,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -245,13 +248,14 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: postgresql
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       PUID: 1000
       PGID: 1000
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================
@@ -320,11 +324,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
+      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: postgresql
       ConnectionStrings__Default: "Host=external-postgres.example.com;Port=5432;Database=hagicode;Username=postgres;Password=postgres"
       License__Activation__LicenseKey: "public-license-key"
       # ==================================================
-      # Claude Code Configuration
+      # Claude Runtime Configuration
       # All providers use ANTHROPIC_AUTH_TOKEN
       # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
       # ==================================================

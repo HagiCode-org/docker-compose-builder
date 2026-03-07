@@ -19,6 +19,15 @@ export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
 export type ConfigProfile = 'quick-start' | 'full-custom';
 
 /**
+ * Runtime AI Provider Type
+ * Top-level provider selection for Docker Compose configuration
+ *
+ * - claude: Uses Anthropic-compatible API providers (Anthropic/ZAI/Aliyun/MiniMax/Volcengine/Custom)
+ * - codex: Uses Codex runtime with CODEX_* environment variables
+ */
+export type RuntimeProvider = 'claude' | 'codex';
+
+/**
  * Anthropic API Provider Type
  * Unified use of ANTHROPIC_AUTH_TOKEN environment variable
  * Different providers are distinguished by ANTHROPIC_URL
@@ -30,6 +39,7 @@ export type ConfigProfile = 'quick-start' | 'full-custom';
  * - zai: Zhipu AI (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - aliyun: Aliyun DashScope (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - minimax: MiniMax (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
+ * - volcengine: Volcengine (uses ANTHROPIC_AUTH_TOKEN + preset ANTHROPIC_URL)
  * - custom: Custom API (uses ANTHROPIC_AUTH_TOKEN + ANTHROPIC_URL)
  */
 export type AnthropicApiProvider = string;
@@ -97,6 +107,10 @@ export interface DockerComposeConfig {
   // Configuration Profile
   profile: ConfigProfile;
 
+  // Runtime AI Provider
+  /** Top-level AI provider selection (claude or codex) */
+  runtimeProvider: RuntimeProvider;
+
   // Basic settings
   httpPort: string;
   containerName: string;
@@ -123,13 +137,19 @@ export interface DockerComposeConfig {
   licenseKeyType: LicenseKeyType;
   licenseKey: string;
 
-  // Anthropic API Configuration
+  // Anthropic API Configuration (used when runtimeProvider = 'claude')
   /** Anthropic API provider selection */
   anthropicApiProvider: AnthropicApiProvider;
-  /** Anthropic API Token (used by all providers) */
+  /** Anthropic API Token (used by all Claude providers) */
   anthropicAuthToken: string;
   /** API Endpoint URL (used by zai/custom providers) */
   anthropicUrl: string;
+
+  // Codex Runtime Configuration (used when runtimeProvider = 'codex')
+  /** Codex API Key (required) */
+  codexApiKey: string;
+  /** Codex Base URL (optional) */
+  codexBaseUrl?: string;
 
   // Volume mounts
   workdirPath: string;
