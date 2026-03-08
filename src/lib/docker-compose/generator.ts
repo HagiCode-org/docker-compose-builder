@@ -82,11 +82,19 @@ function getProviderDescription(_providerId: string, providerConfig?: ProviderPr
   return null;
 }
 
+function isExecutorEnabled(config: DockerComposeConfig, executor: 'claude' | 'codex'): boolean {
+  return Array.isArray(config.enabledExecutors) && config.enabledExecutors.includes(executor);
+}
+
+function getDefaultProvider(defaultExecutor: DockerComposeConfig['defaultExecutor']): 'ClaudeCodeCli' | 'CodexCli' {
+  return defaultExecutor === 'codex' ? 'CodexCli' : 'ClaudeCodeCli';
+}
+
 /**
- * Build provider environment variables based on runtime provider
- * Supports both Claude and Codex runtime providers with mutually exclusive output
+ * Build provider environment variables based on enabled executors.
+ * Claude and Codex can be emitted together when both are enabled.
  * @param config The configuration object
- * @param providerConfig Optional provider configuration (only for Claude)
+ * @param providerConfig Optional provider configuration (for Claude branch)
  * @returns Array of provider environment variable lines
  */
 function buildProviderEnvVars(
@@ -95,8 +103,7 @@ function buildProviderEnvVars(
 ): string[] {
   const lines: string[] = [];
 
-  // Mutually exclusive output based on runtimeProvider
-  if (config.runtimeProvider === 'codex') {
+  if (isExecutorEnabled(config, 'codex')) {
     // Codex runtime configuration
     lines.push('      # ==================================================');
     lines.push('      # Codex Runtime Configuration');
@@ -116,8 +123,10 @@ function buildProviderEnvVars(
       lines.push('      # CODEX_BASE_URL: optional, uses default if not set');
       lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
     }
-  } else {
-    // Claude runtime configuration (default)
+  }
+
+  if (isExecutorEnabled(config, 'claude')) {
+    // Claude runtime configuration
     if (!config.anthropicAuthToken) {
       return lines;
     }
@@ -262,8 +271,8 @@ export function buildAppService(
   lines.push('      ASPNETCORE_URLS: http://+:45000');
   lines.push(`      TZ: ${config.timezone}`);
 
-  // Set default provider based on runtimeProvider
-  const defaultProvider = config.runtimeProvider === 'codex' ? 'CodexCli' : 'ClaudeCodeCli';
+  // Default provider is routing-only and independent from capability enablement.
+  const defaultProvider = getDefaultProvider(config.defaultExecutor);
   lines.push(`      AI__Providers__DefaultProvider: "${defaultProvider}"`);
 
   // Database connection string and provider
@@ -286,12 +295,12 @@ export function buildAppService(
     lines.push(`      PGID: ${config.pgid}`);
   }
 
-  // Runtime provider configuration (Claude or Codex)
+  // Runtime provider configuration (Claude/Codex can both be enabled).
   const providerEnvVars = buildProviderEnvVars(config, providerConfig);
   lines.push(...providerEnvVars);
 
-  // Claude Code Extended Configuration (only for Claude runtime)
-  if (config.runtimeProvider === 'claude') {
+  // Claude Code Extended Configuration (only when Claude capability is enabled)
+  if (isExecutorEnabled(config, 'claude')) {
     if (config.anthropicSonnetModel) {
       lines.push(`      ANTHROPIC_SONNET_MODEL: "${config.anthropicSonnetModel}"`);
     }

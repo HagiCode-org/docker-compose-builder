@@ -19,13 +19,19 @@ export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
 export type ConfigProfile = 'quick-start' | 'full-custom';
 
 /**
- * Runtime AI Provider Type
- * Top-level provider selection for Docker Compose configuration
+ * Executor Type
+ * Used for capability-level executor enablement and default routing
  *
  * - claude: Uses Anthropic-compatible API providers (Anthropic/ZAI/Aliyun/MiniMax/Volcengine/Custom)
  * - codex: Uses Codex runtime with CODEX_* environment variables
  */
-export type RuntimeProvider = 'claude' | 'codex';
+export type ExecutorType = 'claude' | 'codex';
+
+/**
+ * Runtime provider alias kept for legacy compatibility.
+ * New code should prefer `ExecutorType`.
+ */
+export type RuntimeProvider = ExecutorType;
 
 /**
  * Anthropic API Provider Type
@@ -107,9 +113,16 @@ export interface DockerComposeConfig {
   // Configuration Profile
   profile: ConfigProfile;
 
-  // Runtime AI Provider
-  /** Top-level AI provider selection (claude or codex) */
-  runtimeProvider: RuntimeProvider;
+  // Executor capability and routing
+  /** Enabled executor capabilities. Claude and Codex can both be enabled. */
+  enabledExecutors: ExecutorType[];
+  /** Default executor used only when request does not explicitly specify executor. */
+  defaultExecutor: ExecutorType;
+  /**
+   * @deprecated Legacy single-provider field kept only for backward-compatible reads.
+   * New writes should use enabledExecutors/defaultExecutor.
+   */
+  runtimeProvider?: RuntimeProvider;
 
   // Basic settings
   httpPort: string;
@@ -140,7 +153,7 @@ export interface DockerComposeConfig {
   licenseKeyType: LicenseKeyType;
   licenseKey: string;
 
-  // Anthropic API Configuration (used when runtimeProvider = 'claude')
+  // Anthropic API Configuration (used when Claude executor is enabled)
   /** Anthropic API provider selection */
   anthropicApiProvider: AnthropicApiProvider;
   /** Anthropic API Token (used by all Claude providers) */
@@ -148,7 +161,7 @@ export interface DockerComposeConfig {
   /** API Endpoint URL (used by zai/custom providers) */
   anthropicUrl: string;
 
-  // Codex Runtime Configuration (used when runtimeProvider = 'codex')
+  // Codex Runtime Configuration (used when Codex executor is enabled)
   /** Codex API Key (required) */
   codexApiKey: string;
   /** Codex Base URL (optional) */

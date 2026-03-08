@@ -10,7 +10,8 @@ export function createMockConfig(
 ): DockerComposeConfig {
   const defaults: DockerComposeConfig = {
     profile: 'quick-start',
-    runtimeProvider: 'claude',
+    enabledExecutors: ['claude'],
+    defaultExecutor: 'claude',
     httpPort: '8080',
     enableHttps: false,
     httpsPort: '443',
@@ -45,7 +46,15 @@ export function createMockConfig(
     claudeCodeExperimentalAgentTeams: false
   };
 
-  return { ...defaults, ...overrides };
+  const merged = { ...defaults, ...overrides };
+
+  // Backward-compatible test helper behavior for legacy runtimeProvider overrides.
+  if (overrides.runtimeProvider && overrides.enabledExecutors === undefined && overrides.defaultExecutor === undefined) {
+    merged.enabledExecutors = [overrides.runtimeProvider];
+    merged.defaultExecutor = overrides.runtimeProvider;
+  }
+
+  return merged;
 }
 
 /**

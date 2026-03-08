@@ -299,7 +299,7 @@ describe('validateConfig', () => {
   });
 
   describe('Anthropic API validation', () => {
-    it('should require API token for Claude provider', () => {
+    it('should require API token when Claude executor is enabled', () => {
       const config = createMockConfig({
         runtimeProvider: 'claude',
         anthropicAuthToken: ''
@@ -308,7 +308,7 @@ describe('validateConfig', () => {
 
       const tokenErrors = errors.filter(e => e.field === 'anthropicAuthToken');
       expect(tokenErrors).toHaveLength(1);
-      expect(tokenErrors[0].message).toContain('API token is required for Claude provider');
+      expect(tokenErrors[0].message).toContain('API token is required when Claude executor is enabled');
     });
 
     it('should require API URL for custom Claude provider', () => {
@@ -338,7 +338,7 @@ describe('validateConfig', () => {
   });
 
   describe('Codex runtime provider validation', () => {
-    it('should require CODEX_API_KEY for Codex provider', () => {
+    it('should require CODEX_API_KEY when Codex executor is enabled', () => {
       const config = createMockConfig({
         runtimeProvider: 'codex',
         codexApiKey: ''
@@ -347,7 +347,7 @@ describe('validateConfig', () => {
 
       const keyErrors = errors.filter(e => e.field === 'codexApiKey');
       expect(keyErrors).toHaveLength(1);
-      expect(keyErrors[0].message).toContain('CODEX_API_KEY is required for Codex provider');
+      expect(keyErrors[0].message).toContain('CODEX_API_KEY is required when Codex executor is enabled');
     });
 
     it('should accept valid Codex configuration with CODEX_BASE_URL', () => {
@@ -408,6 +408,45 @@ describe('validateConfig', () => {
 
       expect(codexErrors).toHaveLength(0);
       expect(claudeErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Executor capability and default routing validation', () => {
+    it('should reject empty enabled executor set', () => {
+      const config = createMockConfig({
+        enabledExecutors: [],
+        defaultExecutor: 'claude',
+      });
+      const errors = validateConfig(config);
+
+      const executorErrors = errors.filter(e => e.field === 'enabledExecutors');
+      expect(executorErrors).toHaveLength(1);
+      expect(executorErrors[0].message).toContain('At least one executor must be enabled');
+    });
+
+    it('should reject default executor that is not enabled', () => {
+      const config = createMockConfig({
+        enabledExecutors: ['claude'],
+        defaultExecutor: 'codex',
+      });
+      const errors = validateConfig(config);
+
+      const defaultErrors = errors.filter(e => e.field === 'defaultExecutor');
+      expect(defaultErrors).toHaveLength(1);
+      expect(defaultErrors[0].message).toContain('Default executor must be one of the enabled executors');
+    });
+
+    it('should accept valid dual-executor configuration', () => {
+      const config = createMockConfig({
+        enabledExecutors: ['claude', 'codex'],
+        defaultExecutor: 'codex',
+        anthropicAuthToken: 'test-token',
+        codexApiKey: 'test-codex-key',
+      });
+      const errors = validateConfig(config);
+
+      const executorErrors = errors.filter(e => e.field === 'enabledExecutors' || e.field === 'defaultExecutor');
+      expect(executorErrors).toHaveLength(0);
     });
   });
 

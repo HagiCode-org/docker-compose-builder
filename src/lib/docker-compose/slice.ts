@@ -1,10 +1,40 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { DockerComposeConfig } from '../../lib/docker-compose/types';
+import type { DockerComposeConfig, ExecutorType, RuntimeProvider } from '../../lib/docker-compose/types';
 import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoader';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
 const CONFIG_VERSION = '2.3';
+
+const EXECUTOR_OPTIONS: readonly ExecutorType[] = ['claude', 'codex'];
+
+interface LegacyDockerComposeConfig extends Partial<DockerComposeConfig> {
+  runtimeProvider?: RuntimeProvider;
+}
+
+const isExecutorType = (value: unknown): value is ExecutorType =>
+  typeof value === 'string' && EXECUTOR_OPTIONS.includes(value as ExecutorType);
+
+const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
+  const merged = { ...defaultConfig, ...config } as DockerComposeConfig;
+
+  // Legacy migration: map runtimeProvider into new dual-layer fields when missing.
+  const normalizedEnabled = Array.isArray(config.enabledExecutors)
+    ? config.enabledExecutors.filter(isExecutorType)
+    : [];
+  const legacyRuntime = isExecutorType(config.runtimeProvider) ? config.runtimeProvider : undefined;
+  const fallbackExecutor = legacyRuntime ?? defaultConfig.defaultExecutor;
+  const enabledExecutors = normalizedEnabled.length > 0 ? Array.from(new Set(normalizedEnabled)) : [fallbackExecutor];
+  const requestedDefault = isExecutorType(config.defaultExecutor) ? config.defaultExecutor : fallbackExecutor;
+  const defaultExecutor = enabledExecutors.includes(requestedDefault) ? requestedDefault : enabledExecutors[0];
+
+  return {
+    ...merged,
+    enabledExecutors,
+    defaultExecutor,
+    runtimeProvider: undefined
+  };
+};
 
 interface DockerComposeState {
   config: DockerComposeConfig;
@@ -35,14 +65,14 @@ const getInitialConfig = (): DockerComposeConfig => {
 
     const savedConfig = localStorage.getItem('docker-compose-config');
     if (savedConfig) {
-      return { ...defaultConfig, ...JSON.parse(savedConfig) };
+      return normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig);
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
-    if (savedRegistry && (savedRegistry === 'docker-hub' || savedRegistry === 'azure-acr')) {
+    if (savedRegistry && (savedRegistry === 'docker-hub' || savedRegistry === 'azure-acr' || savedRegistry === 'aliyun-acr')) {
       return {
         ...defaultConfig,
-        imageRegistry: savedConfig as DockerComposeConfig['imageRegistry']
+        imageRegistry: savedRegistry as DockerComposeConfig['imageRegistry']
       };
     }
   } catch (error) {
@@ -66,7 +96,7 @@ const dockerComposeSlice = createSlice({
   initialState,
   reducers: {
     updateConfig: (state, action: PayloadAction<Partial<DockerComposeConfig>>) => {
-      state.config = { ...state.config, ...action.payload };
+      state.config = normalizeExecutorConfig({ ...state.config, ...action.payload });
 
       // Save to localStorage
       if (typeof window !== 'undefined') {
@@ -99,6 +129,7 @@ const dockerComposeSlice = createSlice({
     ) => {
       const { field, value } = action.payload;
       state.config[field] = value;
+      state.config = normalizeExecutorConfig(state.config);
 
       // Auto-reset database type to SQLite when switching to quick-start profile
       if (field === 'profile' && value === 'quick-start') {

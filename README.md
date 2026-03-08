@@ -7,7 +7,7 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 - **Interactive Configuration Form**: Step-by-step configuration with real-time validation
 - **Docker Compose YAML Generation**: Automatic YAML file generation based on user input
 - **Multiple Database Options**: Support for internal PostgreSQL or external database connections
-- **API Provider Configuration**: Choose from Anthropic, Zhipu AI, or custom API endpoints
+- **Dual Executor Routing**: Enable Claude/Codex in parallel and choose a default executor for implicit routing
 - **LAN HTTPS Support**: Optional Caddy reverse proxy with `tls internal`
 - **Volume Management**: Configure volume mounts for data persistence
 - **User Permissions**: Linux user permission mapping (PUID/PGID) support
@@ -97,7 +97,11 @@ This will build the application and deploy it to the `gh-pages` branch.
 - **Public Test Key**: Default public test license
 - **Custom License Key**: Use your own license key
 
-#### API Configuration
+#### Executor & API Configuration
+
+- **Parallel Enablement**: Claude and Codex can be enabled together (non-exclusive)
+- **Default Executor**: Used only for requests without an explicit executor
+- **Capability vs Routing**: Default executor selection does not disable other enabled executors
 
 The application dynamically loads provider configurations from the docs repository at `https://docs.hagicode.com/presets/claude-code/providers/`. Available providers include:
 

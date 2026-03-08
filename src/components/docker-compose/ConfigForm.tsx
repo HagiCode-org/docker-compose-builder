@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
-import type { DockerComposeConfig, ConfigProfile, RuntimeProvider } from '@/lib/docker-compose/types';
+import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
 import { Label } from '@/components/ui/label';
@@ -47,6 +47,31 @@ export function ConfigForm() {
     const entries = validateConfig(config).map((error) => [error.field, error.message] as const);
     return Object.fromEntries(entries);
   }, [config]);
+
+  const enabledExecutors = config.enabledExecutors;
+  const claudeEnabled = enabledExecutors.includes('claude');
+  const codexEnabled = enabledExecutors.includes('codex');
+
+  const setEnabledExecutors = useCallback((nextEnabled: ExecutorType[]) => {
+    const uniqueEnabled = Array.from(new Set(nextEnabled));
+    if (uniqueEnabled.length === 0) {
+      return;
+    }
+
+    updateConfig('enabledExecutors', uniqueEnabled);
+    if (!uniqueEnabled.includes(config.defaultExecutor)) {
+      updateConfig('defaultExecutor', uniqueEnabled[0]);
+    }
+  }, [config.defaultExecutor, updateConfig]);
+
+  const toggleExecutor = useCallback((executor: ExecutorType, enabled: boolean) => {
+    if (enabled) {
+      setEnabledExecutors([...enabledExecutors, executor]);
+      return;
+    }
+
+    setEnabledExecutors(enabledExecutors.filter((item) => item !== executor));
+  }, [enabledExecutors, setEnabledExecutors]);
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
@@ -240,25 +265,71 @@ export function ConfigForm() {
         <h3 className="text-lg font-semibold">{t('configForm.aiProviderConfig')}</h3>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="runtimeProvider">
-              {t('configForm.provider')} <span className="text-red-500">*</span>
+            <Label>{t('configForm.enabledExecutors')} <span className="text-red-500">*</span></Label>
+            <p className="text-sm text-muted-foreground">{t('configForm.parallelEnablementHint')}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Label
+                htmlFor="executor-claude"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && claudeEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-claude"
+                  checked={claudeEnabled}
+                  disabled={enabledExecutors.length === 1 && claudeEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('claude', checked === true)}
+                />
+                <span>Claude</span>
+              </Label>
+              <Label
+                htmlFor="executor-codex"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && codexEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-codex"
+                  checked={codexEnabled}
+                  disabled={enabledExecutors.length === 1 && codexEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('codex', checked === true)}
+                />
+                <span>Codex</span>
+              </Label>
+            </div>
+            {validationMap.enabledExecutors && (
+              <p className="text-sm text-red-500">{validationMap.enabledExecutors}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="defaultExecutor">
+              {t('configForm.defaultExecutor')} <span className="text-red-500">*</span>
             </Label>
+            <p className="text-sm text-muted-foreground">{t('configForm.defaultRoutingHint')}</p>
             <Select
-              value={config.runtimeProvider}
-              onValueChange={(value: RuntimeProvider) => updateConfig('runtimeProvider', value)}
+              value={config.defaultExecutor}
+              onValueChange={(value: ExecutorType) => updateConfig('defaultExecutor', value)}
             >
-              <SelectTrigger id="runtimeProvider">
-                <SelectValue placeholder={t('configForm.selectProvider')} />
+              <SelectTrigger id="defaultExecutor">
+                <SelectValue placeholder={t('configForm.selectDefaultExecutor')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="claude">Claude</SelectItem>
-                <SelectItem value="codex">Codex</SelectItem>
+                {enabledExecutors.includes('claude') && <SelectItem value="claude">Claude</SelectItem>}
+                {enabledExecutors.includes('codex') && <SelectItem value="codex">Codex</SelectItem>}
               </SelectContent>
             </Select>
+            {validationMap.defaultExecutor && (
+              <p className="text-sm text-red-500">{validationMap.defaultExecutor}</p>
+            )}
           </div>
 
           {/* Claude Configuration Subform */}
-          {config.runtimeProvider === 'claude' && (
+          {claudeEnabled && (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
               <h4 className="font-medium text-sm">{t('configForm.claudeConfiguration')}</h4>
               <p className="text-sm text-muted-foreground">
@@ -409,7 +480,7 @@ export function ConfigForm() {
           )}
 
           {/* Codex Configuration Subform */}
-          {config.runtimeProvider === 'codex' && (
+          {codexEnabled && (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
               <h4 className="font-medium text-sm">{t('configForm.codexConfiguration')}</h4>
               <p className="text-sm text-muted-foreground">
@@ -630,8 +701,8 @@ export function ConfigForm() {
       </div>
       )}
 
-      {/* Claude Code Extended Configuration - Only show in full-custom mode and when runtimeProvider is claude */}
-      {config.profile === 'full-custom' && config.runtimeProvider === 'claude' && (
+      {/* Claude Code Extended Configuration - only show in full-custom mode when Claude is enabled */}
+      {config.profile === 'full-custom' && claudeEnabled && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h3>
           <p className="text-sm text-muted-foreground">

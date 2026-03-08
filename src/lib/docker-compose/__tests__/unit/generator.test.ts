@@ -353,6 +353,46 @@ describe('buildAppService', () => {
       expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
     });
   });
+
+  describe('Dual executor parallel enablement', () => {
+    it('should output both Claude and Codex configuration blocks when both executors are enabled', () => {
+      const config = createMockConfig({
+        enabledExecutors: ['claude', 'codex'],
+        defaultExecutor: 'claude',
+        anthropicAuthToken: 'test-token',
+        codexApiKey: 'test-codex-key'
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('# Claude Runtime Configuration');
+      expect(appServiceStr).toContain('# Codex Runtime Configuration');
+      expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
+      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
+    });
+
+    it('should route default provider to ClaudeCodeCli when defaultExecutor is claude', () => {
+      const config = createMockConfig({
+        enabledExecutors: ['claude', 'codex'],
+        defaultExecutor: 'claude',
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "ClaudeCodeCli"');
+    });
+
+    it('should route default provider to CodexCli when defaultExecutor is codex', () => {
+      const config = createMockConfig({
+        enabledExecutors: ['claude', 'codex'],
+        defaultExecutor: 'codex',
+      });
+      const appService = buildAppService(config);
+      const appServiceStr = appService.join('\n');
+
+      expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "CodexCli"');
+    });
+  });
 });
 
 describe('HTTPS proxy generation', () => {

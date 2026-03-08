@@ -16,6 +16,17 @@ export interface ValidationError {
  */
 export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   const errors: ValidationError[] = [];
+  const claudeEnabled = config.enabledExecutors.includes('claude');
+  const codexEnabled = config.enabledExecutors.includes('codex');
+
+  // Validate executor capability and default routing
+  if (!Array.isArray(config.enabledExecutors) || config.enabledExecutors.length === 0) {
+    errors.push({ field: 'enabledExecutors', message: 'At least one executor must be enabled' });
+  }
+
+  if (!config.enabledExecutors.includes(config.defaultExecutor)) {
+    errors.push({ field: 'defaultExecutor', message: 'Default executor must be one of the enabled executors' });
+  }
 
   // Validate HTTP port
   if (!config.httpPort || isNaN(parseInt(config.httpPort))) {
@@ -98,11 +109,10 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     }
   }
 
-  // Validate runtime provider configuration
-  if (config.runtimeProvider === 'claude') {
-    // Validate Anthropic API configuration for Claude provider
+  // Validate Claude configuration when Claude capability is enabled
+  if (claudeEnabled) {
     if (!config.anthropicAuthToken || config.anthropicAuthToken.trim() === '') {
-      errors.push({ field: 'anthropicAuthToken', message: 'API token is required for Claude provider' });
+      errors.push({ field: 'anthropicAuthToken', message: 'API token is required when Claude executor is enabled' });
     }
 
     if (config.anthropicApiProvider === 'custom') {
@@ -110,10 +120,12 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
         errors.push({ field: 'anthropicUrl', message: 'API endpoint URL is required for custom Claude provider' });
       }
     }
-  } else if (config.runtimeProvider === 'codex') {
-    // Validate Codex API configuration
+  }
+
+  // Validate Codex configuration when Codex capability is enabled
+  if (codexEnabled) {
     if (!config.codexApiKey || config.codexApiKey.trim() === '') {
-      errors.push({ field: 'codexApiKey', message: 'CODEX_API_KEY is required for Codex provider' });
+      errors.push({ field: 'codexApiKey', message: 'CODEX_API_KEY is required when Codex executor is enabled' });
     }
   }
 

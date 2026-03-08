@@ -2,7 +2,8 @@ import type { DockerComposeConfig } from './types';
 
 export const defaultConfig: DockerComposeConfig = {
   profile: 'quick-start',
-  runtimeProvider: 'claude',
+  enabledExecutors: ['claude'],
+  defaultExecutor: 'claude',
   httpPort: '45000',
   enableHttps: false,
   httpsPort: '443',
