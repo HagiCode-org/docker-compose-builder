@@ -8,7 +8,7 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 - **Docker Compose YAML Generation**: Automatic YAML file generation based on user input
 - **Multiple Database Options**: Support for internal PostgreSQL or external database connections
 - **Explicit Executor Configuration**: Enable Claude/Codex/Copilot CLI/CodeBuddy/IFlow/OpenCode in parallel without a default-provider route
-- **Copilot CLI Docker Template**: Built-in `copilot-cli` template with release-index defaults and strict `<version>-copilot` tag validation
+- **Copilot CLI Support**: Optional `copilot-cli` executor support while the standard Hagicode image tag remains fixed at `0`
 - **LAN HTTPS Support**: Optional Caddy reverse proxy with `tls internal`
 - **Volume Management**: Configure volume mounts for data persistence
 - **User Permissions**: Linux user permission mapping (PUID/PGID) support
@@ -110,20 +110,20 @@ This will build the application and deploy it to the `gh-pages` branch.
 |----------|-------------|------------|-----------------|
 | Claude | Provider preset, token, optional custom endpoint | Requires token; custom preset also requires endpoint URL | Emits `ANTHROPIC_*` variables for the enabled Claude branch |
 | Codex | `CODEX_API_KEY`, optional `CODEX_BASE_URL` | Requires `CODEX_API_KEY` when enabled | Emits `CODEX_*` variables only |
-| Copilot CLI | `COPILOT_API_KEY`, optional `COPILOT_BASE_URL`, image tag, workspace toggle | Requires API key and `<version>-copilot` image tag when enabled | Emits `COPILOT_*` variables and optional sidecar service |
+| Copilot CLI | `COPILOT_API_KEY`, optional `COPILOT_BASE_URL`, standard image tag `0`, workspace toggle | Requires API key when enabled | Emits `COPILOT_*` variables and optional sidecar service without changing the standard Hagicode image tag |
 | CodeBuddy | `CODEBUDDY_API_KEY`, `CODEBUDDY_INTERNET_ENVIRONMENT` | Requires API key when enabled; network environment defaults to `ioa` but remains editable | Emits explicit CodeBuddy provider/platform keys plus `CODEBUDDY_*` variables |
 | IFlow CLI | Informational branch only | No invented private `IFLOW_*` field is required | Emits explicit IFlow provider/platform bootstrap keys and expects prior CLI login or mounted runtime state |
 | OpenCode | Optional managed runtime model | No extra required field beyond normal deployment validation | Emits explicit OpenCode provider registration plus `AI__OpenCode__*` managed runtime keys |
 
-##### Copilot CLI Template
+##### Copilot CLI Runtime Notes
 
-- **Template ID**: `copilot-cli`
+- **Template ID**: `copilot-cli` (reserved for explicit template flows)
 - **Required env**: `COPILOT_API_KEY`
-- **Tag policy**: `imageTag` must match `<version>-copilot` (for example `1.2.3-copilot`)
+- **Standard tag contract**: the standard Hagicode image tag stays fixed at `0`
 - **Optional env**: `COPILOT_BASE_URL`
 - **Workspace mount**: Optional bind mount to `/workspace`
 
-Copilot template defaults are loaded from release index metadata. If loading fails, the app falls back to safe embedded defaults.
+Release index metadata remains available for compatibility checks and future explicit Copilot template flows. Standard builder defaults and refresh paths keep `imageTag` at `0`.
 
 ##### CodeBuddy, IFlow, and OpenCode Notes
 

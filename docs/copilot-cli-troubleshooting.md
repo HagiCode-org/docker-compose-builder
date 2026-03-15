@@ -1,30 +1,32 @@
-# Copilot CLI Template Troubleshooting
+# Copilot CLI Runtime Troubleshooting
 
-This guide covers common issues when using the `copilot-cli` template in Docker Compose Builder.
+This guide covers common issues when enabling the `copilot-cli` executor in Docker Compose Builder.
 
 ## 1. Release index metadata cannot be loaded
 
 **Symptoms**
-- Copilot template shows fallback warning
-- Default `imageTag` is not the expected release tag
+- Copilot metadata warning is shown
+- You want to confirm whether metadata changes the standard `imageTag`
 
 **Checks**
 1. Verify the release index URL is reachable
 2. If needed, override index URL with `VITE_RELEASE_INDEX_URL`
 3. Confirm payload includes `copilot.provider = "copilot-cli"`
+4. Standard builder flows should still keep `imageTag = 0`; metadata is informational unless an explicit template flow opts in
 
-## 2. Image tag validation fails
+## 2. Standard image tag unexpectedly changes
 
 **Symptoms**
-- Validation error on `imageTag`
-- YAML generation blocked
+- `imageTag` is no longer `0` in a standard builder flow
+- Generated standard image reference does not end with `:0`
 
 **Expected format**
-- `<version>-copilot` (example: `1.2.3-copilot`)
+- Standard builder flows keep `imageTag` fixed at `0`
 
 **Fix**
-1. Use a semantic version with `-copilot` suffix
-2. Avoid non-version tags such as `latest` for copilot template
+1. Reset the builder or switch profiles once to re-normalize older saved state
+2. Refresh the page after upgrading to a build that includes the tag fix
+3. If the problem persists, clear the stored builder config from localStorage and reload
 
 ## 3. Missing `COPILOT_API_KEY`
 
