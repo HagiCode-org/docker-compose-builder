@@ -198,7 +198,14 @@
     "downloadSuccess": "docker-compose.yml downloaded successfully!",
     "invalidConfigCannotExport": "Please fix configuration errors before copy/download.",
     "generatedAt": "Generated at:",
-    "basedOnSettings": "This configuration is based on your settings above."
+    "basedOnSettings": "This configuration is based on your settings above.",
+    "previewDescription": "Live YAML output stays aligned with the visible workspace sections.",
+    "lines": "lines",
+    "livePreview": "Live preview",
+    "exportBlockedTitle": "Export is unavailable until the highlighted sections are fixed.",
+    "exportBlockedDescription": "Use the shortcuts below to return to the modules that still have validation issues.",
+    "exportReadyTitle": "This configuration is ready to export.",
+    "exportReadyDescription": "Copy or download the generated file whenever you are satisfied with the preview."
   },
   "languageSwitcher": {
     "selectLanguage": "Select Language"
@@ -206,5 +213,107 @@
   "backToTop": {
     "backToTop": "Back to Top",
     "ariaLabel": "Scroll back to top of page"
+  },
+  "workspace": {
+    "headerSubtitle": "Guide the setup with visible sections, status tracking, and a persistent preview rail.",
+    "introTitle": "Build docker-compose.yml with a clearer workspace",
+    "introDescription": "Work through grouped deployment sections, keep validation status visible, and open the YAML preview without losing your place.",
+    "navigationTitle": "Section navigation",
+    "navigationDescription": "Jump between visible modules and keep hidden branches out of the path.",
+    "previewShortcutTitle": "Preview access",
+    "previewShortcutDescription": "Use the preview rail or drawer to verify output while editing.",
+    "openPreview": "Open preview",
+    "statusLegendTitle": "Status legend",
+    "jumpToFirstError": "Jump to first issue",
+    "resolveSection": "Review section",
+    "mobilePreviewTrigger": "Open YAML preview",
+    "mobilePreviewTitle": "YAML preview",
+    "mobilePreviewDescription": "Inspect the generated docker-compose.yml without leaving the current section.",
+    "repositoryHint": "Repository mapping stays in this section",
+    "repositoryHintDescription": "Keep the workspace mount close to permission settings so Linux and Copilot branches stay aligned.",
+    "licenseDescription": "Choose the shared public key or provide a custom license for this deployment.",
+    "inlineErrorsTitle": "{{count}} issue needs attention in this section",
+    "httpsPanelTitle": "HTTPS runtime details",
+    "providersLoading": "Loading provider configurations...",
+    "providersError": "Failed to load provider configurations: {{message}}",
+    "exportReady": "Export ready",
+    "exportBlocked": "Export blocked",
+    "metrics": {
+      "modules": "Visible modules",
+      "modulesDetail": "Current sections in the workspace",
+      "completed": "Completed",
+      "completedDetail": "Modules that are ready to export",
+      "errors": "Validation issues",
+      "errorsPresent": "Fix these before exporting",
+      "errorsClear": "No blocking issues detected",
+      "export": "Export status",
+      "exportReadyDetail": "Copy and download are available",
+      "exportBlockedDetail": "Preview is live, export stays disabled"
+    },
+    "status": {
+      "active": "Active",
+      "complete": "Ready",
+      "error": "Needs fixes",
+      "pending": "Pending"
+    },
+    "sections": {
+      "profile": {
+        "title": "Deployment mode",
+        "shortTitle": "Mode",
+        "description": "Choose quick start or full custom before editing deeper options."
+      },
+      "base": {
+        "title": "Base deployment",
+        "shortTitle": "Base",
+        "description": "Configure ports, image source, and baseline runtime details."
+      },
+      "executors": {
+        "title": "Executor capabilities",
+        "shortTitle": "Executors",
+        "description": "Enable runtime branches and fill the credentials each active branch needs."
+      },
+      "https": {
+        "title": "HTTPS access",
+        "shortTitle": "HTTPS",
+        "description": "Expose the deployment through Caddy only when HTTPS is enabled."
+      },
+      "database": {
+        "title": "Database strategy",
+        "shortTitle": "Database",
+        "description": "Pick SQLite, an internal PostgreSQL service, or an external database."
+      },
+      "advanced": {
+        "title": "Advanced setup",
+        "shortTitle": "Advanced",
+        "description": "Handle workspace mounts, permissions, license settings, and optional Claude tuning."
+      }
+    },
+    "executorItemsTitle": "Enabled executor branches",
+    "executorItems": {
+      "claude": {
+        "title": "Claude credentials",
+        "description": "Anthropic-compatible provider, endpoint, and token settings."
+      },
+      "codex": {
+        "title": "Codex runtime",
+        "description": "CODEX_API_KEY and optional CODEX_BASE_URL."
+      },
+      "copilot": {
+        "title": "Copilot CLI runtime",
+        "description": "Copilot API access plus workspace mount preferences."
+      },
+      "codebuddy": {
+        "title": "CodeBuddy runtime",
+        "description": "Bootstrap key and internet environment for CodeBuddy CLI."
+      },
+      "iflow": {
+        "title": "IFlow runtime",
+        "description": "ACP bootstrap guidance for the IFlow branch."
+      },
+      "opencode": {
+        "title": "OpenCode runtime",
+        "description": "Managed OpenCode model selection."
+      }
+    }
   }
 }

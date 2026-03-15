@@ -198,7 +198,14 @@
     "downloadSuccess": "docker-compose.yml 下载成功！",
     "invalidConfigCannotExport": "请先修复配置错误后再复制或下载。",
     "generatedAt": "生成时间：",
-    "basedOnSettings": "此配置基于您上面的设置。"
+    "basedOnSettings": "此配置基于您上面的设置。",
+    "previewDescription": "实时 YAML 输出会和当前可见模块保持同步。",
+    "lines": "行",
+    "livePreview": "实时预览",
+    "exportBlockedTitle": "高亮模块修复前，导出操作不可用。",
+    "exportBlockedDescription": "使用下面的快捷入口返回仍有校验问题的配置模块。",
+    "exportReadyTitle": "当前配置已经可以导出。",
+    "exportReadyDescription": "确认预览无误后，可以直接复制或下载生成的文件。"
   },
   "languageSwitcher": {
     "selectLanguage": "选择语言 / Select Language"
@@ -206,5 +213,107 @@
   "backToTop": {
     "backToTop": "返回顶部",
     "ariaLabel": "滚动回页面顶部"
+  },
+  "workspace": {
+    "headerSubtitle": "用可见分区、状态摘要和常驻预览栏引导完整配置流程。",
+    "introTitle": "用更清晰的工作区生成 docker-compose.yml",
+    "introDescription": "按模块完成部署配置，始终看见校验状态，并且无需离开当前上下文就能查看 YAML 预览。",
+    "navigationTitle": "模块导航",
+    "navigationDescription": "只显示当前可见的配置模块，隐藏分支不会继续出现在导航中。",
+    "previewShortcutTitle": "预览入口",
+    "previewShortcutDescription": "编辑时可随时打开预览栏或移动端抽屉检查输出结果。",
+    "openPreview": "打开预览",
+    "statusLegendTitle": "状态说明",
+    "jumpToFirstError": "跳转到首个问题",
+    "resolveSection": "查看此模块",
+    "mobilePreviewTrigger": "打开 YAML 预览",
+    "mobilePreviewTitle": "YAML 预览",
+    "mobilePreviewDescription": "无需离开当前模块即可查看生成的 docker-compose.yml。",
+    "repositoryHint": "仓库挂载与权限配置保持在同一区块",
+    "repositoryHintDescription": "这样可以让 Linux 权限、Copilot 挂载与工作目录设置保持一致，减少来回滚动。",
+    "licenseDescription": "可以继续使用共享测试许可证，也可以切换为自定义许可证。",
+    "inlineErrorsTitle": "本模块有 {{count}} 个问题需要处理",
+    "httpsPanelTitle": "HTTPS 运行时细节",
+    "providersLoading": "正在加载 provider 配置...",
+    "providersError": "加载 provider 配置失败：{{message}}",
+    "exportReady": "可导出",
+    "exportBlocked": "暂不可导出",
+    "metrics": {
+      "modules": "可见模块",
+      "modulesDetail": "当前工作区中的配置分区数量",
+      "completed": "已完成",
+      "completedDetail": "已经满足导出条件的模块",
+      "errors": "校验问题",
+      "errorsPresent": "导出前需要先修复这些问题",
+      "errorsClear": "当前没有阻塞导出的错误",
+      "export": "导出状态",
+      "exportReadyDetail": "复制和下载操作均可使用",
+      "exportBlockedDetail": "预览仍会更新，但导出按钮保持禁用"
+    },
+    "status": {
+      "active": "当前",
+      "complete": "已就绪",
+      "error": "需修复",
+      "pending": "待完善"
+    },
+    "sections": {
+      "profile": {
+        "title": "部署模式",
+        "shortTitle": "模式",
+        "description": "先选择快速开始或完全自定义，再继续编辑更深入的配置。"
+      },
+      "base": {
+        "title": "基础部署",
+        "shortTitle": "基础",
+        "description": "集中配置端口、镜像源和基础运行参数。"
+      },
+      "executors": {
+        "title": "执行器能力",
+        "shortTitle": "执行器",
+        "description": "启用需要的执行器分支，并填写每个分支所需的认证信息。"
+      },
+      "https": {
+        "title": "HTTPS 访问",
+        "shortTitle": "HTTPS",
+        "description": "仅在启用 HTTPS 时展示 Caddy 代理与证书相关配置。"
+      },
+      "database": {
+        "title": "数据库策略",
+        "shortTitle": "数据库",
+        "description": "在 SQLite、内置 PostgreSQL 与外部数据库之间切换。"
+      },
+      "advanced": {
+        "title": "高级配置",
+        "shortTitle": "高级",
+        "description": "处理工作区挂载、权限、许可证以及 Claude 扩展选项。"
+      }
+    },
+    "executorItemsTitle": "已启用的执行器分支",
+    "executorItems": {
+      "claude": {
+        "title": "Claude 凭据",
+        "description": "Anthropic 兼容 provider、端点与 token 设置。"
+      },
+      "codex": {
+        "title": "Codex 运行时",
+        "description": "配置 CODEX_API_KEY 与可选的 CODEX_BASE_URL。"
+      },
+      "copilot": {
+        "title": "Copilot CLI 运行时",
+        "description": "Copilot API 访问配置以及工作区挂载偏好。"
+      },
+      "codebuddy": {
+        "title": "CodeBuddy 运行时",
+        "description": "CodeBuddy CLI 所需的密钥与网络环境配置。"
+      },
+      "iflow": {
+        "title": "IFlow 运行时",
+        "description": "IFlow 分支的 ACP 引导说明。"
+      },
+      "opencode": {
+        "title": "OpenCode 运行时",
+        "description": "托管 OpenCode 模型选择。"
+      }
+    }
   }
 }
