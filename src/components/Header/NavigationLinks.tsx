@@ -15,6 +15,11 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const externalLinks = [
+    NAVIGATION_LINKS.officialSite,
+    NAVIGATION_LINKS.discord,
+    NAVIGATION_LINKS.githubRepo,
+  ];
 
   const handleCopyQQNumber = async () => {
     try {
@@ -64,29 +69,19 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
     <>
       {/* Desktop Navigation */}
       <nav className={`hidden md:flex items-center gap-2 ${className}`}>
-        {/* Official Site Link */}
-        <a
-          href={NAVIGATION_LINKS.officialSite.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
-          aria-label={t(NAVIGATION_LINKS.officialSite.labelKey)}
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>{t(NAVIGATION_LINKS.officialSite.labelKey)}</span>
-        </a>
-
-        {/* GitHub Repository Link */}
-        <a
-          href={NAVIGATION_LINKS.githubRepo.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
-          aria-label={t(NAVIGATION_LINKS.githubRepo.labelKey)}
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>{t(NAVIGATION_LINKS.githubRepo.labelKey)}</span>
-        </a>
+        {externalLinks.map((link) => (
+          <a
+            key={link.labelKey}
+            href={link.url ?? undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
+            aria-label={t(link.labelKey)}
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>{t(link.labelKey)}</span>
+          </a>
+        ))}
 
         {/* QQ Group Button */}
         <Button
@@ -127,29 +122,19 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
             role="navigation"
             aria-label="Main navigation"
           >
-            {/* Official Site Link */}
-            <a
-              href={NAVIGATION_LINKS.officialSite.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent rounded-xl transition-all duration-200 cursor-pointer"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <ExternalLink className="w-4 h-4 text-muted-foreground" />
-              <span>{t(NAVIGATION_LINKS.officialSite.labelKey)}</span>
-            </a>
-
-            {/* GitHub Repository Link */}
-            <a
-              href={NAVIGATION_LINKS.githubRepo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent rounded-xl transition-all duration-200 cursor-pointer"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <ExternalLink className="w-4 h-4 text-muted-foreground" />
-              <span>{t(NAVIGATION_LINKS.githubRepo.labelKey)}</span>
-            </a>
+            {externalLinks.map((link) => (
+              <a
+                key={link.labelKey}
+                href={link.url ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent rounded-xl transition-all duration-200 cursor-pointer"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                <span>{t(link.labelKey)}</span>
+              </a>
+            ))}
 
             {/* QQ Group Button */}
             <button

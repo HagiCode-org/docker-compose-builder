@@ -1,4 +1,4 @@
-import { Globe, Github } from 'lucide-react';
+import { Globe, Github, MessageSquare } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export const NAVIGATION_LINKS = {
@@ -12,6 +12,12 @@ export const NAVIGATION_LINKS = {
     url: 'https://github.com/HagiCode-org/site',
     labelKey: 'header.navigation.githubRepo',
     icon: Github,
+    external: true,
+  },
+  discord: {
+    url: 'https://discord.gg/qY662sJK',
+    labelKey: 'header.navigation.discord',
+    icon: MessageSquare,
     external: true,
   },
   qqGroup: {
