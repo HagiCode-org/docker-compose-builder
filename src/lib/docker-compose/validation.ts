@@ -1,5 +1,6 @@
 import type { DockerComposeConfig } from './types';
 import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
+import { validateCopilotImageTag } from './serviceTemplates';
 
 /**
  * Validation errors interface
@@ -18,14 +19,12 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   const errors: ValidationError[] = [];
   const claudeEnabled = config.enabledExecutors.includes('claude');
   const codexEnabled = config.enabledExecutors.includes('codex');
+  const copilotEnabled = config.enabledExecutors.includes('copilot-cli');
+  const codebuddyEnabled = config.enabledExecutors.includes('codebuddy-cli');
 
-  // Validate executor capability and default routing
+  // Validate executor capability only.
   if (!Array.isArray(config.enabledExecutors) || config.enabledExecutors.length === 0) {
     errors.push({ field: 'enabledExecutors', message: 'At least one executor must be enabled' });
-  }
-
-  if (!config.enabledExecutors.includes(config.defaultExecutor)) {
-    errors.push({ field: 'defaultExecutor', message: 'Default executor must be one of the enabled executors' });
   }
 
   // Validate HTTP port
@@ -126,6 +125,28 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   if (codexEnabled) {
     if (!config.codexApiKey || config.codexApiKey.trim() === '') {
       errors.push({ field: 'codexApiKey', message: 'CODEX_API_KEY is required when Codex executor is enabled' });
+    }
+  }
+
+  // Validate CodeBuddy configuration when CodeBuddy capability is enabled
+  if (codebuddyEnabled) {
+    if (!config.codebuddyApiKey || config.codebuddyApiKey.trim() === '') {
+      errors.push({ field: 'codebuddyApiKey', message: 'CODEBUDDY_API_KEY is required when CodeBuddy executor is enabled' });
+    }
+  }
+
+  // Validate Copilot CLI configuration when Copilot capability is enabled
+  if (copilotEnabled) {
+    if (!config.copilotApiKey || config.copilotApiKey.trim() === '') {
+      errors.push({ field: 'copilotApiKey', message: 'COPILOT_API_KEY is required when Copilot executor is enabled' });
+    }
+
+    if (!validateCopilotImageTag(config.imageTag)) {
+      errors.push({ field: 'imageTag', message: 'Copilot image tag must match <version>-copilot (for example: 1.2.3-copilot)' });
+    }
+
+    if (config.copilotMountWorkspace && (!config.workdirPath || config.workdirPath.trim() === '')) {
+      errors.push({ field: 'workdirPath', message: 'Workspace mount path is required when Copilot workspace mount is enabled' });
     }
   }
 

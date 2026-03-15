@@ -20,18 +20,22 @@ export type ConfigProfile = 'quick-start' | 'full-custom';
 
 /**
  * Executor Type
- * Used for capability-level executor enablement and default routing
+ * Used for capability-level executor enablement only.
  *
  * - claude: Uses Anthropic-compatible API providers (Anthropic/ZAI/Aliyun/MiniMax/Volcengine/Custom)
  * - codex: Uses Codex runtime with CODEX_* environment variables
+ * - copilot-cli: Uses Copilot CLI runtime with COPILOT_* environment variables
+ * - codebuddy-cli: Uses CodeBuddy CLI runtime with CODEBUDDY_* environment variables
+ * - iflow-cli: Uses IFlow CLI runtime with explicit ACP bootstrap configuration
+ * - opencode: Uses the managed OpenCode runtime contract
  */
-export type ExecutorType = 'claude' | 'codex';
-
-/**
- * Runtime provider alias kept for legacy compatibility.
- * New code should prefer `ExecutorType`.
- */
-export type RuntimeProvider = ExecutorType;
+export type ExecutorType =
+  | 'claude'
+  | 'codex'
+  | 'copilot-cli'
+  | 'codebuddy-cli'
+  | 'iflow-cli'
+  | 'opencode';
 
 /**
  * Anthropic API Provider Type
@@ -113,16 +117,9 @@ export interface DockerComposeConfig {
   // Configuration Profile
   profile: ConfigProfile;
 
-  // Executor capability and routing
-  /** Enabled executor capabilities. Claude and Codex can both be enabled. */
+  // Executor capability
+  /** Enabled executor capabilities. Multiple executors can be enabled in parallel. */
   enabledExecutors: ExecutorType[];
-  /** Default executor used only when request does not explicitly specify executor. */
-  defaultExecutor: ExecutorType;
-  /**
-   * @deprecated Legacy single-provider field kept only for backward-compatible reads.
-   * New writes should use enabledExecutors/defaultExecutor.
-   */
-  runtimeProvider?: RuntimeProvider;
 
   // Basic settings
   httpPort: string;
@@ -166,6 +163,24 @@ export interface DockerComposeConfig {
   codexApiKey: string;
   /** Codex Base URL (optional) */
   codexBaseUrl?: string;
+
+  // CodeBuddy Runtime Configuration (used when CodeBuddy executor is enabled)
+  /** CodeBuddy API Key (required when enabled) */
+  codebuddyApiKey: string;
+  /** CodeBuddy network environment hint (recommended default: ioa) */
+  codebuddyInternetEnvironment: string;
+
+  // Copilot CLI Runtime Configuration (used when Copilot executor is enabled)
+  /** Copilot API Key (required) */
+  copilotApiKey: string;
+  /** Copilot Base URL (optional) */
+  copilotBaseUrl?: string;
+  /** Enable workspace mount in generated copilot service */
+  copilotMountWorkspace: boolean;
+
+  // OpenCode Runtime Configuration (used when OpenCode executor is enabled)
+  /** Managed OpenCode model (optional but preseeded from the runtime baseline) */
+  openCodeModel?: string;
 
   // Volume mounts
   workdirPath: string;

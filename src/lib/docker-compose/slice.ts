@@ -1,38 +1,42 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { DockerComposeConfig, ExecutorType, RuntimeProvider } from '../../lib/docker-compose/types';
+import type { DockerComposeConfig, ExecutorType } from '../../lib/docker-compose/types';
 import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoader';
+import type { CopilotReleaseMetadata } from '../../lib/docker-compose/releaseIndexLoader';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.3';
+const CONFIG_VERSION = '2.5';
 
-const EXECUTOR_OPTIONS: readonly ExecutorType[] = ['claude', 'codex'];
+const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
+  'claude',
+  'codex',
+  'copilot-cli',
+  'codebuddy-cli',
+  'iflow-cli',
+  'opencode'
+];
 
 interface LegacyDockerComposeConfig extends Partial<DockerComposeConfig> {
-  runtimeProvider?: RuntimeProvider;
+  runtimeProvider?: unknown;
+  defaultExecutor?: unknown;
 }
 
 const isExecutorType = (value: unknown): value is ExecutorType =>
   typeof value === 'string' && EXECUTOR_OPTIONS.includes(value as ExecutorType);
 
 const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
-  const merged = { ...defaultConfig, ...config } as DockerComposeConfig;
-
-  // Legacy migration: map runtimeProvider into new dual-layer fields when missing.
   const normalizedEnabled = Array.isArray(config.enabledExecutors)
     ? config.enabledExecutors.filter(isExecutorType)
     : [];
-  const legacyRuntime = isExecutorType(config.runtimeProvider) ? config.runtimeProvider : undefined;
-  const fallbackExecutor = legacyRuntime ?? defaultConfig.defaultExecutor;
-  const enabledExecutors = normalizedEnabled.length > 0 ? Array.from(new Set(normalizedEnabled)) : [fallbackExecutor];
-  const requestedDefault = isExecutorType(config.defaultExecutor) ? config.defaultExecutor : fallbackExecutor;
-  const defaultExecutor = enabledExecutors.includes(requestedDefault) ? requestedDefault : enabledExecutors[0];
+  const enabledExecutors = normalizedEnabled.length > 0
+    ? Array.from(new Set(normalizedEnabled))
+    : [...defaultConfig.enabledExecutors];
+  const { runtimeProvider: _legacyRuntimeProvider, defaultExecutor: _legacyDefaultExecutor, ...rest } = config;
 
   return {
-    ...merged,
-    enabledExecutors,
-    defaultExecutor,
-    runtimeProvider: undefined
+    ...defaultConfig,
+    ...rest,
+    enabledExecutors
   };
 };
 
@@ -44,6 +48,9 @@ interface DockerComposeState {
   providers: ProviderPreset[];
   providersLoading: boolean;
   providersError: string | null;
+  copilotMetadata: CopilotReleaseMetadata | null;
+  copilotMetadataLoading: boolean;
+  copilotMetadataError: string | null;
 }
 
 const getInitialConfig = (): DockerComposeConfig => {
@@ -89,6 +96,9 @@ const initialState: DockerComposeState = {
   providers: [],
   providersLoading: false,
   providersError: null,
+  copilotMetadata: null,
+  copilotMetadataLoading: false,
+  copilotMetadataError: null
 };
 
 const dockerComposeSlice = createSlice({
@@ -176,6 +186,21 @@ const dockerComposeSlice = createSlice({
       state.providersLoading = false;
       state.providersError = null;
     },
+
+    setCopilotMetadataLoading: (state, action: PayloadAction<boolean>) => {
+      state.copilotMetadataLoading = action.payload;
+    },
+
+    setCopilotMetadataError: (state, action: PayloadAction<string | null>) => {
+      state.copilotMetadataError = action.payload;
+      state.copilotMetadataLoading = false;
+    },
+
+    setCopilotMetadata: (state, action: PayloadAction<CopilotReleaseMetadata>) => {
+      state.copilotMetadata = action.payload;
+      state.copilotMetadataLoading = false;
+      state.copilotMetadataError = null;
+    },
   },
 });
 
@@ -189,6 +214,9 @@ export const {
   setProvidersLoading,
   setProvidersError,
   setProviders,
+  setCopilotMetadataLoading,
+  setCopilotMetadataError,
+  setCopilotMetadata
 } = dockerComposeSlice.actions;
 
 export default dockerComposeSlice.reducer;
@@ -215,3 +243,12 @@ export const selectProvidersError = (state: { dockerCompose: DockerComposeState 
 
 export const selectProviderById = (state: { dockerCompose: DockerComposeState }, providerId: string) =>
   state.dockerCompose.providers.find(p => p.providerId === providerId);
+
+export const selectCopilotMetadata = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.copilotMetadata;
+
+export const selectCopilotMetadataLoading = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.copilotMetadataLoading;
+
+export const selectCopilotMetadataError = (state: { dockerCompose: DockerComposeState }) =>
+  state.dockerCompose.copilotMetadataError;

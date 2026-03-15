@@ -82,12 +82,8 @@ function getProviderDescription(_providerId: string, providerConfig?: ProviderPr
   return null;
 }
 
-function isExecutorEnabled(config: DockerComposeConfig, executor: 'claude' | 'codex'): boolean {
+function isExecutorEnabled(config: DockerComposeConfig, executor: DockerComposeConfig['enabledExecutors'][number]): boolean {
   return Array.isArray(config.enabledExecutors) && config.enabledExecutors.includes(executor);
-}
-
-function getDefaultProvider(defaultExecutor: DockerComposeConfig['defaultExecutor']): 'ClaudeCodeCli' | 'CodexCli' {
-  return defaultExecutor === 'codex' ? 'CodexCli' : 'ClaudeCodeCli';
 }
 
 /**
@@ -122,6 +118,72 @@ function buildProviderEnvVars(
     } else {
       lines.push('      # CODEX_BASE_URL: optional, uses default if not set');
       lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+    }
+  }
+
+  if (isExecutorEnabled(config, 'copilot-cli')) {
+    lines.push('      # ==================================================');
+    lines.push('      # Copilot CLI Runtime Configuration');
+    lines.push('      # Uses COPILOT_* environment variables');
+    lines.push('      # ==================================================');
+
+    if (config.copilotApiKey) {
+      lines.push(`      COPILOT_API_KEY: "${config.copilotApiKey}"`);
+    }
+
+    if (config.copilotBaseUrl && config.copilotBaseUrl.trim()) {
+      lines.push(`      COPILOT_BASE_URL: "${config.copilotBaseUrl}"`);
+    } else {
+      lines.push('      # COPILOT_BASE_URL: optional, uses default if not set');
+    }
+  }
+
+  if (isExecutorEnabled(config, 'codebuddy-cli')) {
+    lines.push('      # ==================================================');
+    lines.push('      # CodeBuddy CLI Runtime Configuration');
+    lines.push('      # Uses explicit provider/bootstrap registration plus CODEBUDDY_* runtime variables');
+    lines.push('      # ==================================================');
+    lines.push('      AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
+    lines.push('      AI__Providers__Providers__CodebuddyCli__Type: "CodebuddyCli"');
+    lines.push('      AI__Providers__Providers__CodebuddyCli__ExecutablePath: "codebuddy"');
+    lines.push('      AI__PlatformConfigurations__CodebuddyCli__ExecutablePath: "codebuddy"');
+    lines.push('      AI__PlatformConfigurations__CodebuddyCli__Arguments: "--acp"');
+
+    if (config.codebuddyApiKey && config.codebuddyApiKey.trim()) {
+      lines.push(`      CODEBUDDY_API_KEY: "${config.codebuddyApiKey}"`);
+    }
+
+    if (config.codebuddyInternetEnvironment && config.codebuddyInternetEnvironment.trim()) {
+      lines.push(`      CODEBUDDY_INTERNET_ENVIRONMENT: "${config.codebuddyInternetEnvironment}"`);
+    }
+  }
+
+  if (isExecutorEnabled(config, 'iflow-cli')) {
+    lines.push('      # ==================================================');
+    lines.push('      # IFlow CLI Runtime Configuration');
+    lines.push('      # Uses explicit ACP bootstrap keys and relies on prior CLI login or mounted runtime state');
+    lines.push('      # ==================================================');
+    lines.push('      AI__Providers__Providers__IFlowCli__Enabled: "true"');
+    lines.push('      AI__Providers__Providers__IFlowCli__Type: "IFlowCli"');
+    lines.push('      AI__Providers__Providers__IFlowCli__ExecutablePath: "iflow"');
+    lines.push('      AI__PlatformConfigurations__IFlowCli__ProviderName: "IFlowCli"');
+    lines.push('      AI__PlatformConfigurations__IFlowCli__ExecutablePath: "iflow"');
+    lines.push('      AI__PlatformConfigurations__IFlowCli__Arguments: "--experimental-acp --port {port}"');
+    lines.push('      AI__PlatformConfigurations__IFlowCli__AuthMethod: "iflow"');
+  }
+
+  if (isExecutorEnabled(config, 'opencode')) {
+    lines.push('      # ==================================================');
+    lines.push('      # OpenCode Runtime Configuration');
+    lines.push('      # Uses the managed OpenCode runtime contract baked into the unified image');
+    lines.push('      # ==================================================');
+    lines.push('      AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
+    lines.push('      AI__Providers__Providers__OpenCodeCli__Type: "OpenCodeCli"');
+    lines.push('      AI__Providers__Providers__OpenCodeCli__ExecutablePath: "opencode"');
+    lines.push('      AI__OpenCode__Enabled: "true"');
+    lines.push('      AI__OpenCode__ExecutablePath: "opencode"');
+    if (config.openCodeModel && config.openCodeModel.trim()) {
+      lines.push(`      AI__OpenCode__Model: "${config.openCodeModel}"`);
     }
   }
 
@@ -214,6 +276,8 @@ export function buildHeader(
     description: '如果您遇到任何问题或需要技术支持:',
     qqGroup: '加入我们的 QQ 群',
     qqNumber: '610394020',
+    discord: '加入我们的 Discord 社区',
+    discordLink: 'https://discord.gg/qY662sJK',
     assistance: '我们提供实时协助和解决方案',
     share: '分享您的经验并与其他用户交流'
   } : {
@@ -221,6 +285,8 @@ export function buildHeader(
     description: 'If you encounter any issues or need technical support:',
     qqGroup: 'Join our QQ group',
     qqNumber: '610394020',
+    discord: 'Join our Discord community',
+    discordLink: 'https://discord.gg/qY662sJK',
     assistance: 'We provide real-time assistance and solutions',
     share: 'Share your experiences and connect with other users'
   };
@@ -235,6 +301,7 @@ export function buildHeader(
   lines.push('# ==================================================');
   lines.push(`# ${supportInfo.description}`);
   lines.push(`# - ${supportInfo.qqGroup}: ${supportInfo.qqNumber}`);
+  lines.push(`# - ${supportInfo.discord}: ${supportInfo.discordLink}`);
   lines.push(`# - ${supportInfo.assistance}`);
   lines.push(`# - ${supportInfo.share}`);
   lines.push('');
@@ -270,10 +337,6 @@ export function buildAppService(
   lines.push(`      ASPNETCORE_ENVIRONMENT: ${config.aspNetEnvironment}`);
   lines.push('      ASPNETCORE_URLS: http://+:45000');
   lines.push(`      TZ: ${config.timezone}`);
-
-  // Default provider is routing-only and independent from capability enablement.
-  const defaultProvider = getDefaultProvider(config.defaultExecutor);
-  lines.push(`      AI__Providers__DefaultProvider: "${defaultProvider}"`);
 
   // Database connection string and provider
   if (config.databaseType === 'sqlite') {
@@ -499,11 +562,52 @@ export function buildServicesSection(
     lines.push(...caddyServiceLines);
   }
 
+  if (isExecutorEnabled(config, 'copilot-cli')) {
+    const copilotServiceLines = buildCopilotCliService(config);
+    lines.push(...copilotServiceLines);
+  }
+
   // Add internal PostgreSQL service if needed
   if (config.databaseType === 'internal') {
     const postgresServiceLines = buildPostgresService(config);
     lines.push(...postgresServiceLines);
   }
+
+  return lines;
+}
+
+export function buildCopilotCliService(config: DockerComposeConfig): string[] {
+  const lines: string[] = [];
+  const imagePrefix = REGISTRIES[config.imageRegistry].imagePrefix;
+  const imageTag = config.imageTag;
+  const image = config.imageRegistry === 'aliyun-acr'
+    ? `${imagePrefix}/hagicode:${imageTag}`
+    : `${imagePrefix}:${imageTag}`;
+
+  lines.push('');
+  lines.push('  copilot-cli:');
+  lines.push(`    image: ${image}`);
+  lines.push(`    container_name: ${config.containerName}-copilot`);
+  lines.push('    environment:');
+  lines.push(`      COPILOT_API_KEY: "${config.copilotApiKey}"`);
+  if (config.copilotBaseUrl && config.copilotBaseUrl.trim()) {
+    lines.push(`      COPILOT_BASE_URL: "${config.copilotBaseUrl}"`);
+  }
+  lines.push('    working_dir: /workspace');
+
+  if (config.copilotMountWorkspace) {
+    lines.push('    volumes:');
+    if (config.hostOS === 'windows') {
+      lines.push(`      - ${config.workdirPath || 'C:\\\\repos'}:/workspace`);
+    } else {
+      lines.push(`      - ${config.workdirPath || '/home/user/repos'}:/workspace`);
+    }
+  }
+
+  lines.push('    command: ["sleep", "infinity"]');
+  lines.push('    networks:');
+  lines.push('      - pcode-network');
+  lines.push('    restart: unless-stopped');
 
   return lines;
 }

@@ -1,8 +1,19 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { selectConfig, setConfigField, selectProviders, selectProvidersLoading, selectProvidersError, selectProviderById } from '@/lib/docker-compose/slice';
+import {
+  selectConfig,
+  setConfigField,
+  selectProviders,
+  selectProvidersLoading,
+  selectProvidersError,
+  selectProviderById,
+  selectCopilotMetadata,
+  selectCopilotMetadataLoading,
+  selectCopilotMetadataError
+} from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
+import { createCopilotTemplateDefaults } from '@/lib/docker-compose/serviceTemplates';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,6 +34,9 @@ export function ConfigForm() {
   const providers = useSelector(selectProviders);
   const providersLoading = useSelector(selectProvidersLoading);
   const providersError = useSelector(selectProvidersError);
+  const copilotMetadata = useSelector(selectCopilotMetadata);
+  const copilotMetadataLoading = useSelector(selectCopilotMetadataLoading);
+  const copilotMetadataError = useSelector(selectCopilotMetadataError);
 
   const updateConfig = useCallback(<K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => {
     dispatch(setConfigField({ field, value }));
@@ -51,6 +65,23 @@ export function ConfigForm() {
   const enabledExecutors = config.enabledExecutors;
   const claudeEnabled = enabledExecutors.includes('claude');
   const codexEnabled = enabledExecutors.includes('codex');
+  const copilotEnabled = enabledExecutors.includes('copilot-cli');
+  const codebuddyEnabled = enabledExecutors.includes('codebuddy-cli');
+  const iflowEnabled = enabledExecutors.includes('iflow-cli');
+  const openCodeEnabled = enabledExecutors.includes('opencode');
+
+  useEffect(() => {
+    if (!copilotEnabled || !copilotMetadata) {
+      return;
+    }
+
+    if (!config.imageTag.endsWith('-copilot')) {
+      const templateDefaults = createCopilotTemplateDefaults(copilotMetadata);
+      if (templateDefaults.imageTag) {
+        updateConfig('imageTag', templateDefaults.imageTag);
+      }
+    }
+  }, [copilotEnabled, copilotMetadata, config.imageTag, updateConfig]);
 
   const setEnabledExecutors = useCallback((nextEnabled: ExecutorType[]) => {
     const uniqueEnabled = Array.from(new Set(nextEnabled));
@@ -59,19 +90,23 @@ export function ConfigForm() {
     }
 
     updateConfig('enabledExecutors', uniqueEnabled);
-    if (!uniqueEnabled.includes(config.defaultExecutor)) {
-      updateConfig('defaultExecutor', uniqueEnabled[0]);
-    }
-  }, [config.defaultExecutor, updateConfig]);
+  }, [updateConfig]);
 
   const toggleExecutor = useCallback((executor: ExecutorType, enabled: boolean) => {
     if (enabled) {
       setEnabledExecutors([...enabledExecutors, executor]);
+      if (executor === 'copilot-cli' && copilotMetadata) {
+        const templateDefaults = createCopilotTemplateDefaults(copilotMetadata);
+        if (templateDefaults.imageTag) {
+          updateConfig('imageTag', templateDefaults.imageTag);
+        }
+        updateConfig('copilotMountWorkspace', true);
+      }
       return;
     }
 
     setEnabledExecutors(enabledExecutors.filter((item) => item !== executor));
-  }, [enabledExecutors, setEnabledExecutors]);
+  }, [copilotMetadata, enabledExecutors, setEnabledExecutors, updateConfig]);
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
@@ -198,7 +233,9 @@ export function ConfigForm() {
                 {t('configForm.imageRegistry')} <span className="text-red-500">*</span>
               </Label>
               <div className="text-sm text-muted-foreground">
-                遇到困难？欢迎加入 QQ 群 {NAVIGATION_LINKS.qqGroup.groupNumber} 解决
+                {t('configForm.supportHint', {
+                  groupNumber: NAVIGATION_LINKS.qqGroup.groupNumber,
+                })}
               </div>
             </div>
             <Select
@@ -267,7 +304,8 @@ export function ConfigForm() {
           <div className="space-y-2">
             <Label>{t('configForm.enabledExecutors')} <span className="text-red-500">*</span></Label>
             <p className="text-sm text-muted-foreground">{t('configForm.parallelEnablementHint')}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <p className="text-sm text-muted-foreground">{t('configForm.explicitExecutorHint')}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
               <Label
                 htmlFor="executor-claude"
                 className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
@@ -300,31 +338,73 @@ export function ConfigForm() {
                 />
                 <span>Codex</span>
               </Label>
+              <Label
+                htmlFor="executor-copilot"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && copilotEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-copilot"
+                  checked={copilotEnabled}
+                  disabled={enabledExecutors.length === 1 && copilotEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('copilot-cli', checked === true)}
+                />
+                <span>Copilot CLI</span>
+              </Label>
+              <Label
+                htmlFor="executor-codebuddy"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && codebuddyEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-codebuddy"
+                  checked={codebuddyEnabled}
+                  disabled={enabledExecutors.length === 1 && codebuddyEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('codebuddy-cli', checked === true)}
+                />
+                <span>CodeBuddy</span>
+              </Label>
+              <Label
+                htmlFor="executor-iflow"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && iflowEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-iflow"
+                  checked={iflowEnabled}
+                  disabled={enabledExecutors.length === 1 && iflowEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('iflow-cli', checked === true)}
+                />
+                <span>IFlow CLI</span>
+              </Label>
+              <Label
+                htmlFor="executor-opencode"
+                className={`flex items-center gap-2 p-3 border rounded-md transition-colors ${
+                  enabledExecutors.length === 1 && openCodeEnabled
+                    ? 'cursor-not-allowed opacity-60'
+                    : 'cursor-pointer hover:bg-accent/40'
+                }`}
+              >
+                <Checkbox
+                  id="executor-opencode"
+                  checked={openCodeEnabled}
+                  disabled={enabledExecutors.length === 1 && openCodeEnabled}
+                  onCheckedChange={(checked) => toggleExecutor('opencode', checked === true)}
+                />
+                <span>OpenCode</span>
+              </Label>
             </div>
             {validationMap.enabledExecutors && (
               <p className="text-sm text-red-500">{validationMap.enabledExecutors}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="defaultExecutor">
-              {t('configForm.defaultExecutor')} <span className="text-red-500">*</span>
-            </Label>
-            <p className="text-sm text-muted-foreground">{t('configForm.defaultRoutingHint')}</p>
-            <Select
-              value={config.defaultExecutor}
-              onValueChange={(value: ExecutorType) => updateConfig('defaultExecutor', value)}
-            >
-              <SelectTrigger id="defaultExecutor">
-                <SelectValue placeholder={t('configForm.selectDefaultExecutor')} />
-              </SelectTrigger>
-              <SelectContent>
-                {enabledExecutors.includes('claude') && <SelectItem value="claude">Claude</SelectItem>}
-                {enabledExecutors.includes('codex') && <SelectItem value="codex">Codex</SelectItem>}
-              </SelectContent>
-            </Select>
-            {validationMap.defaultExecutor && (
-              <p className="text-sm text-red-500">{validationMap.defaultExecutor}</p>
             )}
           </div>
 
@@ -525,6 +605,174 @@ export function ConfigForm() {
                     OPENAI_BASE_URL = CODEX_BASE_URL
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {codebuddyEnabled && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.codebuddyConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.codebuddyDescription')}
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="codebuddyApiKey">
+                  CODEBUDDY_API_KEY <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="codebuddyApiKey"
+                  type="text"
+                  value={config.codebuddyApiKey}
+                  onChange={(e) => updateConfig('codebuddyApiKey', e.target.value)}
+                  placeholder="cb-..."
+                />
+                {validationMap.codebuddyApiKey && (
+                  <p className="text-sm text-red-500">{validationMap.codebuddyApiKey}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="codebuddyInternetEnvironment">
+                  CODEBUDDY_INTERNET_ENVIRONMENT
+                </Label>
+                <Input
+                  id="codebuddyInternetEnvironment"
+                  type="text"
+                  value={config.codebuddyInternetEnvironment}
+                  onChange={(e) => updateConfig('codebuddyInternetEnvironment', e.target.value)}
+                  placeholder="ioa"
+                />
+                <p className="text-sm text-muted-foreground">
+                  {t('configForm.codebuddyInternetEnvironmentHint')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {iflowEnabled && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.iflowConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.iflowDescription')}
+              </p>
+              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
+                <p className="font-medium">{t('configForm.iflowRuntimeCommand')}</p>
+                <p className="text-muted-foreground mt-1">
+                  {t('configForm.iflowLoginHint')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {openCodeEnabled && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.openCodeConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.openCodeDescription')}
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="openCodeModel">
+                  {t('configForm.openCodeModel')}
+                </Label>
+                <Input
+                  id="openCodeModel"
+                  type="text"
+                  value={config.openCodeModel || ''}
+                  onChange={(e) => updateConfig('openCodeModel', e.target.value || undefined)}
+                  placeholder="anthropic/claude-sonnet-4"
+                />
+                <p className="text-sm text-muted-foreground">
+                  {t('configForm.openCodeModelHint')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Copilot CLI Configuration Subform */}
+          {copilotEnabled && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">{t('configForm.copilotConfiguration')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('configForm.copilotDescription')}
+              </p>
+
+              {copilotMetadataLoading && (
+                <div className="text-sm text-muted-foreground">
+                  {t('configForm.loadingCopilotMetadata')}
+                </div>
+              )}
+
+              {copilotMetadata && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-md text-sm">
+                  <p>{t('configForm.copilotMetadataHint', { version: copilotMetadata.envSchemaVersion })}</p>
+                  <p className="text-xs font-mono mt-1">
+                    imageTag: {copilotMetadata.imageTag}
+                  </p>
+                </div>
+              )}
+
+              {copilotMetadataError && (
+                <div className="p-3 bg-yellow-50 dark:bg-yellow-950 rounded-md text-sm">
+                  <p>{t('configForm.copilotMetadataFallback')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{copilotMetadataError}</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="copilotApiKey">
+                  COPILOT_API_KEY <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="copilotApiKey"
+                  type="text"
+                  value={config.copilotApiKey}
+                  onChange={(e) => updateConfig('copilotApiKey', e.target.value)}
+                  placeholder="Enter your COPILOT_API_KEY"
+                />
+                {validationMap.copilotApiKey && (
+                  <p className="text-sm text-red-500">{validationMap.copilotApiKey}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="copilotBaseUrl">
+                  COPILOT_BASE_URL ({t('configForm.optional')})
+                </Label>
+                <Input
+                  id="copilotBaseUrl"
+                  type="text"
+                  value={config.copilotBaseUrl || ''}
+                  onChange={(e) => updateConfig('copilotBaseUrl', e.target.value || undefined)}
+                  placeholder="https://api.githubcopilot.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="copilotImageTag">
+                  {t('configForm.imageTag')} <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="copilotImageTag"
+                  value={config.imageTag}
+                  onChange={(e) => updateConfig('imageTag', e.target.value)}
+                  placeholder="1.2.3-copilot"
+                />
+                {validationMap.imageTag && (
+                  <p className="text-sm text-red-500">{validationMap.imageTag}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="copilotMountWorkspace"
+                  checked={config.copilotMountWorkspace}
+                  onCheckedChange={(checked) => updateConfig('copilotMountWorkspace', checked === true)}
+                />
+                <Label htmlFor="copilotMountWorkspace" className="cursor-pointer">
+                  {t('configForm.copilotMountWorkspace')}
+                </Label>
               </div>
             </div>
           )}

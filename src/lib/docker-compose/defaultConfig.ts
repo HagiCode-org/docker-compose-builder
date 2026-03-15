@@ -3,7 +3,6 @@ import type { DockerComposeConfig } from './types';
 export const defaultConfig: DockerComposeConfig = {
   profile: 'quick-start',
   enabledExecutors: ['claude'],
-  defaultExecutor: 'claude',
   httpPort: '45000',
   enableHttps: false,
   httpsPort: '443',
@@ -29,6 +28,15 @@ export const defaultConfig: DockerComposeConfig = {
   // Codex Runtime Configuration (default to empty strings)
   codexApiKey: '',
   codexBaseUrl: undefined,
+  // CodeBuddy Runtime Configuration
+  codebuddyApiKey: '',
+  codebuddyInternetEnvironment: 'ioa',
+  // Copilot CLI Runtime Configuration (default to empty strings)
+  copilotApiKey: '',
+  copilotBaseUrl: undefined,
+  copilotMountWorkspace: true,
+  // OpenCode Runtime Configuration
+  openCodeModel: 'anthropic/claude-sonnet-4',
   workdirPath: '',
   workdirCreatedByRoot: false,
   puid: '1000',
