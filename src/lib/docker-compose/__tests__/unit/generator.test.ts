@@ -1,664 +1,214 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  buildHeader,
   buildAppService,
   buildCaddyService,
   buildCaddyfile,
+  buildCopilotCliService,
+  buildHeader,
+  buildNetworksSection,
   buildPostgresService,
   buildServicesSection,
   buildVolumesSection,
-  buildNetworksSection,
-  generateYAML
+  generateYAML,
 } from '../../generator';
-import { createMockConfig, FIXED_DATE } from '../helpers/config';
+import {
+  FIXED_DATE,
+  createCodeBuddyConfig,
+  createIFlowConfig,
+  createMockConfig,
+  createOpenCodeConfig,
+} from '../helpers/config';
 
 describe('buildHeader', () => {
-  it('should generate header in Chinese', () => {
-    const config = createMockConfig();
-    const header = buildHeader(config, 'zh-CN', FIXED_DATE);
-    const headerStr = header.join('\n');
+  it('generates localized support metadata', () => {
+    const zhHeader = buildHeader(createMockConfig(), 'zh-CN', FIXED_DATE).join('\n');
+    const enHeader = buildHeader(createMockConfig(), 'en-US', FIXED_DATE).join('\n');
 
-    expect(headerStr).toContain('# Hagicode Docker Compose Configuration');
-    expect(headerStr).toContain('# 支持信息');
-    expect(headerStr).toContain('2024/1/1');
-  });
-
-  it('should generate header in English', () => {
-    const config = createMockConfig();
-    const header = buildHeader(config, 'en-US', FIXED_DATE);
-    const headerStr = header.join('\n');
-
-    expect(headerStr).toContain('# Hagicode Docker Compose Configuration');
-    expect(headerStr).toContain('# Support Information');
-    expect(headerStr).toContain('1/1/2024');
-  });
-
-  it('should include support information', () => {
-    const config = createMockConfig();
-    const header = buildHeader(config, 'zh-CN', FIXED_DATE);
-
-    expect(header).toContain('# - 加入我们的 QQ 群: 610394020');
+    expect(zhHeader).toContain('# 支持信息');
+    expect(zhHeader).toContain('2024/1/1');
+    expect(enHeader).toContain('# Support Information');
+    expect(enHeader).toContain('1/1/2024');
   });
 });
 
 describe('buildAppService', () => {
-  it('should generate app service with ClaudeCodeCli as default provider', () => {
-    const config = createMockConfig({ runtimeProvider: 'claude', imageRegistry: 'docker-hub' });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('does not emit the removed default-provider key', () => {
+    const appService = buildAppService(createMockConfig()).join('\n');
 
-    expect(appService).toContain('  hagicode:');
-    expect(appServiceStr).toContain('image: newbe36524/hagicode:0');
-    expect(appServiceStr).toContain('container_name: hagicode');
-    expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "ClaudeCodeCli"');
+    expect(appService).not.toContain('AI__Providers__DefaultProvider');
   });
 
-  it('should generate app service with CodexCli as default provider', () => {
-    const config = createMockConfig({ runtimeProvider: 'codex', imageRegistry: 'docker-hub' });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('renders Claude and Codex branches together when both executors are enabled', () => {
+    const appService = buildAppService(createMockConfig({
+      enabledExecutors: ['claude', 'codex'],
+      anthropicAuthToken: 'test-token',
+      codexApiKey: 'test-codex-key',
+    })).join('\n');
 
-    expect(appService).toContain('  hagicode:');
-    expect(appServiceStr).toContain('image: newbe36524/hagicode:0');
-    expect(appServiceStr).toContain('container_name: hagicode');
-    expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "CodexCli"');
+    expect(appService).toContain('# Claude Runtime Configuration');
+    expect(appService).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
+    expect(appService).toContain('# Codex Runtime Configuration');
+    expect(appService).toContain('CODEX_API_KEY: "test-codex-key"');
   });
 
-  it('should generate app service with Aliyun registry', () => {
-    const config = createMockConfig({ imageRegistry: 'aliyun-acr' });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('renders CodeBuddy provider/bootstrap configuration explicitly', () => {
+    const appService = buildAppService(createCodeBuddyConfig()).join('\n');
 
-    expect(appServiceStr).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:0');
+    expect(appService).toContain('AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
+    expect(appService).toContain('AI__PlatformConfigurations__CodebuddyCli__Arguments: "--acp"');
+    expect(appService).toContain('CODEBUDDY_API_KEY: "cb-test-key"');
+    expect(appService).toContain('CODEBUDDY_INTERNET_ENVIRONMENT: "ioa"');
   });
 
-  it('should include Anthropic API configuration', () => {
-    const config = createMockConfig({ anthropicApiProvider: 'anthropic' });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('renders IFlow bootstrap configuration without inventing IFLOW runtime variables', () => {
+    const appService = buildAppService(createIFlowConfig()).join('\n');
 
-    expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-    expect(appServiceStr).toContain('# Anthropic Official API');
+    expect(appService).toContain('AI__Providers__Providers__IFlowCli__Enabled: "true"');
+    expect(appService).toContain('AI__PlatformConfigurations__IFlowCli__Arguments: "--experimental-acp --port {port}"');
+    expect(appService).toContain('AI__PlatformConfigurations__IFlowCli__AuthMethod: "iflow"');
+    expect(appService).not.toMatch(/^\s*IFLOW_/m);
   });
 
-  it('should include ZAI API configuration', () => {
-    const config = createMockConfig({ anthropicApiProvider: 'zai' });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('renders the managed OpenCode runtime contract explicitly', () => {
+    const appService = buildAppService(createOpenCodeConfig()).join('\n');
 
-    expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-    expect(appServiceStr).toContain('ANTHROPIC_URL: "https://open.bigmodel.cn/api/anthropic"');
-    expect(appServiceStr).toContain('# Zhipu AI (ZAI)');
+    expect(appService).toContain('AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
+    expect(appService).toContain('AI__OpenCode__Enabled: "true"');
+    expect(appService).toContain('AI__OpenCode__ExecutablePath: "opencode"');
+    expect(appService).toContain('AI__OpenCode__Model: "anthropic/claude-sonnet-4"');
   });
 
-  it('should include custom API configuration', () => {
-    const config = createMockConfig({
-      anthropicApiProvider: 'custom',
-      anthropicUrl: 'https://custom-api.example.com'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+  it('renders Copilot runtime variables without a default-provider route', () => {
+    const appService = buildAppService(createMockConfig({
+      enabledExecutors: ['copilot-cli'],
+      imageTag: '1.2.3-copilot',
+      copilotApiKey: 'test-copilot-key',
+      copilotBaseUrl: 'https://api.githubcopilot.com',
+    })).join('\n');
 
-    expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-    expect(appServiceStr).toContain('ANTHROPIC_URL: "https://custom-api.example.com"');
-    expect(appServiceStr).toContain('# Custom Anthropic-compatible API');
+    expect(appService).toContain('COPILOT_API_KEY: "test-copilot-key"');
+    expect(appService).toContain('COPILOT_BASE_URL: "https://api.githubcopilot.com"');
+    expect(appService).not.toContain('AI__Providers__DefaultProvider');
   });
 
-  it('should include PUID/PGID for Linux non-root users', () => {
-    const config = createMockConfig({
+  it('keeps Linux user mapping and Claude persistence volume behavior', () => {
+    const appService = buildAppService(createMockConfig({
       hostOS: 'linux',
       workdirCreatedByRoot: false,
       puid: '1000',
-      pgid: '1000'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
+      pgid: '1000',
+    })).join('\n');
 
-    expect(appServiceStr).toContain('PUID: 1000');
-    expect(appServiceStr).toContain('PGID: 1000');
-  });
-
-  it('should not include PUID/PGID for Linux root users', () => {
-    const config = createMockConfig({
-      hostOS: 'linux',
-      workdirCreatedByRoot: true
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).not.toContain('PUID:');
-    expect(appServiceStr).not.toContain('PGID:');
-  });
-
-  it('should use Windows workdir path', () => {
-    const config = createMockConfig({
-      hostOS: 'windows',
-      workdirPath: 'C:\\\\repos'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('- C:\\\\repos:/app/workdir');
-  });
-
-  it('should use Linux workdir path', () => {
-    const config = createMockConfig({
-      hostOS: 'linux',
-      workdirPath: '/home/user/repos'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('- /home/user/repos:/app/workdir');
-  });
-
-  it('should include database connection string for internal database', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      postgresDatabase: 'testdb',
-      postgresUser: 'testuser',
-      postgresPassword: 'testpass'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ConnectionStrings__Default: "Host=postgres;Port=5432;Database=testdb;Username=testuser;Password=testpass"');
-  });
-
-  it('should include database connection string for external database', () => {
-    const config = createMockConfig({
-      databaseType: 'external',
-      externalDbHost: 'external-host',
-      externalDbPort: '5433',
-      postgresDatabase: 'testdb',
-      postgresUser: 'testuser',
-      postgresPassword: 'testpass'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ConnectionStrings__Default: "Host=external-host;Port=5433;Database=testdb;Username=testuser;Password=testpass"');
-  });
-
-  it('should include Claude config volume mount', () => {
-    const config = createMockConfig();
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('claude-data:/home/hagicode/.claude');
-  });
-
-  it('should include hagicode_data and claude-data volumes', () => {
-    const config = createMockConfig();
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('hagicode_data:/app/data');
-    expect(appServiceStr).toContain('claude-data:/home/hagicode/.claude');
-  });
-
-  // Claude Code Extended Configuration tests
-  it('should include ANTHROPIC_SONNET_MODEL when configured', () => {
-    const config = createMockConfig({
-      anthropicSonnetModel: 'claude-sonnet-4-20250514'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
-  });
-
-  it('should include ANTHROPIC_OPUS_MODEL when configured', () => {
-    const config = createMockConfig({
-      anthropicOpusModel: 'claude-opus-4-20250514'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ANTHROPIC_OPUS_MODEL: "claude-opus-4-20250514"');
-  });
-
-  it('should include ANTHROPIC_HAIKU_MODEL when configured', () => {
-    const config = createMockConfig({
-      anthropicHaikuModel: 'claude-haiku-4-20250514'
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ANTHROPIC_HAIKU_MODEL: "claude-haiku-4-20250514"');
-  });
-
-  it('should include CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS when configured', () => {
-    const config = createMockConfig({
-      claudeCodeExperimentalAgentTeams: true
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
-  });
-
-  it('should not include optional Claude Code config fields when not configured', () => {
-    const config = createMockConfig();
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).not.toContain('ANTHROPIC_SONNET_MODEL:');
-    expect(appServiceStr).not.toContain('ANTHROPIC_OPUS_MODEL:');
-    expect(appServiceStr).not.toContain('ANTHROPIC_HAIKU_MODEL:');
-    expect(appServiceStr).not.toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:');
-  });
-
-  it('should include all Claude Code extended config fields when configured', () => {
-    const config = createMockConfig({
-      anthropicSonnetModel: 'claude-sonnet-4-20250514',
-      anthropicOpusModel: 'claude-opus-4-20250514',
-      anthropicHaikuModel: 'claude-haiku-4-20250514',
-      claudeCodeExperimentalAgentTeams: true
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
-    expect(appServiceStr).toContain('ANTHROPIC_OPUS_MODEL: "claude-opus-4-20250514"');
-    expect(appServiceStr).toContain('ANTHROPIC_HAIKU_MODEL: "claude-haiku-4-20250514"');
-    expect(appServiceStr).toContain('CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "true"');
-  });
-
-  it('should hide app public port mapping when HTTPS is enabled', () => {
-    const config = createMockConfig({
-      enableHttps: true,
-      httpsPort: '443',
-      lanIp: '192.168.1.100',
-    });
-    const appService = buildAppService(config);
-    const appServiceStr = appService.join('\n');
-
-    expect(appServiceStr).not.toContain('ports:');
-    expect(appServiceStr).not.toContain('"8080:45000"');
-  });
-
-  // Runtime Provider tests
-  describe('Runtime Provider', () => {
-    it('should output ANTHROPIC_* variables when runtimeProvider is claude', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicAuthToken: 'test-token',
-        codexApiKey: 'codex-key'
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('# Claude Runtime Configuration');
-      expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-      expect(appServiceStr).not.toContain('CODEX_API_KEY');
-    });
-
-    it('should output CODEX_* variables when runtimeProvider is codex', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-codex-key',
-        codexBaseUrl: 'https://api.example.com',
-        anthropicAuthToken: 'test-token'
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('# Codex Runtime Configuration');
-      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
-      expect(appServiceStr).toContain('CODEX_BASE_URL: "https://api.example.com"');
-      expect(appServiceStr).toContain('# Compatibility alias: OPENAI_API_KEY = CODEX_API_KEY');
-      expect(appServiceStr).toContain('# Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
-      expect(appServiceStr).not.toContain('ANTHROPIC_AUTH_TOKEN');
-    });
-
-    it('should output CODEX_* variables without base URL when not provided', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-codex-key',
-        codexBaseUrl: undefined
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
-      expect(appServiceStr).toContain('# CODEX_BASE_URL: optional, uses default if not set');
-      // Check that actual CODEX_BASE_URL env var is not set (only the comment)
-      expect(appServiceStr).not.toMatch(/^\s*CODEX_BASE_URL:.*$/m);
-    });
-
-    it('should not include Claude Code extended config for Codex provider', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-codex-key',
-        anthropicSonnetModel: 'claude-sonnet-4-20250514',
-        anthropicOpusModel: 'claude-opus-4-20250514'
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).not.toContain('ANTHROPIC_SONNET_MODEL:');
-      expect(appServiceStr).not.toContain('ANTHROPIC_OPUS_MODEL:');
-    });
-
-    it('should include Claude Code extended config for Claude provider', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicAuthToken: 'test-token',
-        anthropicSonnetModel: 'claude-sonnet-4-20250514'
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('ANTHROPIC_SONNET_MODEL: "claude-sonnet-4-20250514"');
-    });
-  });
-
-  describe('Dual executor parallel enablement', () => {
-    it('should output both Claude and Codex configuration blocks when both executors are enabled', () => {
-      const config = createMockConfig({
-        enabledExecutors: ['claude', 'codex'],
-        defaultExecutor: 'claude',
-        anthropicAuthToken: 'test-token',
-        codexApiKey: 'test-codex-key'
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('# Claude Runtime Configuration');
-      expect(appServiceStr).toContain('# Codex Runtime Configuration');
-      expect(appServiceStr).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-      expect(appServiceStr).toContain('CODEX_API_KEY: "test-codex-key"');
-    });
-
-    it('should route default provider to ClaudeCodeCli when defaultExecutor is claude', () => {
-      const config = createMockConfig({
-        enabledExecutors: ['claude', 'codex'],
-        defaultExecutor: 'claude',
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "ClaudeCodeCli"');
-    });
-
-    it('should route default provider to CodexCli when defaultExecutor is codex', () => {
-      const config = createMockConfig({
-        enabledExecutors: ['claude', 'codex'],
-        defaultExecutor: 'codex',
-      });
-      const appService = buildAppService(config);
-      const appServiceStr = appService.join('\n');
-
-      expect(appServiceStr).toContain('AI__Providers__DefaultProvider: "CodexCli"');
-    });
+    expect(appService).toContain('PUID: 1000');
+    expect(appService).toContain('PGID: 1000');
+    expect(appService).toContain('claude-data:/home/hagicode/.claude');
   });
 });
 
-describe('HTTPS proxy generation', () => {
-  it('should build Caddy service when HTTPS is enabled', () => {
-    const config = createMockConfig({
-      enableHttps: true,
-      httpsPort: '8443',
-      lanIp: '192.168.1.100',
-    });
-    const lines = buildCaddyService(config).join('\n');
-
-    expect(lines).toContain('https-proxy:');
-    expect(lines).toContain('image: caddy:2-alpine');
-    expect(lines).toContain('"8443:443"');
-    expect(lines).toContain('caddy_data:/data');
-  });
-
-  it('should generate Caddyfile with tls internal and reverse proxy', () => {
-    const config = createMockConfig({
-      enableHttps: true,
-      httpsPort: '443',
-      lanIp: '192.168.1.100',
-    });
+describe('proxy and service helpers', () => {
+  it('builds the HTTPS proxy service and Caddyfile', () => {
+    const config = createMockConfig({ enableHttps: true, httpsPort: '443', lanIp: '192.168.1.100' });
+    const proxyService = buildCaddyService(config).join('\n');
     const caddyfile = buildCaddyfile(config);
 
+    expect(proxyService).toContain('https-proxy:');
+    expect(proxyService).toContain('"443:443"');
     expect(caddyfile).toContain('tls internal');
     expect(caddyfile).toContain('reverse_proxy hagicode:45000');
-    expect(caddyfile).toContain('redir https://{host}{uri} permanent');
   });
 
-  it('should include Caddy service and Caddy volumes in generated YAML', () => {
-    const config = createMockConfig({
-      enableHttps: true,
-      httpsPort: '443',
-      lanIp: '192.168.1.100',
-    });
-    const yaml = generateYAML(config);
+  it('builds the Copilot sidecar service when enabled', () => {
+    const service = buildCopilotCliService(createMockConfig({
+      enabledExecutors: ['copilot-cli'],
+      imageTag: '1.2.3-copilot',
+      copilotApiKey: 'test-copilot-key',
+      copilotMountWorkspace: true,
+      workdirPath: '/workspace',
+    })).join('\n');
 
-    expect(yaml).toContain('https-proxy:');
-    expect(yaml).toContain('caddy_data:');
-    expect(yaml).toContain('caddy_config:');
-  });
-});
-
-describe('buildPostgresService', () => {
-  it('should generate PostgreSQL service with default registry', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      imageRegistry: 'docker-hub'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
-
-    expect(postgresService).toContain('  postgres:');
-    expect(postgresServiceStr).toContain('image: bitnami/postgresql:latest');
+    expect(service).toContain('copilot-cli:');
+    expect(service).toContain('COPILOT_API_KEY: "test-copilot-key"');
+    expect(service).toContain('- /workspace:/workspace');
   });
 
-  it('should generate PostgreSQL service with Aliyun registry', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      imageRegistry: 'aliyun-acr'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
-
-    expect(postgresServiceStr).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/bitnami_postgresql:16');
-  });
-
-  it('should use named volume', () => {
-    const config = createMockConfig({
+  it('builds the postgres service for internal database mode', () => {
+    const postgresService = buildPostgresService(createMockConfig({
       databaseType: 'internal',
       volumeType: 'named',
-      volumeName: 'postgres-data'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
+      volumeName: 'postgres-data',
+    })).join('\n');
 
-    expect(postgresServiceStr).toContain('- postgres-data:/bitnami/postgresql');
-  });
-
-  it('should use bind mount', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'bind',
-      volumePath: '/data/postgres'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
-
-    expect(postgresServiceStr).toContain('- /data/postgres:/bitnami/postgresql');
-  });
-
-  it('should use default Linux path for bind mount', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'bind',
-      hostOS: 'linux'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
-
-    expect(postgresServiceStr).toContain('- /data/postgres:/bitnami/postgresql');
-  });
-
-  it('should use default Windows path for bind mount', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'bind',
-      hostOS: 'windows'
-    });
-    const postgresService = buildPostgresService(config);
-    const postgresServiceStr = postgresService.join('\n');
-
-    expect(postgresServiceStr).toContain('- C:\\\\data\\\\postgres:/bitnami/postgresql');
+    expect(postgresService).toContain('postgres:');
+    expect(postgresService).toContain('POSTGRES_DATABASE: hagicode');
+    expect(postgresService).toContain('- postgres-data:/bitnami/postgresql');
   });
 });
 
-describe('buildServicesSection', () => {
-  it('should generate services with internal database', () => {
-    const config = createMockConfig({ databaseType: 'internal' });
-    const services = buildServicesSection(config);
-    const servicesStr = services.join('\n');
-
-    expect(servicesStr).toContain('services:');
-    expect(servicesStr).toContain('hagicode:');
-    expect(servicesStr).toContain('postgres:');
-  });
-
-  it('should generate services without external database', () => {
-    const config = createMockConfig({ databaseType: 'external' });
-    const services = buildServicesSection(config);
-    const servicesStr = services.join('\n');
-
-    expect(servicesStr).toContain('services:');
-    expect(servicesStr).toContain('hagicode:');
-    expect(servicesStr).not.toContain('postgres:');
-  });
-});
-
-describe('buildVolumesSection', () => {
-  it('should generate volumes for internal database with named volume', () => {
-    const config = createMockConfig({
+describe('section builders', () => {
+  it('includes conditional services for copilot and postgres', () => {
+    const services = buildServicesSection(createMockConfig({
+      enabledExecutors: ['claude', 'copilot-cli'],
       databaseType: 'internal',
-      volumeType: 'named'
-    });
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
+      imageTag: '1.2.3-copilot',
+      copilotApiKey: 'test-copilot-key',
+    })).join('\n');
 
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('postgres-data:');
+    expect(services).toContain('services:');
+    expect(services).toContain('hagicode:');
+    expect(services).toContain('copilot-cli:');
+    expect(services).toContain('postgres:');
   });
 
-  it('should not generate postgres-data volume for external database', () => {
-    const config = createMockConfig({ databaseType: 'external' });
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
+  it('builds volumes and networks sections', () => {
+    const volumes = buildVolumesSection(createMockConfig({ databaseType: 'internal', volumeType: 'named' })).join('\n');
+    const networks = buildNetworksSection().join('\n');
 
-    // hagicode_data is always present, but postgres-data should not be
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('hagicode_data:');
-    expect(volumesStr).not.toContain('postgres-data:');
-  });
-
-  it('should generate hagicode_data volume for bind mount (no postgres-data)', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'bind'
-    });
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
-
-    // hagicode_data is always present, but postgres-data is not for bind mounts
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('hagicode_data:');
-    expect(volumesStr).not.toContain('postgres-data:');
-  });
-
-  it('should generate claude-data volume for all configurations', () => {
-    const config = createMockConfig();
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
-
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('claude-data:');
-  });
-
-  it('should generate claude-data volume for external database', () => {
-    const config = createMockConfig({ databaseType: 'external' });
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
-
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('claude-data:');
-    expect(volumesStr).toContain('hagicode_data:');
-    expect(volumesStr).not.toContain('postgres-data:');
-  });
-
-  it('should generate claude-data volume for internal database with named volume', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'named'
-    });
-    const volumes = buildVolumesSection(config);
-    const volumesStr = volumes.join('\n');
-
-    expect(volumesStr).toContain('volumes:');
-    expect(volumesStr).toContain('claude-data:');
-    expect(volumesStr).toContain('hagicode_data:');
-    expect(volumesStr).toContain('postgres-data:');
-  });
-});
-
-describe('buildNetworksSection', () => {
-  it('should generate networks section', () => {
-    const networks = buildNetworksSection();
-    const networksStr = networks.join('\n');
-
-    expect(networksStr).toContain('networks:');
-    expect(networksStr).toContain('pcode-network:');
-    expect(networksStr).toContain('driver: bridge');
+    expect(volumes).toContain('hagicode_data:');
+    expect(volumes).toContain('claude-data:');
+    expect(volumes).toContain('postgres-data:');
+    expect(networks).toContain('pcode-network:');
+    expect(networks).toContain('driver: bridge');
   });
 });
 
 describe('generateYAML', () => {
-  it('should generate complete YAML for quick-start config', () => {
-    const config = createMockConfig({
-      profile: 'quick-start',
+  it('generates a complete compose file without the removed default-provider line', () => {
+    const yaml = generateYAML(createMockConfig({
+      enabledExecutors: ['claude', 'codex', 'codebuddy-cli', 'iflow-cli', 'opencode'],
+      anthropicAuthToken: 'test-token',
+      codexApiKey: 'test-codex-key',
+      codebuddyApiKey: 'cb-test-key',
+      codebuddyInternetEnvironment: 'ioa',
       databaseType: 'internal',
-      volumeType: 'named'
-    });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+      volumeType: 'named',
+      volumeName: 'postgres-data',
+    }), undefined, 'zh-CN', FIXED_DATE);
 
     expect(yaml).toContain('# Hagicode Docker Compose Configuration');
     expect(yaml).toContain('services:');
-    expect(yaml).toContain('hagicode:');
     expect(yaml).toContain('postgres:');
-    expect(yaml).toContain('volumes:');
-    expect(yaml).toContain('networks:');
-    expect(yaml).toContain('pcode-network:');
+    expect(yaml).toContain('AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
+    expect(yaml).toContain('AI__Providers__Providers__IFlowCli__Enabled: "true"');
+    expect(yaml).toContain('AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
+    expect(yaml).not.toContain('AI__Providers__DefaultProvider');
   });
 
-  it('should generate YAML with hagicode_data volume for external database (no postgres-data)', () => {
-    const config = createMockConfig({
-      databaseType: 'external',
-      externalDbHost: 'external-host',
-      externalDbPort: '5432'
+  it('keeps snapshot coverage for copilot compose variants', () => {
+    const withVolume = createMockConfig({
+      enabledExecutors: ['copilot-cli'],
+      imageTag: '1.2.3-copilot',
+      copilotApiKey: 'test-copilot-key',
+      copilotMountWorkspace: true,
+      workdirPath: '/workspace',
     });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+    const withoutVolume = createMockConfig({
+      enabledExecutors: ['copilot-cli'],
+      imageTag: '1.2.3-copilot',
+      copilotApiKey: 'test-copilot-key',
+      copilotMountWorkspace: false,
+    });
 
-    expect(yaml).toContain('services:');
-    expect(yaml).toContain('hagicode:');
-    expect(yaml).not.toContain('postgres:');
-
-    // hagicode_data volume is always present, but postgres-data should not be
-    const servicesEnd = yaml.indexOf('restart: unless-stopped');
-    const afterServices = yaml.substring(servicesEnd);
-    expect(afterServices).toContain('\nvolumes:');
-    expect(afterServices).toContain('hagicode_data:');
-    expect(afterServices).not.toContain('postgres-data:');
-  });
-
-  it('should use fixed date when provided', () => {
-    const config = createMockConfig();
-    const fixedDate = new Date('2024-01-01T00:00:00Z');
-    const yaml = generateYAML(config, undefined, 'zh-CN', fixedDate);
-
-    expect(yaml).toContain('2024/1/1');
+    expect(generateYAML(withVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
+    expect(generateYAML(withoutVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
   });
 });

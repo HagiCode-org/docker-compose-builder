@@ -11,7 +11,6 @@ export function createMockConfig(
   const defaults: DockerComposeConfig = {
     profile: 'quick-start',
     enabledExecutors: ['claude'],
-    defaultExecutor: 'claude',
     httpPort: '8080',
     enableHttps: false,
     httpsPort: '443',
@@ -35,6 +34,12 @@ export function createMockConfig(
     anthropicUrl: '',
     codexApiKey: '',
     codexBaseUrl: undefined,
+    codebuddyApiKey: '',
+    codebuddyInternetEnvironment: 'ioa',
+    copilotApiKey: '',
+    copilotBaseUrl: undefined,
+    copilotMountWorkspace: true,
+    openCodeModel: 'anthropic/claude-sonnet-4',
     workdirPath: '/home/user/repos',
     workdirCreatedByRoot: true,
     puid: '1000',
@@ -46,15 +51,7 @@ export function createMockConfig(
     claudeCodeExperimentalAgentTeams: false
   };
 
-  const merged = { ...defaults, ...overrides };
-
-  // Backward-compatible test helper behavior for legacy runtimeProvider overrides.
-  if (overrides.runtimeProvider && overrides.enabledExecutors === undefined && overrides.defaultExecutor === undefined) {
-    merged.enabledExecutors = [overrides.runtimeProvider];
-    merged.defaultExecutor = overrides.runtimeProvider;
-  }
-
-  return merged;
+  return { ...defaults, ...overrides };
 }
 
 /**
@@ -177,6 +174,39 @@ export function createCustomProviderConfig(
   return createMockConfig({
     anthropicApiProvider: 'custom',
     anthropicUrl: 'https://custom-api.example.com',
+    ...overrides
+  });
+}
+
+export function createCodeBuddyConfig(
+  overrides: Partial<DockerComposeConfig> = {}
+): DockerComposeConfig {
+  return createMockConfig({
+    enabledExecutors: ['codebuddy-cli'],
+    codebuddyApiKey: 'cb-test-key',
+    codebuddyInternetEnvironment: 'ioa',
+    anthropicAuthToken: '',
+    ...overrides
+  });
+}
+
+export function createIFlowConfig(
+  overrides: Partial<DockerComposeConfig> = {}
+): DockerComposeConfig {
+  return createMockConfig({
+    enabledExecutors: ['iflow-cli'],
+    anthropicAuthToken: '',
+    ...overrides
+  });
+}
+
+export function createOpenCodeConfig(
+  overrides: Partial<DockerComposeConfig> = {}
+): DockerComposeConfig {
+  return createMockConfig({
+    enabledExecutors: ['opencode'],
+    anthropicAuthToken: '',
+    openCodeModel: 'anthropic/claude-sonnet-4',
     ...overrides
   });
 }

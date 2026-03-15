@@ -10,6 +10,7 @@ exports[`API Provider Profiles - Complete File Verification with YAML Parsing > 
 # ==================================================
 # 如果您遇到任何问题或需要技术支持:
 # - 加入我们的 QQ 群: 610394020
+# - 加入我们的 Discord 社区: https://discord.gg/qY662sJK
 # - 我们提供实时协助和解决方案
 # - 分享您的经验并与其他用户交流
 
@@ -21,7 +22,6 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
@@ -62,6 +62,7 @@ exports[`API Provider Profiles - Complete File Verification with YAML Parsing > 
 # ==================================================
 # 如果您遇到任何问题或需要技术支持:
 # - 加入我们的 QQ 群: 610394020
+# - 加入我们的 Discord 社区: https://discord.gg/qY662sJK
 # - 我们提供实时协助和解决方案
 # - 分享您的经验并与其他用户交流
 
@@ -73,7 +74,6 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"
@@ -115,6 +115,7 @@ exports[`API Provider Profiles - Complete File Verification with YAML Parsing > 
 # ==================================================
 # 如果您遇到任何问题或需要技术支持:
 # - 加入我们的 QQ 群: 610394020
+# - 加入我们的 Discord 社区: https://discord.gg/qY662sJK
 # - 我们提供实时协助和解决方案
 # - 分享您的经验并与其他用户交流
 
@@ -126,7 +127,6 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:45000
       TZ: Asia/Shanghai
-      AI__Providers__DefaultProvider: "ClaudeCodeCli"
       Database__Provider: sqlite
       ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"
       License__Activation__LicenseKey: "public-license-key"

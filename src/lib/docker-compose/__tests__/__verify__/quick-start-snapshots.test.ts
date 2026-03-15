@@ -5,6 +5,7 @@ import {
   createZaiProviderConfig,
   createAnthropicProviderConfig,
   createCustomProviderConfig,
+  createMockConfig,
   FIXED_DATE
 } from '../helpers/config';
 import {
@@ -195,5 +196,27 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
     // 快速启动使用 SQLite，没有 postgres 服务
     expect(parsed.parsed.services.postgres).toBeUndefined();
+  });
+
+  it('should generate explicit executor branches for CodeBuddy, IFlow, and OpenCode without default-provider routing', async () => {
+    const config = createMockConfig({
+      enabledExecutors: ['codebuddy-cli', 'iflow-cli', 'opencode'],
+      anthropicAuthToken: '',
+      codebuddyApiKey: 'cb-test-key',
+      codebuddyInternetEnvironment: 'ioa',
+      openCodeModel: 'anthropic/claude-sonnet-4'
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.errors).toEqual([]);
+    expect(validation.valid).toBe(true);
+
+    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__CodebuddyCli__Enabled')).toBe(true);
+    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__IFlowCli__Enabled')).toBe(true);
+    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__OpenCodeCli__Enabled')).toBe(true);
+    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__DefaultProvider')).toBe(false);
+
+    expect(yaml).toMatchSnapshot('quick-start-explicit-executor-matrix-zh-CN');
   });
 });

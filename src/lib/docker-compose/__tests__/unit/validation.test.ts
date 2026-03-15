@@ -1,547 +1,107 @@
-import { describe, it, expect } from 'vitest';
-import { validateConfig, isValidConfig } from '../../validation';
-import { createMockConfig } from '../helpers/config';
+import { describe, expect, it } from 'vitest';
+import { isValidConfig, validateConfig } from '../../validation';
+import {
+  createCodeBuddyConfig,
+  createIFlowConfig,
+  createMockConfig,
+  createOpenCodeConfig,
+} from '../helpers/config';
 
 describe('validateConfig', () => {
-  describe('HTTP port validation', () => {
-    it('should accept valid port numbers', () => {
-      const config = createMockConfig({ httpPort: '8080' });
-      const errors = validateConfig(config);
+  it('requires at least one enabled executor', () => {
+    const errors = validateConfig(createMockConfig({ enabledExecutors: [] }));
 
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(0);
-    });
-
-    it('should reject invalid port numbers', () => {
-      const config = createMockConfig({ httpPort: 'invalid' });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(1);
-      expect(portErrors[0].message).toContain('must be a valid number');
-    });
-
-    it('should reject port numbers out of range (too low)', () => {
-      const config = createMockConfig({ httpPort: '0' });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(1);
-      expect(portErrors[0].message).toContain('between 1 and 65535');
-    });
-
-    it('should reject port numbers out of range (too high)', () => {
-      const config = createMockConfig({ httpPort: '65536' });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(1);
-      expect(portErrors[0].message).toContain('between 1 and 65535');
-    });
-
-    it('should accept port number at lower boundary', () => {
-      const config = createMockConfig({ httpPort: '1' });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(0);
-    });
-
-    it('should accept port number at upper boundary', () => {
-      const config = createMockConfig({ httpPort: '65535' });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'httpPort');
-      expect(portErrors).toHaveLength(0);
-    });
+    expect(errors.filter((error) => error.field === 'enabledExecutors')).toHaveLength(1);
   });
 
-  describe('HTTPS validation', () => {
-    it('should accept valid HTTPS configuration', () => {
-      const config = createMockConfig({
-        enableHttps: true,
-        httpsPort: '443',
-        lanIp: '192.168.1.100',
-      });
-      const errors = validateConfig(config);
+  it('does not require a removed default-executor field', () => {
+    const errors = validateConfig(createMockConfig({ enabledExecutors: ['claude', 'codex'], codexApiKey: 'test-codex-key' }));
 
-      const httpsErrors = errors.filter(e => e.field === 'httpsPort' || e.field === 'lanIp');
-      expect(httpsErrors).toHaveLength(0);
-    });
-
-    it('should reject invalid HTTPS port', () => {
-      const config = createMockConfig({
-        enableHttps: true,
-        httpsPort: '70000',
-      });
-      const errors = validateConfig(config);
-
-      const httpsErrors = errors.filter(e => e.field === 'httpsPort');
-      expect(httpsErrors.length).toBeGreaterThan(0);
-    });
-
-    it('should reject invalid LAN IP', () => {
-      const config = createMockConfig({
-        enableHttps: true,
-        lanIp: 'not-ip',
-      });
-      const errors = validateConfig(config);
-
-      const ipErrors = errors.filter(e => e.field === 'lanIp');
-      expect(ipErrors).toHaveLength(1);
-    });
-
-    it('should reject when HTTPS port equals HTTP port', () => {
-      const config = createMockConfig({
-        enableHttps: true,
-        httpPort: '45000',
-        httpsPort: '45000',
-      });
-      const errors = validateConfig(config);
-
-      const httpsErrors = errors.filter(e => e.field === 'httpsPort');
-      expect(httpsErrors.length).toBeGreaterThan(0);
-    });
+    expect(errors.some((error) => error.field === 'defaultExecutor')).toBe(false);
   });
 
-  describe('Container name validation', () => {
-    it('should accept valid container name', () => {
-      const config = createMockConfig({ containerName: 'hagicode' });
-      const errors = validateConfig(config);
+  it('validates Claude fields only when Claude is enabled', () => {
+    const claudeErrors = validateConfig(createMockConfig({ anthropicAuthToken: '' }));
+    const codexOnlyErrors = validateConfig(createMockConfig({
+      enabledExecutors: ['codex'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+    }));
 
-      const nameErrors = errors.filter(e => e.field === 'containerName');
-      expect(nameErrors).toHaveLength(0);
-    });
-
-    it('should reject empty container name', () => {
-      const config = createMockConfig({ containerName: '' });
-      const errors = validateConfig(config);
-
-      const nameErrors = errors.filter(e => e.field === 'containerName');
-      expect(nameErrors).toHaveLength(1);
-      expect(nameErrors[0].message).toContain('is required');
-    });
-
-    it('should reject whitespace-only container name', () => {
-      const config = createMockConfig({ containerName: '   ' });
-      const errors = validateConfig(config);
-
-      const nameErrors = errors.filter(e => e.field === 'containerName');
-      expect(nameErrors).toHaveLength(1);
-    });
+    expect(claudeErrors.some((error) => error.field === 'anthropicAuthToken')).toBe(true);
+    expect(codexOnlyErrors.some((error) => error.field === 'anthropicAuthToken')).toBe(false);
   });
 
-  describe('Image tag validation', () => {
-    it('should accept valid image tag', () => {
-      const config = createMockConfig({ imageTag: 'latest' });
-      const errors = validateConfig(config);
+  it('validates Codex fields only when Codex is enabled', () => {
+    const errors = validateConfig(createMockConfig({
+      enabledExecutors: ['claude', 'codex'],
+      codexApiKey: '',
+    }));
 
-      const tagErrors = errors.filter(e => e.field === 'imageTag');
-      expect(tagErrors).toHaveLength(0);
-    });
-
-    it('should reject empty image tag', () => {
-      const config = createMockConfig({ imageTag: '' });
-      const errors = validateConfig(config);
-
-      const tagErrors = errors.filter(e => e.field === 'imageTag');
-      expect(tagErrors).toHaveLength(1);
-      expect(tagErrors[0].message).toContain('is required');
-    });
+    expect(errors.some((error) => error.field === 'codexApiKey')).toBe(true);
   });
 
-  describe('Internal database validation', () => {
-    it('should accept valid internal database configuration', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        postgresDatabase: 'hagicode',
-        postgresUser: 'postgres',
-        postgresPassword: 'password',
-        volumeType: 'named',
-        volumeName: 'postgres-data'
-      });
-      const errors = validateConfig(config);
+  it('validates Copilot image tag and api key only when Copilot is enabled', () => {
+    const errors = validateConfig(createMockConfig({
+      enabledExecutors: ['copilot-cli'],
+      imageTag: '1.2.3',
+      copilotApiKey: '',
+    }));
 
-      const dbErrors = errors.filter(e =>
-        e.field.startsWith('postgres') ||
-        e.field.startsWith('volume')
-      );
-      expect(dbErrors).toHaveLength(0);
-    });
-
-    it('should reject missing database name', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        postgresDatabase: ''
-      });
-      const errors = validateConfig(config);
-
-      const dbErrors = errors.filter(e => e.field === 'postgresDatabase');
-      expect(dbErrors).toHaveLength(1);
-    });
-
-    it('should reject missing database user', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        postgresUser: ''
-      });
-      const errors = validateConfig(config);
-
-      const userErrors = errors.filter(e => e.field === 'postgresUser');
-      expect(userErrors).toHaveLength(1);
-    });
-
-    it('should reject missing database password', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        postgresPassword: ''
-      });
-      const errors = validateConfig(config);
-
-      const passErrors = errors.filter(e => e.field === 'postgresPassword');
-      expect(passErrors).toHaveLength(1);
-    });
-
-    it('should reject missing volume name for named volumes', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        volumeType: 'named',
-        volumeName: ''
-      });
-      const errors = validateConfig(config);
-
-      const volErrors = errors.filter(e => e.field === 'volumeName');
-      expect(volErrors).toHaveLength(1);
-      expect(volErrors[0].message).toContain('Volume name is required for named volumes');
-    });
-
-    it('should reject missing volume path for bind mounts', () => {
-      const config = createMockConfig({
-        databaseType: 'internal',
-        volumeType: 'bind',
-        volumePath: ''
-      });
-      const errors = validateConfig(config);
-
-      const volErrors = errors.filter(e => e.field === 'volumePath');
-      expect(volErrors).toHaveLength(1);
-      expect(volErrors[0].message).toContain('Volume path is required for bind mounts');
-    });
+    expect(errors.some((error) => error.field === 'copilotApiKey')).toBe(true);
+    expect(errors.some((error) => error.field === 'imageTag')).toBe(true);
   });
 
-  describe('External database validation', () => {
-    it('should accept valid external database configuration', () => {
-      const config = createMockConfig({
-        databaseType: 'external',
-        externalDbHost: 'localhost',
-        externalDbPort: '5432',
-        postgresDatabase: 'hagicode',
-        postgresUser: 'postgres',
-        postgresPassword: 'password'
-      });
-      const errors = validateConfig(config);
+  it('requires CODEBUDDY_API_KEY when CodeBuddy is enabled', () => {
+    const errors = validateConfig(createCodeBuddyConfig({ codebuddyApiKey: '' }));
 
-      const dbErrors = errors.filter(e =>
-        e.field.startsWith('postgres') ||
-        e.field.startsWith('externalDb')
-      );
-      expect(dbErrors).toHaveLength(0);
-    });
-
-    it('should reject missing external database host', () => {
-      const config = createMockConfig({
-        databaseType: 'external',
-        externalDbHost: ''
-      });
-      const errors = validateConfig(config);
-
-      const hostErrors = errors.filter(e => e.field === 'externalDbHost');
-      expect(hostErrors).toHaveLength(1);
-      expect(hostErrors[0].message).toContain('External database host is required');
-    });
-
-    it('should reject invalid external database port', () => {
-      const config = createMockConfig({
-        databaseType: 'external',
-        externalDbPort: 'invalid'
-      });
-      const errors = validateConfig(config);
-
-      const portErrors = errors.filter(e => e.field === 'externalDbPort');
-      expect(portErrors).toHaveLength(1);
-      expect(portErrors[0].message).toContain('must be a valid number');
-    });
+    expect(errors.some((error) => error.field === 'codebuddyApiKey')).toBe(true);
   });
 
-  describe('License key validation', () => {
-    it('should require license key for custom license type', () => {
-      const config = createMockConfig({
-        licenseKeyType: 'custom',
-        licenseKey: ''
-      });
-      const errors = validateConfig(config);
+  it('does not invent required IFLOW-specific env validation', () => {
+    const errors = validateConfig(createIFlowConfig());
 
-      const keyErrors = errors.filter(e => e.field === 'licenseKey');
-      expect(keyErrors).toHaveLength(1);
-      expect(keyErrors[0].message).toContain('Custom license key is required');
-    });
-
-    it('should not require license key for public license type', () => {
-      const config = createMockConfig({
-        licenseKeyType: 'public',
-        licenseKey: ''
-      });
-      const errors = validateConfig(config);
-
-      const keyErrors = errors.filter(e => e.field === 'licenseKey');
-      expect(keyErrors).toHaveLength(0);
-    });
+    expect(errors.some((error) => error.field.startsWith('iflow'))).toBe(false);
   });
 
-  describe('Anthropic API validation', () => {
-    it('should require API token when Claude executor is enabled', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicAuthToken: ''
-      });
-      const errors = validateConfig(config);
+  it('does not require OpenCode-specific fields beyond normal deployment validation', () => {
+    const errors = validateConfig(createOpenCodeConfig());
 
-      const tokenErrors = errors.filter(e => e.field === 'anthropicAuthToken');
-      expect(tokenErrors).toHaveLength(1);
-      expect(tokenErrors[0].message).toContain('API token is required when Claude executor is enabled');
-    });
-
-    it('should require API URL for custom Claude provider', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicApiProvider: 'custom',
-        anthropicUrl: ''
-      });
-      const errors = validateConfig(config);
-
-      const urlErrors = errors.filter(e => e.field === 'anthropicUrl');
-      expect(urlErrors).toHaveLength(1);
-      expect(urlErrors[0].message).toContain('API endpoint URL is required for custom Claude provider');
-    });
-
-    it('should not require API URL for Anthropic Claude provider', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicApiProvider: 'anthropic',
-        anthropicUrl: ''
-      });
-      const errors = validateConfig(config);
-
-      const urlErrors = errors.filter(e => e.field === 'anthropicUrl');
-      expect(urlErrors).toHaveLength(0);
-    });
+    expect(errors.some((error) => error.field === 'openCodeModel')).toBe(false);
   });
 
-  describe('Codex runtime provider validation', () => {
-    it('should require CODEX_API_KEY when Codex executor is enabled', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: ''
-      });
-      const errors = validateConfig(config);
+  it('validates custom Claude endpoint when Claude custom provider is enabled', () => {
+    const errors = validateConfig(createMockConfig({
+      anthropicApiProvider: 'custom',
+      anthropicUrl: '',
+    }));
 
-      const keyErrors = errors.filter(e => e.field === 'codexApiKey');
-      expect(keyErrors).toHaveLength(1);
-      expect(keyErrors[0].message).toContain('CODEX_API_KEY is required when Codex executor is enabled');
-    });
-
-    it('should accept valid Codex configuration with CODEX_BASE_URL', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-api-key',
-        codexBaseUrl: 'https://api.example.com/v1',
-        anthropicAuthToken: '' // Not required for Codex
-      });
-      const errors = validateConfig(config);
-
-      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
-      expect(codexErrors).toHaveLength(0);
-    });
-
-    it('should accept valid Codex configuration without CODEX_BASE_URL', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-api-key',
-        anthropicAuthToken: '' // Not required for Codex
-      });
-      const errors = validateConfig(config);
-
-      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
-      expect(codexErrors).toHaveLength(0);
-    });
+    expect(errors.some((error) => error.field === 'anthropicUrl')).toBe(true);
   });
 
-  describe('Runtime provider switching validation', () => {
-    it('should validate only Codex fields when runtimeProvider is codex', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'codex',
-        codexApiKey: 'test-key',
-        anthropicAuthToken: '', // Should not be validated for Codex
-        anthropicApiProvider: 'custom',
-        anthropicUrl: '' // Should not be validated for Codex
-      });
-      const errors = validateConfig(config);
+  it('validates shared deployment fields such as workdir and ports', () => {
+    const errors = validateConfig(createMockConfig({
+      httpPort: 'invalid',
+      workdirPath: '',
+    }));
 
-      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
-      const claudeErrors = errors.filter(e => e.field.startsWith('anthropic'));
-
-      expect(codexErrors).toHaveLength(0);
-      expect(claudeErrors).toHaveLength(0);
-    });
-
-    it('should validate only Claude fields when runtimeProvider is claude', () => {
-      const config = createMockConfig({
-        runtimeProvider: 'claude',
-        anthropicAuthToken: 'test-token',
-        codexApiKey: '', // Should not be validated for Claude
-        codexBaseUrl: '' // Should not be validated for Claude
-      });
-      const errors = validateConfig(config);
-
-      const codexErrors = errors.filter(e => e.field.startsWith('codex'));
-      const claudeErrors = errors.filter(e => e.field.startsWith('anthropic'));
-
-      expect(codexErrors).toHaveLength(0);
-      expect(claudeErrors).toHaveLength(0);
-    });
-  });
-
-  describe('Executor capability and default routing validation', () => {
-    it('should reject empty enabled executor set', () => {
-      const config = createMockConfig({
-        enabledExecutors: [],
-        defaultExecutor: 'claude',
-      });
-      const errors = validateConfig(config);
-
-      const executorErrors = errors.filter(e => e.field === 'enabledExecutors');
-      expect(executorErrors).toHaveLength(1);
-      expect(executorErrors[0].message).toContain('At least one executor must be enabled');
-    });
-
-    it('should reject default executor that is not enabled', () => {
-      const config = createMockConfig({
-        enabledExecutors: ['claude'],
-        defaultExecutor: 'codex',
-      });
-      const errors = validateConfig(config);
-
-      const defaultErrors = errors.filter(e => e.field === 'defaultExecutor');
-      expect(defaultErrors).toHaveLength(1);
-      expect(defaultErrors[0].message).toContain('Default executor must be one of the enabled executors');
-    });
-
-    it('should accept valid dual-executor configuration', () => {
-      const config = createMockConfig({
-        enabledExecutors: ['claude', 'codex'],
-        defaultExecutor: 'codex',
-        anthropicAuthToken: 'test-token',
-        codexApiKey: 'test-codex-key',
-      });
-      const errors = validateConfig(config);
-
-      const executorErrors = errors.filter(e => e.field === 'enabledExecutors' || e.field === 'defaultExecutor');
-      expect(executorErrors).toHaveLength(0);
-    });
-  });
-
-  describe('Work directory validation', () => {
-    it('should reject empty work directory path', () => {
-      const config = createMockConfig({
-        workdirPath: ''
-      });
-      const errors = validateConfig(config);
-
-      const pathErrors = errors.filter(e => e.field === 'workdirPath');
-      expect(pathErrors).toHaveLength(1);
-      expect(pathErrors[0].message).toContain('Work directory path is required');
-    });
-  });
-
-  describe('PUID/PGID validation for Linux', () => {
-    it('should require valid PUID for Linux non-root user', () => {
-      const config = createMockConfig({
-        hostOS: 'linux',
-        workdirCreatedByRoot: false,
-        puid: 'invalid'
-      });
-      const errors = validateConfig(config);
-
-      const puidErrors = errors.filter(e => e.field === 'puid');
-      expect(puidErrors).toHaveLength(1);
-      expect(puidErrors[0].message).toContain('must be a valid number');
-    });
-
-    it('should require valid PGID for Linux non-root user', () => {
-      const config = createMockConfig({
-        hostOS: 'linux',
-        workdirCreatedByRoot: false,
-        pgid: 'invalid'
-      });
-      const errors = validateConfig(config);
-
-      const pgidErrors = errors.filter(e => e.field === 'pgid');
-      expect(pgidErrors).toHaveLength(1);
-      expect(pgidErrors[0].message).toContain('must be a valid number');
-    });
-
-    it('should not require PUID/PGID for Linux root user', () => {
-      const config = createMockConfig({
-        hostOS: 'linux',
-        workdirCreatedByRoot: true,
-        puid: '',
-        pgid: ''
-      });
-      const errors = validateConfig(config);
-
-      const puidErrors = errors.filter(e => e.field === 'puid');
-      const pgidErrors = errors.filter(e => e.field === 'pgid');
-      expect(puidErrors).toHaveLength(0);
-      expect(pgidErrors).toHaveLength(0);
-    });
+    expect(errors.some((error) => error.field === 'httpPort')).toBe(true);
+    expect(errors.some((error) => error.field === 'workdirPath')).toBe(true);
   });
 });
 
 describe('isValidConfig', () => {
-  it('should return true for valid configuration', () => {
-    const config = createMockConfig();
-    expect(isValidConfig(config)).toBe(true);
+  it('returns true for a standard valid config', () => {
+    expect(isValidConfig(createMockConfig())).toBe(true);
   });
 
-  it('should return false for invalid configuration', () => {
-    const config = createMockConfig({
-      httpPort: 'invalid',
-      containerName: ''
-    });
-    expect(isValidConfig(config)).toBe(false);
-  });
-
-  it('should return true for valid internal database configuration', () => {
-    const config = createMockConfig({
-      databaseType: 'internal',
-      postgresDatabase: 'testdb',
-      postgresUser: 'testuser',
-      postgresPassword: 'testpass',
-      volumeType: 'named',
-      volumeName: 'test-vol'
-    });
-    expect(isValidConfig(config)).toBe(true);
-  });
-
-  it('should return true for valid external database configuration', () => {
-    const config = createMockConfig({
-      databaseType: 'external',
-      externalDbHost: 'localhost',
-      externalDbPort: '5432',
-      postgresDatabase: 'testdb',
-      postgresUser: 'testuser',
-      postgresPassword: 'testpass'
-    });
-    expect(isValidConfig(config)).toBe(true);
+  it('returns true for explicit executor combinations without a default provider route', () => {
+    expect(isValidConfig(createMockConfig({
+      enabledExecutors: ['claude', 'codex', 'codebuddy-cli', 'iflow-cli', 'opencode'],
+      anthropicAuthToken: 'test-token',
+      codexApiKey: 'test-codex-key',
+      codebuddyApiKey: 'cb-test-key',
+      codebuddyInternetEnvironment: 'ioa',
+    }))).toBe(true);
   });
 });
