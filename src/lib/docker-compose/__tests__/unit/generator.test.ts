@@ -211,4 +211,21 @@ describe('generateYAML', () => {
     expect(generateYAML(withVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
     expect(generateYAML(withoutVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
   });
+
+  it('keeps the standard hagicode image tag fixed at 0 across supported registries', () => {
+    const expectedImages = {
+      'docker-hub': 'newbe36524/hagicode:0',
+      'azure-acr': 'hagicode.azurecr.io/hagicode:0',
+      'aliyun-acr': 'registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:0',
+    } as const;
+
+    (Object.keys(expectedImages) as Array<keyof typeof expectedImages>).forEach((imageRegistry) => {
+      const yaml = generateYAML(createMockConfig({
+        imageRegistry,
+        imageTag: '0',
+      }), undefined, 'en-US', FIXED_DATE);
+
+      expect(yaml).toContain(`image: ${expectedImages[imageRegistry]}`);
+    });
+  });
 });

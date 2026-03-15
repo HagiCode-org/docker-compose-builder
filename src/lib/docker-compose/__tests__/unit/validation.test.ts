@@ -41,15 +41,15 @@ describe('validateConfig', () => {
     expect(errors.some((error) => error.field === 'codexApiKey')).toBe(true);
   });
 
-  it('validates Copilot image tag and api key only when Copilot is enabled', () => {
+  it('keeps the standard image tag while validating Copilot-specific credentials', () => {
     const errors = validateConfig(createMockConfig({
       enabledExecutors: ['copilot-cli'],
-      imageTag: '1.2.3',
+      imageTag: '0',
       copilotApiKey: '',
     }));
 
     expect(errors.some((error) => error.field === 'copilotApiKey')).toBe(true);
-    expect(errors.some((error) => error.field === 'imageTag')).toBe(true);
+    expect(errors.some((error) => error.field === 'imageTag')).toBe(false);
   });
 
   it('requires CODEBUDDY_API_KEY when CodeBuddy is enabled', () => {
