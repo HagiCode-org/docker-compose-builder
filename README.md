@@ -1,5 +1,7 @@
 # Docker Compose Builder
 
+[简体中文](./README_cn.md)
+
 A modern Docker Compose configuration generator for Hagicode, built with React + TypeScript + Vite + shadcn/ui.
 
 ## Features
