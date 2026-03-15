@@ -3,6 +3,7 @@ import type { DockerComposeConfig, ExecutorType } from '../../lib/docker-compose
 import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoader';
 import type { CopilotReleaseMetadata } from '../../lib/docker-compose/releaseIndexLoader';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
+import { validateCopilotImageTag } from '../../lib/docker-compose/serviceTemplates';
 
 // Configuration version - increment to invalidate old localStorage caches
 const CONFIG_VERSION = '2.5';
@@ -40,6 +41,17 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
   };
 };
 
+const normalizeStandardImageTag = (config: DockerComposeConfig): DockerComposeConfig => {
+  if (!validateCopilotImageTag(config.imageTag)) {
+    return config;
+  }
+
+  return {
+    ...config,
+    imageTag: defaultConfig.imageTag
+  };
+};
+
 interface DockerComposeState {
   config: DockerComposeConfig;
   isLoading: boolean;
@@ -72,7 +84,9 @@ const getInitialConfig = (): DockerComposeConfig => {
 
     const savedConfig = localStorage.getItem('docker-compose-config');
     if (savedConfig) {
-      return normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig);
+      return normalizeStandardImageTag(
+        normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig)
+      );
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
@@ -144,6 +158,10 @@ const dockerComposeSlice = createSlice({
       // Auto-reset database type to SQLite when switching to quick-start profile
       if (field === 'profile' && value === 'quick-start') {
         state.config.databaseType = 'sqlite';
+      }
+
+      if (field === 'profile') {
+        state.config = normalizeStandardImageTag(state.config);
       }
 
       // Save to localStorage

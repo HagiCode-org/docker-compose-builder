@@ -1,6 +1,5 @@
 import type { DockerComposeConfig } from './types';
 import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
-import { validateCopilotImageTag } from './serviceTemplates';
 
 /**
  * Validation errors interface
@@ -139,10 +138,6 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   if (copilotEnabled) {
     if (!config.copilotApiKey || config.copilotApiKey.trim() === '') {
       errors.push({ field: 'copilotApiKey', message: 'COPILOT_API_KEY is required when Copilot executor is enabled' });
-    }
-
-    if (!validateCopilotImageTag(config.imageTag)) {
-      errors.push({ field: 'imageTag', message: 'Copilot image tag must match <version>-copilot (for example: 1.2.3-copilot)' });
     }
 
     if (config.copilotMountWorkspace && (!config.workdirPath || config.workdirPath.trim() === '')) {

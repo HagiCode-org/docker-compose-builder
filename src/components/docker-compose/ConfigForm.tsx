@@ -13,7 +13,6 @@ import {
 import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
 import { REGISTRIES } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
-import { createCopilotTemplateDefaults } from '@/lib/docker-compose/serviceTemplates';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -70,19 +69,6 @@ export function ConfigForm() {
   const iflowEnabled = enabledExecutors.includes('iflow-cli');
   const openCodeEnabled = enabledExecutors.includes('opencode');
 
-  useEffect(() => {
-    if (!copilotEnabled || !copilotMetadata) {
-      return;
-    }
-
-    if (!config.imageTag.endsWith('-copilot')) {
-      const templateDefaults = createCopilotTemplateDefaults(copilotMetadata);
-      if (templateDefaults.imageTag) {
-        updateConfig('imageTag', templateDefaults.imageTag);
-      }
-    }
-  }, [copilotEnabled, copilotMetadata, config.imageTag, updateConfig]);
-
   const setEnabledExecutors = useCallback((nextEnabled: ExecutorType[]) => {
     const uniqueEnabled = Array.from(new Set(nextEnabled));
     if (uniqueEnabled.length === 0) {
@@ -95,18 +81,14 @@ export function ConfigForm() {
   const toggleExecutor = useCallback((executor: ExecutorType, enabled: boolean) => {
     if (enabled) {
       setEnabledExecutors([...enabledExecutors, executor]);
-      if (executor === 'copilot-cli' && copilotMetadata) {
-        const templateDefaults = createCopilotTemplateDefaults(copilotMetadata);
-        if (templateDefaults.imageTag) {
-          updateConfig('imageTag', templateDefaults.imageTag);
-        }
+      if (executor === 'copilot-cli') {
         updateConfig('copilotMountWorkspace', true);
       }
       return;
     }
 
     setEnabledExecutors(enabledExecutors.filter((item) => item !== executor));
-  }, [copilotMetadata, enabledExecutors, setEnabledExecutors, updateConfig]);
+  }, [enabledExecutors, setEnabledExecutors, updateConfig]);
 
   return (
     <div className="space-y-6 p-6 sm:p-8">
