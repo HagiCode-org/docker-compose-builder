@@ -10,6 +10,7 @@ import { IpConfigInput } from './IpConfigInput';
 import { CaddyfilePreview } from './CaddyfilePreview';
 import { buildCaddyfile } from '@/lib/docker-compose/generator';
 import { useTranslation } from 'react-i18next';
+import { ShieldCheck, ShieldOff } from 'lucide-react';
 
 interface HttpsConfigPanelProps {
   config: DockerComposeConfig;
@@ -21,11 +22,18 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
   const { t } = useTranslation();
   const caddyfile = useMemo(() => buildCaddyfile(config), [config]);
   const accessUrl = `https://${config.lanIp}:${config.httpsPort || '443'}`;
+  const StatusIcon = config.enableHttps ? ShieldCheck : ShieldOff;
 
   return (
-    <div className="space-y-4 rounded-xl border p-4 bg-muted/20">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-lg font-semibold">{t('configForm.httpsSettings')}</h3>
+    <div className="space-y-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <StatusIcon className="size-4 text-primary" />
+            <span>{t('workspace.httpsPanelTitle')}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">{t('configForm.enableHttpsHelp')}</p>
+        </div>
         <Badge variant={config.enableHttps ? 'default' : 'secondary'}>
           {config.enableHttps ? t('configForm.httpsEnabled') : t('configForm.httpsDisabled')}
         </Badge>
@@ -41,8 +49,6 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
           {t('configForm.enableHttps')}
         </Label>
       </div>
-      <p className="text-xs text-muted-foreground">{t('configForm.enableHttpsHelp')}</p>
-
       {config.enableHttps && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -65,7 +71,7 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 rounded-md bg-background/60 border px-3 py-2">
+          <div className="flex items-center justify-between gap-2 rounded-xl border bg-background/70 px-3 py-2">
             <span className="text-sm">{t('configForm.accessUrl')}</span>
             <code className="text-xs">{accessUrl}</code>
           </div>
