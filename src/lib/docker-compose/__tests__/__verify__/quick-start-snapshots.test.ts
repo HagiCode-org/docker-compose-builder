@@ -16,7 +16,8 @@ import {
   hasEnvVar,
   getServiceEnvVar,
   getServiceImage,
-  getServicePorts
+  getServicePorts,
+  getServiceVolumes
 } from '../helpers/yaml';
 
 describe('Quick Start Profiles - Complete File Verification with YAML Parsing', () => {
@@ -198,12 +199,11 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(parsed.parsed.services.postgres).toBeUndefined();
   });
 
-  it('should generate explicit executor branches for CodeBuddy, IFlow, and OpenCode without default-provider routing', async () => {
+  it('should generate explicit executor branches for Codex and OpenCode without default-provider routing', async () => {
     const config = createMockConfig({
-      enabledExecutors: ['codebuddy-cli', 'iflow-cli', 'opencode'],
+      enabledExecutors: ['codex', 'opencode'],
       anthropicAuthToken: '',
-      codebuddyApiKey: 'cb-test-key',
-      codebuddyInternetEnvironment: 'ioa',
+      codexApiKey: 'test-codex-key',
       openCodeModel: 'anthropic/claude-sonnet-4'
     });
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
@@ -212,11 +212,59 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
 
-    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__CodebuddyCli__Enabled')).toBe(true);
-    expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__IFlowCli__Enabled')).toBe(true);
+    expect(hasEnvVar(yaml, 'hagicode', 'CODEX_API_KEY')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__OpenCodeCli__Enabled')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__DefaultProvider')).toBe(false);
+    expect(yaml).not.toContain('CODEBUDDY_API_KEY');
+    expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
+    expect(yaml).not.toContain('copilot-cli:');
 
-    expect(yaml).toMatchSnapshot('quick-start-explicit-executor-matrix-zh-CN');
+    expect(yaml).toMatchSnapshot('quick-start-retained-executor-matrix-zh-CN');
+  });
+
+  it('should export the managed OpenCode config volume in quick-start mode by default', async () => {
+    const config = createMockConfig({
+      enabledExecutors: ['opencode'],
+      anthropicAuthToken: '',
+      openCodeModel: 'anthropic/claude-sonnet-4',
+      openCodeConfigMode: 'default-managed',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.errors).toEqual([]);
+    expect(validation.valid).toBe(true);
+    expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+
+    expect(yaml).toMatchSnapshot('quick-start-opencode-managed-volume-zh-CN');
+  });
+
+  it('should emit managed persistence volumes only for retained executors in quick-start mode', async () => {
+    const config = createMockConfig({
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeModel: 'anthropic/claude-sonnet-4',
+      workdirPath: '/workspace',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.errors).toEqual([]);
+    expect(validation.valid).toBe(true);
+
+    expect(hasVolume(yaml, 'codex-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('codex-data:/home/hagicode/.codex');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(hasService(yaml, 'copilot-cli')).toBe(false);
+    expect(hasVolume(yaml, 'copilot-data')).toBe(false);
+    expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
+    expect(hasVolume(yaml, 'kimi-data')).toBe(false);
+    expect(hasVolume(yaml, 'qoder-data')).toBe(false);
+    expect(hasVolume(yaml, 'kiro-data')).toBe(false);
+
+    expect(yaml).toMatchSnapshot('quick-start-retained-cli-persistence-zh-CN');
   });
 });

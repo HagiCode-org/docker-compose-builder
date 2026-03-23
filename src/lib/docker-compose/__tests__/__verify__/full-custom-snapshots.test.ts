@@ -202,4 +202,67 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     const linuxPostgresVolumes = getServiceVolumes(linuxYaml, 'postgres');
     expect(linuxPostgresVolumes).toContain('/mnt/data/postgres:/bitnami/postgresql');
   });
+
+  it('should keep only retained executor volumes in full custom mode', async () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeModel: 'anthropic/claude-sonnet-4',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.valid).toBe(true);
+
+    const volumes = getServiceVolumes(yaml, 'hagicode');
+    expect(volumes).toContain('codex-data:/home/hagicode/.codex');
+    expect(volumes).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
+    expect(hasVolume(yaml, 'kimi-data')).toBe(false);
+    expect(hasVolume(yaml, 'qoder-data')).toBe(false);
+    expect(hasVolume(yaml, 'kiro-data')).toBe(false);
+
+    expect(yaml).toMatchSnapshot('full-custom-retained-executor-volumes-zh-CN');
+  });
+
+  it('should export an OpenCode host-file bind mount in full custom mode', async () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      enabledExecutors: ['opencode'],
+      anthropicAuthToken: '',
+      hostOS: 'linux',
+      openCodeConfigMode: 'host-file',
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.valid).toBe(true);
+    expect(hasVolume(yaml, 'opencode-config-data')).toBe(false);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
+
+    expect(yaml).toMatchSnapshot('full-custom-opencode-host-file-zh-CN');
+  });
+
+  it('should not emit removed executor services or volumes in full custom mode', async () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      enabledExecutors: ['claude', 'codex'],
+      codexApiKey: 'test-codex-key',
+      anthropicAuthToken: '',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.valid).toBe(true);
+    expect(hasService(yaml, 'copilot-cli')).toBe(false);
+    expect(hasVolume(yaml, 'copilot-data')).toBe(false);
+    expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
+    expect(hasVolume(yaml, 'qoder-data')).toBe(false);
+    expect(yaml).not.toContain('COPILOT_API_KEY');
+
+    expect(yaml).toMatchSnapshot('full-custom-no-removed-executors-zh-CN');
+  });
 });
