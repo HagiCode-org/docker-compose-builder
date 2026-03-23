@@ -8,6 +8,7 @@ export type HostOS = 'windows' | 'linux';
 export type LicenseKeyType = 'public' | 'custom';
 export type VolumeType = 'named' | 'bind';
 export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
+export type OpenCodeConfigMode = 'default-managed' | 'host-file';
 
 /**
  * Configuration Profile Type
@@ -24,18 +25,9 @@ export type ConfigProfile = 'quick-start' | 'full-custom';
  *
  * - claude: Uses Anthropic-compatible API providers (Anthropic/ZAI/Aliyun/MiniMax/Volcengine/Custom)
  * - codex: Uses Codex runtime with CODEX_* environment variables
- * - copilot-cli: Uses Copilot CLI runtime with COPILOT_* environment variables
- * - codebuddy-cli: Uses CodeBuddy CLI runtime with CODEBUDDY_* environment variables
- * - iflow-cli: Uses IFlow CLI runtime with explicit ACP bootstrap configuration
  * - opencode: Uses the managed OpenCode runtime contract
  */
-export type ExecutorType =
-  | 'claude'
-  | 'codex'
-  | 'copilot-cli'
-  | 'codebuddy-cli'
-  | 'iflow-cli'
-  | 'opencode';
+export type ExecutorType = 'claude' | 'codex' | 'opencode';
 
 /**
  * Anthropic API Provider Type
@@ -67,6 +59,8 @@ export type { ProviderPreset } from './providerConfigLoader';
 export const ZAI_API_URL = 'https://open.bigmodel.cn/api/anthropic';
 export const ALIYUN_API_URL = 'https://coding.dashscope.aliyuncs.com/apps/anthropic';
 export const VOLCENGINE_API_URL = 'https://ark.cn-beijing.volces.com/api/coding';
+export const OPENCODE_CONFIG_TARGET_DIR = '/home/hagicode/.config/opencode';
+export const OPENCODE_CONFIG_TARGET_FILE = `${OPENCODE_CONFIG_TARGET_DIR}/opencode.json`;
 
 /**
  * Image Registry Configuration Interface
@@ -164,23 +158,13 @@ export interface DockerComposeConfig {
   /** Codex Base URL (optional) */
   codexBaseUrl?: string;
 
-  // CodeBuddy Runtime Configuration (used when CodeBuddy executor is enabled)
-  /** CodeBuddy API Key (required when enabled) */
-  codebuddyApiKey: string;
-  /** CodeBuddy network environment hint (recommended default: ioa) */
-  codebuddyInternetEnvironment: string;
-
-  // Copilot CLI Runtime Configuration (used when Copilot executor is enabled)
-  /** Copilot API Key (required) */
-  copilotApiKey: string;
-  /** Copilot Base URL (optional) */
-  copilotBaseUrl?: string;
-  /** Enable workspace mount in generated copilot service */
-  copilotMountWorkspace: boolean;
-
   // OpenCode Runtime Configuration (used when OpenCode executor is enabled)
   /** Managed OpenCode model (optional but preseeded from the runtime baseline) */
   openCodeModel?: string;
+  /** Determines how opencode.json is persisted for the container runtime */
+  openCodeConfigMode: OpenCodeConfigMode;
+  /** Optional host file path used when OpenCode config persistence is set to host-file */
+  openCodeConfigHostPath: string;
 
   // Volume mounts
   workdirPath: string;

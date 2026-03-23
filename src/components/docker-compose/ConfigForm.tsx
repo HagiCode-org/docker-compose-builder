@@ -6,12 +6,9 @@ import {
   selectProvidersLoading,
   selectProvidersError,
   selectProviderById,
-  selectCopilotMetadata,
-  selectCopilotMetadataLoading,
-  selectCopilotMetadataError,
 } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
-import { REGISTRIES } from '@/lib/docker-compose/types';
+import { OPENCODE_CONFIG_TARGET_FILE, REGISTRIES } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -44,9 +41,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
   const providers = useSelector(selectProviders);
   const providersLoading = useSelector(selectProvidersLoading);
   const providersError = useSelector(selectProvidersError);
-  const copilotMetadata = useSelector(selectCopilotMetadata);
-  const copilotMetadataLoading = useSelector(selectCopilotMetadataLoading);
-  const copilotMetadataError = useSelector(selectCopilotMetadataError);
 
   const updateConfig = useCallback(<K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => {
     dispatch(setConfigField({ field, value }));
@@ -74,9 +68,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
   const enabledExecutors = config.enabledExecutors;
   const claudeEnabled = enabledExecutors.includes('claude');
   const codexEnabled = enabledExecutors.includes('codex');
-  const copilotEnabled = enabledExecutors.includes('copilot-cli');
-  const codebuddyEnabled = enabledExecutors.includes('codebuddy-cli');
-  const iflowEnabled = enabledExecutors.includes('iflow-cli');
   const openCodeEnabled = enabledExecutors.includes('opencode');
 
   const setEnabledExecutors = useCallback((nextEnabled: ExecutorType[]) => {
@@ -91,9 +82,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
   const toggleExecutor = useCallback((executor: ExecutorType, enabled: boolean) => {
     if (enabled) {
       setEnabledExecutors([...enabledExecutors, executor]);
-      if (executor === 'copilot-cli') {
-        updateConfig('copilotMountWorkspace', true);
-      }
       return;
     }
 
@@ -303,27 +291,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   onCheckedChange={(checked) => toggleExecutor('codex', checked)}
                 />
                 <ExecutorToggle
-                  id="executor-copilot"
-                  label="Copilot CLI"
-                  checked={copilotEnabled}
-                  disabled={enabledExecutors.length === 1 && copilotEnabled}
-                  onCheckedChange={(checked) => toggleExecutor('copilot-cli', checked)}
-                />
-                <ExecutorToggle
-                  id="executor-codebuddy"
-                  label="CodeBuddy"
-                  checked={codebuddyEnabled}
-                  disabled={enabledExecutors.length === 1 && codebuddyEnabled}
-                  onCheckedChange={(checked) => toggleExecutor('codebuddy-cli', checked)}
-                />
-                <ExecutorToggle
-                  id="executor-iflow"
-                  label="IFlow CLI"
-                  checked={iflowEnabled}
-                  disabled={enabledExecutors.length === 1 && iflowEnabled}
-                  onCheckedChange={(checked) => toggleExecutor('iflow-cli', checked)}
-                />
-                <ExecutorToggle
                   id="executor-opencode"
                   label="OpenCode"
                   checked={openCodeEnabled}
@@ -332,6 +299,13 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 />
               </div>
               {renderFieldError('enabledExecutors')}
+            </div>
+
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
+              <p className="font-medium">{t('configForm.communitySupportTitle')}</p>
+              <p className="mt-1 text-muted-foreground">{t('configForm.communitySupportDescription')}</p>
+              <p className="mt-3 text-muted-foreground">{t('configForm.communityContributeBuilder')}</p>
+              <p className="text-muted-foreground">{t('configForm.communityContributeRelease')}</p>
             </div>
 
             {claudeEnabled ? (
@@ -511,147 +485,105 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               </div>
             ) : null}
 
-            {codebuddyEnabled ? (
-              <div id="executor-codebuddy" tabIndex={-1} className={subSectionClass}>
-                <div>
-                  <h4 className="text-base font-semibold">{t('configForm.codebuddyConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.codebuddyDescription')}</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="codebuddyApiKey">CODEBUDDY_API_KEY <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="codebuddyApiKey"
-                      type="text"
-                      value={config.codebuddyApiKey}
-                      onChange={(event) => updateConfig('codebuddyApiKey', event.target.value)}
-                      placeholder="cb-..."
-                    />
-                    {renderFieldError('codebuddyApiKey')}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="codebuddyInternetEnvironment">CODEBUDDY_INTERNET_ENVIRONMENT</Label>
-                    <Input
-                      id="codebuddyInternetEnvironment"
-                      type="text"
-                      value={config.codebuddyInternetEnvironment}
-                      onChange={(event) => updateConfig('codebuddyInternetEnvironment', event.target.value)}
-                      placeholder="ioa"
-                    />
-                    <p className="text-sm text-muted-foreground">{t('configForm.codebuddyInternetEnvironmentHint')}</p>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {iflowEnabled ? (
-              <div id="executor-iflow" tabIndex={-1} className={subSectionClass}>
-                <div>
-                  <h4 className="text-base font-semibold">{t('configForm.iflowConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.iflowDescription')}</p>
-                </div>
-                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                  <p className="font-medium">{t('configForm.iflowRuntimeCommand')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.iflowLoginHint')}</p>
-                </div>
-              </div>
-            ) : null}
-
             {openCodeEnabled ? (
               <div id="executor-opencode" tabIndex={-1} className={subSectionClass}>
                 <div>
                   <h4 className="text-base font-semibold">{t('configForm.openCodeConfiguration')}</h4>
                   <p className="text-sm text-muted-foreground">{t('configForm.openCodeDescription')}</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="openCodeModel">{t('configForm.openCodeModel')}</Label>
-                  <Input
-                    id="openCodeModel"
-                    type="text"
-                    value={config.openCodeModel || ''}
-                    onChange={(event) => updateConfig('openCodeModel', event.target.value || undefined)}
-                    placeholder="anthropic/claude-sonnet-4"
-                  />
-                  <p className="text-sm text-muted-foreground">{t('configForm.openCodeModelHint')}</p>
-                </div>
-              </div>
-            ) : null}
-
-            {copilotEnabled ? (
-              <div id="executor-copilot" tabIndex={-1} className={subSectionClass}>
-                <div>
-                  <h4 className="text-base font-semibold">{t('configForm.copilotConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.copilotDescription')}</p>
-                </div>
-
-                {copilotMetadataLoading ? (
-                  <div className="text-sm text-muted-foreground">{t('configForm.loadingCopilotMetadata')}</div>
-                ) : null}
-
-                {copilotMetadata ? (
-                  <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                    <p>{t('configForm.copilotMetadataHint', { version: copilotMetadata.envSchemaVersion })}</p>
-                    <p className="mt-1 text-xs font-mono">imageTag: {copilotMetadata.imageTag}</p>
-                  </div>
-                ) : null}
-
-                {copilotMetadataError ? (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
-                    <p>{t('configForm.copilotMetadataFallback')}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{copilotMetadataError}</p>
-                  </div>
-                ) : null}
-
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="copilotApiKey">COPILOT_API_KEY <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="openCodeModel">{t('configForm.openCodeModel')}</Label>
                     <Input
-                      id="copilotApiKey"
+                      id="openCodeModel"
                       type="text"
-                      value={config.copilotApiKey}
-                      onChange={(event) => updateConfig('copilotApiKey', event.target.value)}
-                      placeholder="Enter your COPILOT_API_KEY"
+                      value={config.openCodeModel || ''}
+                      onChange={(event) => updateConfig('openCodeModel', event.target.value || undefined)}
+                      placeholder="anthropic/claude-sonnet-4"
                     />
-                    {renderFieldError('copilotApiKey')}
+                    <p className="text-sm text-muted-foreground">{t('configForm.openCodeModelHint')}</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="copilotBaseUrl">COPILOT_BASE_URL ({t('configForm.optional')})</Label>
-                    <Input
-                      id="copilotBaseUrl"
-                      type="text"
-                      value={config.copilotBaseUrl || ''}
-                      onChange={(event) => updateConfig('copilotBaseUrl', event.target.value || undefined)}
-                      placeholder="https://api.githubcopilot.com"
-                    />
+                  <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
+                    <p className="text-sm font-medium">{t('configForm.openCodeTargetPathLabel')}</p>
+                    <p className="mt-2 font-mono text-sm text-primary">{OPENCODE_CONFIG_TARGET_FILE}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{t('configForm.openCodeTargetPathHint')}</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="copilotImageTag">{t('configForm.imageTag')} <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="copilotImageTag"
-                      value={config.imageTag}
-                      onChange={(event) => updateConfig('imageTag', event.target.value)}
-                      placeholder="1.2.3-copilot"
-                    />
-                    {renderFieldError('imageTag')}
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label>{t('configForm.openCodeConfigSource')}</Label>
+                      <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigSourceHint')}</p>
+                    </div>
+                    <RadioGroup
+                      value={config.openCodeConfigMode}
+                      onValueChange={(value: DockerComposeConfig['openCodeConfigMode']) => updateConfig('openCodeConfigMode', value)}
+                      className="grid grid-cols-1 gap-3"
+                    >
+                      <Label
+                        htmlFor="openCodeConfigMode-default-managed"
+                        className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border/70 bg-background/90 p-4 transition-all hover:border-primary/40 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/6"
+                      >
+                        <RadioGroupItem value="default-managed" id="openCodeConfigMode-default-managed" className="mt-1" />
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 font-medium">
+                            <span>{t('configForm.openCodeConfigModeDefault')}</span>
+                            <Badge variant="secondary">{t('common.recommended')}</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigModeDefaultHint')}</p>
+                        </div>
+                      </Label>
+                      <Label
+                        htmlFor="openCodeConfigMode-host-file"
+                        className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border/70 bg-background/90 p-4 transition-all hover:border-primary/40 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/6"
+                      >
+                        <RadioGroupItem value="host-file" id="openCodeConfigMode-host-file" className="mt-1" />
+                        <div className="space-y-1">
+                          <div className="font-medium">{t('configForm.openCodeConfigModeHostFile')}</div>
+                          <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigModeHostFileHint')}</p>
+                        </div>
+                      </Label>
+                    </RadioGroup>
                   </div>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/80 p-4">
-                    <Checkbox
-                      id="copilotMountWorkspace"
-                      checked={config.copilotMountWorkspace}
-                      onCheckedChange={(checked) => updateConfig('copilotMountWorkspace', checked === true)}
-                    />
-                    <Label htmlFor="copilotMountWorkspace" className="cursor-pointer">
-                      {t('configForm.copilotMountWorkspace')}
-                    </Label>
-                  </div>
+                  {config.openCodeConfigMode === 'host-file' ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="openCodeConfigHostPath">
+                        {t('configForm.openCodeConfigHostPath')} <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="openCodeConfigHostPath"
+                        type="text"
+                        value={config.openCodeConfigHostPath}
+                        onChange={(event) => updateConfig('openCodeConfigHostPath', event.target.value)}
+                        placeholder={config.hostOS === 'windows'
+                          ? 'C:\\opencode\\opencode.json'
+                          : '/srv/opencode/opencode.json'}
+                      />
+                      {renderFieldError('openCodeConfigHostPath')}
+                      <p className="text-sm text-muted-foreground">
+                        {t('configForm.openCodeConfigHostPathHint', {
+                          example: config.hostOS === 'windows'
+                            ? 'C:\\opencode\\opencode.json'
+                            : '/srv/opencode/opencode.json'
+                        })}
+                      </p>
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
+                        <p className="font-medium">{t('configForm.openCodeConfigBrowserLimitTitle')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigBrowserLimitHint')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigManualPriorityHint')}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
+                      <p className="font-medium">{t('configForm.openCodeManagedVolumeTitle')}</p>
+                      <p className="mt-1 text-muted-foreground">{t('configForm.openCodeManagedVolumeHint')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
+
           </div>
         </ConfigSectionCard>
       ) : null}

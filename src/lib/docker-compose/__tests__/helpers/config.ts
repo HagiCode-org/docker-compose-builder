@@ -34,12 +34,9 @@ export function createMockConfig(
     anthropicUrl: '',
     codexApiKey: '',
     codexBaseUrl: undefined,
-    codebuddyApiKey: '',
-    codebuddyInternetEnvironment: 'ioa',
-    copilotApiKey: '',
-    copilotBaseUrl: undefined,
-    copilotMountWorkspace: true,
     openCodeModel: 'anthropic/claude-sonnet-4',
+    openCodeConfigMode: 'default-managed',
+    openCodeConfigHostPath: '',
     workdirPath: '/home/user/repos',
     workdirCreatedByRoot: true,
     puid: '1000',
@@ -174,28 +171,6 @@ export function createCustomProviderConfig(
   return createMockConfig({
     anthropicApiProvider: 'custom',
     anthropicUrl: 'https://custom-api.example.com',
-    ...overrides
-  });
-}
-
-export function createCodeBuddyConfig(
-  overrides: Partial<DockerComposeConfig> = {}
-): DockerComposeConfig {
-  return createMockConfig({
-    enabledExecutors: ['codebuddy-cli'],
-    codebuddyApiKey: 'cb-test-key',
-    codebuddyInternetEnvironment: 'ioa',
-    anthropicAuthToken: '',
-    ...overrides
-  });
-}
-
-export function createIFlowConfig(
-  overrides: Partial<DockerComposeConfig> = {}
-): DockerComposeConfig {
-  return createMockConfig({
-    enabledExecutors: ['iflow-cli'],
-    anthropicAuthToken: '',
     ...overrides
   });
 }

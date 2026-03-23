@@ -28,15 +28,10 @@ export const defaultConfig: DockerComposeConfig = {
   // Codex Runtime Configuration (default to empty strings)
   codexApiKey: '',
   codexBaseUrl: undefined,
-  // CodeBuddy Runtime Configuration
-  codebuddyApiKey: '',
-  codebuddyInternetEnvironment: 'ioa',
-  // Copilot CLI Runtime Configuration (default to empty strings)
-  copilotApiKey: '',
-  copilotBaseUrl: undefined,
-  copilotMountWorkspace: true,
   // OpenCode Runtime Configuration
   openCodeModel: 'anthropic/claude-sonnet-4',
+  openCodeConfigMode: 'default-managed',
+  openCodeConfigHostPath: '',
   workdirPath: '',
   workdirCreatedByRoot: false,
   puid: '1000',

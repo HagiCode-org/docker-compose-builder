@@ -12,9 +12,6 @@ export type WorkspaceSectionId =
 export type WorkspaceSectionChildId =
   | 'executor-claude'
   | 'executor-codex'
-  | 'executor-copilot'
-  | 'executor-codebuddy'
-  | 'executor-iflow'
   | 'executor-opencode';
 
 export type WorkspaceSectionStatus = 'active' | 'complete' | 'error' | 'pending';
@@ -105,12 +102,9 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       'anthropicUrl',
       'codexApiKey',
       'codexBaseUrl',
-      'codebuddyApiKey',
-      'codebuddyInternetEnvironment',
-      'copilotApiKey',
-      'copilotBaseUrl',
-      'copilotMountWorkspace',
       'openCodeModel',
+      'openCodeConfigMode',
+      'openCodeConfigHostPath',
     ],
     isVisible: () => true,
     isComplete: (config) => {
@@ -122,12 +116,13 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
         || (hasTextValue(config.anthropicAuthToken)
           && (config.anthropicApiProvider !== 'custom' || hasTextValue(config.anthropicUrl)));
       const codexReady = !config.enabledExecutors.includes('codex') || hasTextValue(config.codexApiKey);
-      const codebuddyReady = !config.enabledExecutors.includes('codebuddy-cli') || hasTextValue(config.codebuddyApiKey);
-      const copilotReady = !config.enabledExecutors.includes('copilot-cli')
-        || (hasTextValue(config.copilotApiKey)
-          && (!config.copilotMountWorkspace || hasTextValue(config.workdirPath)));
+      const openCodeReady = !config.enabledExecutors.includes('opencode')
+        || config.openCodeConfigMode === 'default-managed'
+        || hasTextValue(config.openCodeConfigHostPath);
 
-      return claudeReady && codexReady && codebuddyReady && copilotReady;
+      return claudeReady
+        && codexReady
+        && openCodeReady;
     },
   },
   {
@@ -229,42 +224,14 @@ const childDefinitions: WorkspaceSectionChildDefinition[] = [
     isComplete: (config) => hasTextValue(config.codexApiKey),
   },
   {
-    id: 'executor-copilot',
-    parentId: 'executors',
-    titleKey: 'workspace.executorItems.copilot.title',
-    descriptionKey: 'workspace.executorItems.copilot.description',
-    fieldIds: ['copilotApiKey', 'copilotBaseUrl', 'copilotMountWorkspace'],
-    isVisible: (config) => config.enabledExecutors.includes('copilot-cli'),
-    isComplete: (config) =>
-      hasTextValue(config.copilotApiKey)
-      && (!config.copilotMountWorkspace || hasTextValue(config.workdirPath)),
-  },
-  {
-    id: 'executor-codebuddy',
-    parentId: 'executors',
-    titleKey: 'workspace.executorItems.codebuddy.title',
-    descriptionKey: 'workspace.executorItems.codebuddy.description',
-    fieldIds: ['codebuddyApiKey', 'codebuddyInternetEnvironment'],
-    isVisible: (config) => config.enabledExecutors.includes('codebuddy-cli'),
-    isComplete: (config) => hasTextValue(config.codebuddyApiKey),
-  },
-  {
-    id: 'executor-iflow',
-    parentId: 'executors',
-    titleKey: 'workspace.executorItems.iflow.title',
-    descriptionKey: 'workspace.executorItems.iflow.description',
-    fieldIds: [],
-    isVisible: (config) => config.enabledExecutors.includes('iflow-cli'),
-    isComplete: () => true,
-  },
-  {
     id: 'executor-opencode',
     parentId: 'executors',
     titleKey: 'workspace.executorItems.opencode.title',
     descriptionKey: 'workspace.executorItems.opencode.description',
-    fieldIds: ['openCodeModel'],
+    fieldIds: ['openCodeModel', 'openCodeConfigMode', 'openCodeConfigHostPath'],
     isVisible: (config) => config.enabledExecutors.includes('opencode'),
-    isComplete: () => true,
+    isComplete: (config) =>
+      config.openCodeConfigMode === 'default-managed' || hasTextValue(config.openCodeConfigHostPath),
   },
 ];
 

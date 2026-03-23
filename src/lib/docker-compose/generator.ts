@@ -1,6 +1,13 @@
 import type { DockerComposeConfig } from './types';
 import type { ProviderPreset } from './providerConfigLoader';
-import { REGISTRIES, ZAI_API_URL, ALIYUN_API_URL, VOLCENGINE_API_URL } from './types';
+import {
+  REGISTRIES,
+  ZAI_API_URL,
+  ALIYUN_API_URL,
+  VOLCENGINE_API_URL,
+  OPENCODE_CONFIG_TARGET_DIR,
+  OPENCODE_CONFIG_TARGET_FILE
+} from './types';
 
 /**
  * Get provider API URL for Docker Compose generation
@@ -86,6 +93,87 @@ function isExecutorEnabled(config: DockerComposeConfig, executor: DockerComposeC
   return Array.isArray(config.enabledExecutors) && config.enabledExecutors.includes(executor);
 }
 
+function hasTextValue(value: string | undefined): value is string {
+  return Boolean(value?.trim());
+}
+
+type ExecutorVolumeSpec = {
+  executor: DockerComposeConfig['enabledExecutors'][number];
+  volumeName: string;
+  targetPath: string;
+  hostPath?: (config: DockerComposeConfig) => string | undefined;
+};
+
+const APP_EXECUTOR_VOLUME_SPECS: ExecutorVolumeSpec[] = [
+  { executor: 'claude', volumeName: 'claude-data', targetPath: '/home/hagicode/.claude' },
+  { executor: 'codex', volumeName: 'codex-data', targetPath: '/home/hagicode/.codex' },
+];
+
+const EXECUTOR_VOLUME_DECLARATION_ORDER = [
+  'claude-data',
+  'codex-data',
+  'opencode-config-data',
+] as const;
+
+function getExecutorVolumeSource(
+  config: DockerComposeConfig,
+  spec: ExecutorVolumeSpec
+): string | null {
+  if (!isExecutorEnabled(config, spec.executor)) {
+    return null;
+  }
+
+  const hostPath = spec.hostPath?.(config);
+  if (hasTextValue(hostPath)) {
+    return hostPath;
+  }
+
+  return spec.volumeName;
+}
+
+function getAppExecutorVolumeMounts(config: DockerComposeConfig): string[] {
+  const mounts: string[] = [];
+
+  for (const spec of APP_EXECUTOR_VOLUME_SPECS) {
+    const source = getExecutorVolumeSource(config, spec);
+    if (source) {
+      mounts.push(`      - ${source}:${spec.targetPath}`);
+    }
+  }
+
+  if (isExecutorEnabled(config, 'opencode')) {
+    if (config.openCodeConfigMode === 'host-file' && hasTextValue(config.openCodeConfigHostPath)) {
+      mounts.push(`      - ${config.openCodeConfigHostPath}:${OPENCODE_CONFIG_TARGET_FILE}`);
+    } else {
+      mounts.push(`      - opencode-config-data:${OPENCODE_CONFIG_TARGET_DIR}`);
+    }
+  }
+
+  return mounts;
+}
+
+function getUsedExecutorNamedVolumes(config: DockerComposeConfig): Set<string> {
+  const usedVolumes = new Set<string>();
+
+  for (const spec of APP_EXECUTOR_VOLUME_SPECS) {
+    const source = getExecutorVolumeSource(config, spec);
+    if (source === spec.volumeName) {
+      usedVolumes.add(spec.volumeName);
+    }
+  }
+
+  if (isExecutorEnabled(config, 'opencode')) {
+    const usesManagedOpenCodeVolume =
+      config.openCodeConfigMode !== 'host-file' || !hasTextValue(config.openCodeConfigHostPath);
+
+    if (usesManagedOpenCodeVolume) {
+      usedVolumes.add('opencode-config-data');
+    }
+  }
+
+  return usedVolumes;
+}
+
 /**
  * Build provider environment variables based on enabled executors.
  * Claude and Codex can be emitted together when both are enabled.
@@ -119,57 +207,6 @@ function buildProviderEnvVars(
       lines.push('      # CODEX_BASE_URL: optional, uses default if not set');
       lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
     }
-  }
-
-  if (isExecutorEnabled(config, 'copilot-cli')) {
-    lines.push('      # ==================================================');
-    lines.push('      # Copilot CLI Runtime Configuration');
-    lines.push('      # Uses COPILOT_* environment variables');
-    lines.push('      # ==================================================');
-
-    if (config.copilotApiKey) {
-      lines.push(`      COPILOT_API_KEY: "${config.copilotApiKey}"`);
-    }
-
-    if (config.copilotBaseUrl && config.copilotBaseUrl.trim()) {
-      lines.push(`      COPILOT_BASE_URL: "${config.copilotBaseUrl}"`);
-    } else {
-      lines.push('      # COPILOT_BASE_URL: optional, uses default if not set');
-    }
-  }
-
-  if (isExecutorEnabled(config, 'codebuddy-cli')) {
-    lines.push('      # ==================================================');
-    lines.push('      # CodeBuddy CLI Runtime Configuration');
-    lines.push('      # Uses explicit provider/bootstrap registration plus CODEBUDDY_* runtime variables');
-    lines.push('      # ==================================================');
-    lines.push('      AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
-    lines.push('      AI__Providers__Providers__CodebuddyCli__Type: "CodebuddyCli"');
-    lines.push('      AI__Providers__Providers__CodebuddyCli__ExecutablePath: "codebuddy"');
-    lines.push('      AI__PlatformConfigurations__CodebuddyCli__ExecutablePath: "codebuddy"');
-    lines.push('      AI__PlatformConfigurations__CodebuddyCli__Arguments: "--acp"');
-
-    if (config.codebuddyApiKey && config.codebuddyApiKey.trim()) {
-      lines.push(`      CODEBUDDY_API_KEY: "${config.codebuddyApiKey}"`);
-    }
-
-    if (config.codebuddyInternetEnvironment && config.codebuddyInternetEnvironment.trim()) {
-      lines.push(`      CODEBUDDY_INTERNET_ENVIRONMENT: "${config.codebuddyInternetEnvironment}"`);
-    }
-  }
-
-  if (isExecutorEnabled(config, 'iflow-cli')) {
-    lines.push('      # ==================================================');
-    lines.push('      # IFlow CLI Runtime Configuration');
-    lines.push('      # Uses explicit ACP bootstrap keys and relies on prior CLI login or mounted runtime state');
-    lines.push('      # ==================================================');
-    lines.push('      AI__Providers__Providers__IFlowCli__Enabled: "true"');
-    lines.push('      AI__Providers__Providers__IFlowCli__Type: "IFlowCli"');
-    lines.push('      AI__Providers__Providers__IFlowCli__ExecutablePath: "iflow"');
-    lines.push('      AI__PlatformConfigurations__IFlowCli__ProviderName: "IFlowCli"');
-    lines.push('      AI__PlatformConfigurations__IFlowCli__ExecutablePath: "iflow"');
-    lines.push('      AI__PlatformConfigurations__IFlowCli__Arguments: "--experimental-acp --port {port}"');
-    lines.push('      AI__PlatformConfigurations__IFlowCli__AuthMethod: "iflow"');
   }
 
   if (isExecutorEnabled(config, 'opencode')) {
@@ -395,8 +432,7 @@ export function buildAppService(
   // Contains SQLite database file when using SQLite, or Orleans grain storage, logs, etc. for PostgreSQL
   lines.push('      - hagicode_data:/app/data');
 
-  // Claude Code configuration volume (persists user config, session history, and plugins)
-  lines.push('      - claude-data:/home/hagicode/.claude');
+  lines.push(...getAppExecutorVolumeMounts(config));
 
   // Depends on (only for internal PostgreSQL)
   if (config.databaseType === 'internal') {
@@ -562,52 +598,11 @@ export function buildServicesSection(
     lines.push(...caddyServiceLines);
   }
 
-  if (isExecutorEnabled(config, 'copilot-cli')) {
-    const copilotServiceLines = buildCopilotCliService(config);
-    lines.push(...copilotServiceLines);
-  }
-
   // Add internal PostgreSQL service if needed
   if (config.databaseType === 'internal') {
     const postgresServiceLines = buildPostgresService(config);
     lines.push(...postgresServiceLines);
   }
-
-  return lines;
-}
-
-export function buildCopilotCliService(config: DockerComposeConfig): string[] {
-  const lines: string[] = [];
-  const imagePrefix = REGISTRIES[config.imageRegistry].imagePrefix;
-  const imageTag = config.imageTag;
-  const image = config.imageRegistry === 'aliyun-acr'
-    ? `${imagePrefix}/hagicode:${imageTag}`
-    : `${imagePrefix}:${imageTag}`;
-
-  lines.push('');
-  lines.push('  copilot-cli:');
-  lines.push(`    image: ${image}`);
-  lines.push(`    container_name: ${config.containerName}-copilot`);
-  lines.push('    environment:');
-  lines.push(`      COPILOT_API_KEY: "${config.copilotApiKey}"`);
-  if (config.copilotBaseUrl && config.copilotBaseUrl.trim()) {
-    lines.push(`      COPILOT_BASE_URL: "${config.copilotBaseUrl}"`);
-  }
-  lines.push('    working_dir: /workspace');
-
-  if (config.copilotMountWorkspace) {
-    lines.push('    volumes:');
-    if (config.hostOS === 'windows') {
-      lines.push(`      - ${config.workdirPath || 'C:\\\\repos'}:/workspace`);
-    } else {
-      lines.push(`      - ${config.workdirPath || '/home/user/repos'}:/workspace`);
-    }
-  }
-
-  lines.push('    command: ["sleep", "infinity"]');
-  lines.push('    networks:');
-  lines.push('      - pcode-network');
-  lines.push('    restart: unless-stopped');
 
   return lines;
 }
@@ -619,6 +614,7 @@ export function buildCopilotCliService(config: DockerComposeConfig): string[] {
  */
 export function buildVolumesSection(config: DockerComposeConfig): string[] {
   const lines: string[] = [];
+  const usedExecutorVolumes = getUsedExecutorNamedVolumes(config);
 
   lines.push('');
   lines.push('volumes:');
@@ -626,8 +622,11 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
   // hagicode_data is always present (contains app data: SQLite database or Orleans grain storage, logs, etc.)
   lines.push('  hagicode_data:');
 
-  // claude-data is always present (persists Claude Code configuration, session history, and plugins)
-  lines.push('  claude-data:');
+  for (const volumeName of EXECUTOR_VOLUME_DECLARATION_ORDER) {
+    if (usedExecutorVolumes.has(volumeName)) {
+      lines.push(`  ${volumeName}:`);
+    }
+  }
 
   if (config.enableHttps) {
     lines.push('  caddy_data:');

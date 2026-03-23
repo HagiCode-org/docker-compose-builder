@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
+
 import {
   buildAppService,
   buildCaddyService,
   buildCaddyfile,
-  buildCopilotCliService,
   buildHeader,
   buildNetworksSection,
   buildPostgresService,
@@ -13,11 +13,10 @@ import {
 } from '../../generator';
 import {
   FIXED_DATE,
-  createCodeBuddyConfig,
-  createIFlowConfig,
   createMockConfig,
   createOpenCodeConfig,
 } from '../helpers/config';
+import { getServiceVolumes, hasService, hasVolume } from '../helpers/yaml';
 
 describe('buildHeader', () => {
   it('generates localized support metadata', () => {
@@ -51,24 +50,6 @@ describe('buildAppService', () => {
     expect(appService).toContain('CODEX_API_KEY: "test-codex-key"');
   });
 
-  it('renders CodeBuddy provider/bootstrap configuration explicitly', () => {
-    const appService = buildAppService(createCodeBuddyConfig()).join('\n');
-
-    expect(appService).toContain('AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
-    expect(appService).toContain('AI__PlatformConfigurations__CodebuddyCli__Arguments: "--acp"');
-    expect(appService).toContain('CODEBUDDY_API_KEY: "cb-test-key"');
-    expect(appService).toContain('CODEBUDDY_INTERNET_ENVIRONMENT: "ioa"');
-  });
-
-  it('renders IFlow bootstrap configuration without inventing IFLOW runtime variables', () => {
-    const appService = buildAppService(createIFlowConfig()).join('\n');
-
-    expect(appService).toContain('AI__Providers__Providers__IFlowCli__Enabled: "true"');
-    expect(appService).toContain('AI__PlatformConfigurations__IFlowCli__Arguments: "--experimental-acp --port {port}"');
-    expect(appService).toContain('AI__PlatformConfigurations__IFlowCli__AuthMethod: "iflow"');
-    expect(appService).not.toMatch(/^\s*IFLOW_/m);
-  });
-
   it('renders the managed OpenCode runtime contract explicitly', () => {
     const appService = buildAppService(createOpenCodeConfig()).join('\n');
 
@@ -76,19 +57,31 @@ describe('buildAppService', () => {
     expect(appService).toContain('AI__OpenCode__Enabled: "true"');
     expect(appService).toContain('AI__OpenCode__ExecutablePath: "opencode"');
     expect(appService).toContain('AI__OpenCode__Model: "anthropic/claude-sonnet-4"');
+    expect(appService).toContain('opencode-config-data:/home/hagicode/.config/opencode');
   });
 
-  it('renders Copilot runtime variables without a default-provider route', () => {
-    const appService = buildAppService(createMockConfig({
-      enabledExecutors: ['copilot-cli'],
-      imageTag: '1.2.3-copilot',
-      copilotApiKey: 'test-copilot-key',
-      copilotBaseUrl: 'https://api.githubcopilot.com',
+  it('renders a bind mount when OpenCode host-file mode is selected', () => {
+    const appService = buildAppService(createOpenCodeConfig({
+      openCodeConfigMode: 'host-file',
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
     })).join('\n');
 
-    expect(appService).toContain('COPILOT_API_KEY: "test-copilot-key"');
-    expect(appService).toContain('COPILOT_BASE_URL: "https://api.githubcopilot.com"');
-    expect(appService).not.toContain('AI__Providers__DefaultProvider');
+    expect(appService).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
+    expect(appService).not.toContain('opencode-config-data:/home/hagicode/.config/opencode');
+  });
+
+  it('mounts only retained executor state volumes when enabled', () => {
+    const appService = buildAppService(createMockConfig({
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeConfigMode: 'default-managed',
+    })).join('\n');
+
+    expect(appService).toContain('codex-data:/home/hagicode/.codex');
+    expect(appService).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(appService).not.toContain('claude-data:/home/hagicode/.claude');
+    expect(appService).not.toContain('copilot-data:/home/hagicode/.copilot');
   });
 
   it('keeps Linux user mapping and Claude persistence volume behavior', () => {
@@ -117,20 +110,6 @@ describe('proxy and service helpers', () => {
     expect(caddyfile).toContain('reverse_proxy hagicode:45000');
   });
 
-  it('builds the Copilot sidecar service when enabled', () => {
-    const service = buildCopilotCliService(createMockConfig({
-      enabledExecutors: ['copilot-cli'],
-      imageTag: '1.2.3-copilot',
-      copilotApiKey: 'test-copilot-key',
-      copilotMountWorkspace: true,
-      workdirPath: '/workspace',
-    })).join('\n');
-
-    expect(service).toContain('copilot-cli:');
-    expect(service).toContain('COPILOT_API_KEY: "test-copilot-key"');
-    expect(service).toContain('- /workspace:/workspace');
-  });
-
   it('builds the postgres service for internal database mode', () => {
     const postgresService = buildPostgresService(createMockConfig({
       databaseType: 'internal',
@@ -145,22 +124,27 @@ describe('proxy and service helpers', () => {
 });
 
 describe('section builders', () => {
-  it('includes conditional services for copilot and postgres', () => {
-    const services = buildServicesSection(createMockConfig({
-      enabledExecutors: ['claude', 'copilot-cli'],
+  it('includes conditional postgres services only when required', () => {
+    const withPostgres = buildServicesSection(createMockConfig({
+      enabledExecutors: ['claude', 'codex'],
       databaseType: 'internal',
-      imageTag: '1.2.3-copilot',
-      copilotApiKey: 'test-copilot-key',
+      codexApiKey: 'test-codex-key',
+    })).join('\n');
+    const withoutPostgres = buildServicesSection(createMockConfig({
+      enabledExecutors: ['opencode'],
+      anthropicAuthToken: '',
     })).join('\n');
 
-    expect(services).toContain('services:');
-    expect(services).toContain('hagicode:');
-    expect(services).toContain('copilot-cli:');
-    expect(services).toContain('postgres:');
+    expect(withPostgres).toContain('postgres:');
+    expect(withoutPostgres).not.toContain('postgres:');
+    expect(withoutPostgres).not.toContain('copilot-cli:');
   });
 
   it('builds volumes and networks sections', () => {
-    const volumes = buildVolumesSection(createMockConfig({ databaseType: 'internal', volumeType: 'named' })).join('\n');
+    const volumes = buildVolumesSection(createMockConfig({
+      databaseType: 'internal',
+      volumeType: 'named',
+    })).join('\n');
     const networks = buildNetworksSection().join('\n');
 
     expect(volumes).toContain('hagicode_data:');
@@ -169,16 +153,41 @@ describe('section builders', () => {
     expect(networks).toContain('pcode-network:');
     expect(networks).toContain('driver: bridge');
   });
+
+  it('adds the OpenCode named volume only for the default-managed mode', () => {
+    const managedVolumes = buildVolumesSection(createOpenCodeConfig()).join('\n');
+    const hostFileVolumes = buildVolumesSection(createOpenCodeConfig({
+      openCodeConfigMode: 'host-file',
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
+    })).join('\n');
+
+    expect(managedVolumes).toContain('opencode-config-data:');
+    expect(hostFileVolumes).not.toContain('opencode-config-data:');
+  });
+
+  it('declares only the managed executor volumes that are actually used', () => {
+    const yaml = generateYAML(createMockConfig({
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeConfigMode: 'default-managed',
+    }), undefined, 'en-US', FIXED_DATE);
+
+    expect(hasVolume(yaml, 'codex-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(hasVolume(yaml, 'claude-data')).toBe(false);
+    expect(hasVolume(yaml, 'kimi-data')).toBe(false);
+    expect(hasVolume(yaml, 'copilot-data')).toBe(false);
+  });
 });
 
 describe('generateYAML', () => {
-  it('generates a complete compose file without the removed default-provider line', () => {
+  it('generates a complete compose file for the retained executor matrix', () => {
     const yaml = generateYAML(createMockConfig({
-      enabledExecutors: ['claude', 'codex', 'codebuddy-cli', 'iflow-cli', 'opencode'],
+      enabledExecutors: ['claude', 'codex', 'opencode'],
       anthropicAuthToken: 'test-token',
       codexApiKey: 'test-codex-key',
-      codebuddyApiKey: 'cb-test-key',
-      codebuddyInternetEnvironment: 'ioa',
+      openCodeModel: 'openai/gpt-5',
       databaseType: 'internal',
       volumeType: 'named',
       volumeName: 'postgres-data',
@@ -187,29 +196,13 @@ describe('generateYAML', () => {
     expect(yaml).toContain('# Hagicode Docker Compose Configuration');
     expect(yaml).toContain('services:');
     expect(yaml).toContain('postgres:');
-    expect(yaml).toContain('AI__Providers__Providers__CodebuddyCli__Enabled: "true"');
-    expect(yaml).toContain('AI__Providers__Providers__IFlowCli__Enabled: "true"');
+    expect(yaml).toContain('CODEX_API_KEY: "test-codex-key"');
     expect(yaml).toContain('AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
+    expect(yaml).toContain('opencode-config-data:/home/hagicode/.config/opencode');
     expect(yaml).not.toContain('AI__Providers__DefaultProvider');
-  });
-
-  it('keeps snapshot coverage for copilot compose variants', () => {
-    const withVolume = createMockConfig({
-      enabledExecutors: ['copilot-cli'],
-      imageTag: '1.2.3-copilot',
-      copilotApiKey: 'test-copilot-key',
-      copilotMountWorkspace: true,
-      workdirPath: '/workspace',
-    });
-    const withoutVolume = createMockConfig({
-      enabledExecutors: ['copilot-cli'],
-      imageTag: '1.2.3-copilot',
-      copilotApiKey: 'test-copilot-key',
-      copilotMountWorkspace: false,
-    });
-
-    expect(generateYAML(withVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
-    expect(generateYAML(withoutVolume, undefined, 'en-US', FIXED_DATE)).toMatchSnapshot();
+    expect(yaml).not.toContain('copilot-cli:');
+    expect(yaml).not.toContain('CODEBUDDY_API_KEY');
+    expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
   });
 
   it('keeps the standard hagicode image tag fixed at 0 across supported registries', () => {
@@ -227,5 +220,19 @@ describe('generateYAML', () => {
 
       expect(yaml).toContain(`image: ${expectedImages[imageRegistry]}`);
     });
+  });
+
+  it('does not emit removed executor services or volumes', () => {
+    const yaml = generateYAML(createMockConfig({
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeConfigMode: 'default-managed',
+    }), undefined, 'en-US', FIXED_DATE);
+
+    expect(hasService(yaml, 'copilot-cli')).toBe(false);
+    expect(getServiceVolumes(yaml, 'hagicode')).not.toContain('copilot-data:/home/hagicode/.copilot');
+    expect(yaml).not.toContain('CODEBUDDY_API_KEY');
+    expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
   });
 });

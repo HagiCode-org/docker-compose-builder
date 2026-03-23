@@ -7,14 +7,10 @@ import { initializeClarity } from './services/clarityService';
 import { initializeDefaultSEO } from './lib/seo/utils';
 import { injectAllSchemas } from './lib/seo/schema-generator';
 import { initializeProviderConfig, getProviderConfigLoader } from './lib/docker-compose/providerConfigLoader';
-import { loadCopilotReleaseMetadata } from './lib/docker-compose/releaseIndexLoader';
 import {
   setProvidersLoading,
   setProviders,
-  setProvidersError,
-  setCopilotMetadataLoading,
-  setCopilotMetadata,
-  setCopilotMetadataError
+  setProvidersError
 } from './lib/docker-compose/slice';
 
 import "./index.css"
@@ -45,20 +41,6 @@ async function initProviderConfig() {
 
 // Start provider config initialization (non-blocking)
 initProviderConfig();
-
-// Initialize copilot release metadata (non-blocking)
-async function initCopilotReleaseMetadata() {
-  store.dispatch(setCopilotMetadataLoading(true));
-  try {
-    const metadata = await loadCopilotReleaseMetadata();
-    store.dispatch(setCopilotMetadata(metadata));
-  } catch (error) {
-    console.error('Failed to initialize copilot release metadata:', error);
-    store.dispatch(setCopilotMetadataError(error instanceof Error ? error.message : 'Unknown error'));
-  }
-}
-
-initCopilotReleaseMetadata();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

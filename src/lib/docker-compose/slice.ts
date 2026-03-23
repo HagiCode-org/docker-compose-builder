@@ -1,48 +1,80 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { DockerComposeConfig, ExecutorType } from '../../lib/docker-compose/types';
 import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoader';
-import type { CopilotReleaseMetadata } from '../../lib/docker-compose/releaseIndexLoader';
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
-import { validateCopilotImageTag } from '../../lib/docker-compose/serviceTemplates';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.5';
+const CONFIG_VERSION = '2.8';
+const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
   'claude',
   'codex',
-  'copilot-cli',
-  'codebuddy-cli',
-  'iflow-cli',
   'opencode'
 ];
 
 interface LegacyDockerComposeConfig extends Partial<DockerComposeConfig> {
   runtimeProvider?: unknown;
   defaultExecutor?: unknown;
+  codebuddyApiKey?: unknown;
+  codebuddyInternetEnvironment?: unknown;
+  kimiExecutablePath?: unknown;
+  kimiStateMountPath?: unknown;
+  copilotApiKey?: unknown;
+  copilotBaseUrl?: unknown;
+  copilotMountWorkspace?: unknown;
+  qoderPersonalAccessToken?: unknown;
+  kiroExecutablePath?: unknown;
+  kiroStateMountPath?: unknown;
 }
 
 const isExecutorType = (value: unknown): value is ExecutorType =>
   typeof value === 'string' && EXECUTOR_OPTIONS.includes(value as ExecutorType);
 
+const isOpenCodeConfigMode = (value: unknown): value is DockerComposeConfig['openCodeConfigMode'] =>
+  value === 'default-managed' || value === 'host-file';
+
 const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
   const normalizedEnabled = Array.isArray(config.enabledExecutors)
-    ? config.enabledExecutors.filter(isExecutorType)
+    ? (config.enabledExecutors as string[])
+      .filter(isExecutorType)
     : [];
   const enabledExecutors = normalizedEnabled.length > 0
     ? Array.from(new Set(normalizedEnabled))
     : [...defaultConfig.enabledExecutors];
-  const { runtimeProvider: _legacyRuntimeProvider, defaultExecutor: _legacyDefaultExecutor, ...rest } = config;
+  const {
+    runtimeProvider: _legacyRuntimeProvider,
+    defaultExecutor: _legacyDefaultExecutor,
+    codebuddyApiKey: _legacyCodeBuddyApiKey,
+    codebuddyInternetEnvironment: _legacyCodeBuddyInternetEnvironment,
+    kimiExecutablePath: _legacyKimiExecutablePath,
+    kimiStateMountPath: _legacyKimiStateMountPath,
+    copilotApiKey: _legacyCopilotApiKey,
+    copilotBaseUrl: _legacyCopilotBaseUrl,
+    copilotMountWorkspace: _legacyCopilotMountWorkspace,
+    qoderPersonalAccessToken: _legacyQoderPersonalAccessToken,
+    kiroExecutablePath: _legacyKiroExecutablePath,
+    kiroStateMountPath: _legacyKiroStateMountPath,
+    ...rest
+  } = config;
 
-  return {
+  const normalizedConfig: DockerComposeConfig = {
     ...defaultConfig,
     ...rest,
     enabledExecutors
   };
+
+  return {
+    ...normalizedConfig,
+    openCodeConfigMode: isOpenCodeConfigMode(normalizedConfig.openCodeConfigMode)
+      ? normalizedConfig.openCodeConfigMode
+      : defaultConfig.openCodeConfigMode,
+    openCodeConfigHostPath: normalizedConfig.openCodeConfigHostPath ?? defaultConfig.openCodeConfigHostPath
+  };
 };
 
 const normalizeStandardImageTag = (config: DockerComposeConfig): DockerComposeConfig => {
-  if (!validateCopilotImageTag(config.imageTag)) {
+  if (!LEGACY_COPILOT_IMAGE_TAG_REGEX.test(config.imageTag.trim())) {
     return config;
   }
 
@@ -60,9 +92,6 @@ interface DockerComposeState {
   providers: ProviderPreset[];
   providersLoading: boolean;
   providersError: string | null;
-  copilotMetadata: CopilotReleaseMetadata | null;
-  copilotMetadataLoading: boolean;
-  copilotMetadataError: string | null;
 }
 
 const getInitialConfig = (): DockerComposeConfig => {
@@ -72,21 +101,29 @@ const getInitialConfig = (): DockerComposeConfig => {
 
   try {
     const savedVersion = localStorage.getItem('docker-compose-config-version');
+    const savedConfig = localStorage.getItem('docker-compose-config');
+    if (savedConfig) {
+      const normalizedConfig = normalizeStandardImageTag(
+        normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig)
+      );
 
-    // If version doesn't match, clear old config and use new defaults
+      if (savedVersion !== CONFIG_VERSION) {
+        console.log('Config version mismatch, migrating saved config to current defaults');
+      }
+
+      localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
+      localStorage.setItem('docker-compose-config', JSON.stringify(normalizedConfig));
+      localStorage.setItem('docker-compose-image-registry', normalizedConfig.imageRegistry);
+
+      return normalizedConfig;
+    }
+
     if (savedVersion !== CONFIG_VERSION) {
       console.log('Config version mismatch, resetting to defaults');
       localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
-      localStorage.removeItem('docker-compose-config');
       localStorage.setItem('docker-compose-image-registry', defaultConfig.imageRegistry);
+      localStorage.removeItem('docker-compose-config');
       return { ...defaultConfig };
-    }
-
-    const savedConfig = localStorage.getItem('docker-compose-config');
-    if (savedConfig) {
-      return normalizeStandardImageTag(
-        normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig)
-      );
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
@@ -109,10 +146,7 @@ const initialState: DockerComposeState = {
   error: null,
   providers: [],
   providersLoading: false,
-  providersError: null,
-  copilotMetadata: null,
-  copilotMetadataLoading: false,
-  copilotMetadataError: null
+  providersError: null
 };
 
 const dockerComposeSlice = createSlice({
@@ -203,22 +237,7 @@ const dockerComposeSlice = createSlice({
       state.providers = action.payload;
       state.providersLoading = false;
       state.providersError = null;
-    },
-
-    setCopilotMetadataLoading: (state, action: PayloadAction<boolean>) => {
-      state.copilotMetadataLoading = action.payload;
-    },
-
-    setCopilotMetadataError: (state, action: PayloadAction<string | null>) => {
-      state.copilotMetadataError = action.payload;
-      state.copilotMetadataLoading = false;
-    },
-
-    setCopilotMetadata: (state, action: PayloadAction<CopilotReleaseMetadata>) => {
-      state.copilotMetadata = action.payload;
-      state.copilotMetadataLoading = false;
-      state.copilotMetadataError = null;
-    },
+    }
   },
 });
 
@@ -231,10 +250,7 @@ export const {
   clearError,
   setProvidersLoading,
   setProvidersError,
-  setProviders,
-  setCopilotMetadataLoading,
-  setCopilotMetadataError,
-  setCopilotMetadata
+  setProviders
 } = dockerComposeSlice.actions;
 
 export default dockerComposeSlice.reducer;
@@ -261,12 +277,3 @@ export const selectProvidersError = (state: { dockerCompose: DockerComposeState 
 
 export const selectProviderById = (state: { dockerCompose: DockerComposeState }, providerId: string) =>
   state.dockerCompose.providers.find(p => p.providerId === providerId);
-
-export const selectCopilotMetadata = (state: { dockerCompose: DockerComposeState }) =>
-  state.dockerCompose.copilotMetadata;
-
-export const selectCopilotMetadataLoading = (state: { dockerCompose: DockerComposeState }) =>
-  state.dockerCompose.copilotMetadataLoading;
-
-export const selectCopilotMetadataError = (state: { dockerCompose: DockerComposeState }) =>
-  state.dockerCompose.copilotMetadataError;

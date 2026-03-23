@@ -47,16 +47,17 @@ describe('workspace section metadata', () => {
     expect(isWorkspaceExportReady(sections)).toBe(false);
   });
 
-  it('groups executor branch errors under the executor section', () => {
+  it('groups retained executor branch errors under the executor section', () => {
     const config = {
       ...defaultConfig,
       workdirPath: '/workspace/repos',
-      enabledExecutors: ['claude', 'codex', 'copilot-cli'] as ExecutorType[],
+      enabledExecutors: ['claude', 'codex', 'opencode'] as ExecutorType[],
       anthropicApiProvider: 'custom',
       anthropicAuthToken: '',
       anthropicUrl: '',
       codexApiKey: '',
-      copilotApiKey: '',
+      openCodeConfigMode: 'host-file' as const,
+      openCodeConfigHostPath: '',
     };
 
     const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
@@ -67,10 +68,30 @@ describe('workspace section metadata', () => {
     expect(executorSection?.children.map((child) => child.id)).toEqual([
       'executor-claude',
       'executor-codex',
-      'executor-copilot',
+      'executor-opencode',
     ]);
     expect(executorSection?.children.find((child) => child.id === 'executor-claude')?.errorCount).toBe(2);
+    expect(executorSection?.children.find((child) => child.id === 'executor-codex')?.errorCount).toBe(1);
+    expect(executorSection?.children.find((child) => child.id === 'executor-opencode')?.errorCount).toBe(1);
     expect(isWorkspaceExportReady(sections)).toBe(false);
+  });
+
+  it('marks OpenCode as complete with the default-managed persistence mode', () => {
+    const config = {
+      ...defaultConfig,
+      workdirPath: '/workspace/repos',
+      enabledExecutors: ['opencode'] as ExecutorType[],
+      anthropicAuthToken: '',
+      openCodeConfigMode: 'default-managed' as const,
+    };
+
+    const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
+    const openCodeChild = sections
+      .find((section) => section.id === 'executors')
+      ?.children.find((child) => child.id === 'executor-opencode');
+
+    expect(openCodeChild?.isComplete).toBe(true);
+    expect(openCodeChild?.errorCount).toBe(0);
   });
 
   it('reports a fully ready workspace summary when all required inputs are present', () => {

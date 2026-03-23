@@ -1,6 +1,34 @@
 import type { DockerComposeConfig } from './types';
 import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
 
+const WINDOWS_FILE_PATH_PATTERN = /^[A-Za-z]:[\\/].+$/;
+
+function getOpenCodeHostPathError(config: DockerComposeConfig): string | null {
+  const path = config.openCodeConfigHostPath.trim();
+
+  if (path.length === 0) {
+    return 'OpenCode host file path is required when host-file mode is enabled';
+  }
+
+  if (path.endsWith('/') || path.endsWith('\\')) {
+    return 'OpenCode host file path must point to a .json file, not a directory';
+  }
+
+  if (!path.toLowerCase().endsWith('.json')) {
+    return 'OpenCode host file path must end with .json';
+  }
+
+  if (config.hostOS === 'windows') {
+    return WINDOWS_FILE_PATH_PATTERN.test(path)
+      ? null
+      : 'OpenCode host file path must be an absolute Windows path such as C:\\opencode\\opencode.json';
+  }
+
+  return path.startsWith('/')
+    ? null
+    : 'OpenCode host file path must be an absolute Linux path such as /srv/opencode/opencode.json';
+}
+
 /**
  * Validation errors interface
  */
@@ -18,8 +46,7 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   const errors: ValidationError[] = [];
   const claudeEnabled = config.enabledExecutors.includes('claude');
   const codexEnabled = config.enabledExecutors.includes('codex');
-  const copilotEnabled = config.enabledExecutors.includes('copilot-cli');
-  const codebuddyEnabled = config.enabledExecutors.includes('codebuddy-cli');
+  const openCodeEnabled = config.enabledExecutors.includes('opencode');
 
   // Validate executor capability only.
   if (!Array.isArray(config.enabledExecutors) || config.enabledExecutors.length === 0) {
@@ -127,21 +154,13 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     }
   }
 
-  // Validate CodeBuddy configuration when CodeBuddy capability is enabled
-  if (codebuddyEnabled) {
-    if (!config.codebuddyApiKey || config.codebuddyApiKey.trim() === '') {
-      errors.push({ field: 'codebuddyApiKey', message: 'CODEBUDDY_API_KEY is required when CodeBuddy executor is enabled' });
-    }
-  }
-
-  // Validate Copilot CLI configuration when Copilot capability is enabled
-  if (copilotEnabled) {
-    if (!config.copilotApiKey || config.copilotApiKey.trim() === '') {
-      errors.push({ field: 'copilotApiKey', message: 'COPILOT_API_KEY is required when Copilot executor is enabled' });
-    }
-
-    if (config.copilotMountWorkspace && (!config.workdirPath || config.workdirPath.trim() === '')) {
-      errors.push({ field: 'workdirPath', message: 'Workspace mount path is required when Copilot workspace mount is enabled' });
+  if (openCodeEnabled && config.openCodeConfigMode === 'host-file') {
+    const openCodeHostPathError = getOpenCodeHostPathError(config);
+    if (openCodeHostPathError) {
+      errors.push({
+        field: 'openCodeConfigHostPath',
+        message: openCodeHostPathError
+      });
     }
   }
 
