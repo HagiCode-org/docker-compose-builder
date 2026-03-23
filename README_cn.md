@@ -9,8 +9,7 @@
 - **交互式配置表单**：分步配置，实时验证
 - **Docker Compose YAML 生成**：根据用户输入自动生成 YAML 文件
 - **多种数据库选项**：支持内置 PostgreSQL 或外部数据库连接
-- **显式执行器配置**：并行启用 Claude/Codex/Copilot CLI/CodeBuddy/IFlow/OpenCode，无需默认 provider 路由
-- **Copilot CLI 支持**：可选的 `copilot-cli` 执行器支持，标准 HagiCode 镜像标签固定为 `0`
+- **显式执行器配置**：并行启用 Claude/Codex/OpenCode，无需默认 provider 路由
 - **局域网 HTTPS 支持**：可选的 Caddy 反向代理，使用 `tls internal`
 - **卷管理**：配置数据持久化的卷挂载
 - **用户权限**：Linux 用户权限映射（PUID/PGID）支持
@@ -102,36 +101,40 @@ npm run deploy
 
 #### 执行器 & API 配置
 
-- **并行启用**：Claude、Codex、Copilot CLI、CodeBuddy、IFlow CLI 和 OpenCode 可以一起启用（非互斥）
+- **并行启用**：Claude、Codex 与 OpenCode 可以一起启用（非互斥）
 - **仅显式选择**：生成的 YAML 仅导出启用的执行器分支；不再写入 `AI__Providers__DefaultProvider`
 - **能力 vs 路由**：启用一个执行器不会禁用其他执行器，运行时选择现在必须是显式的
 
-##### 显式执行器矩阵
+##### 保留的集成执行器矩阵
 
 | 执行器 | 表单字段 | 验证 | 导出行为 |
 |----------|-------------|------------|-----------------|
 | Claude | Provider 预设、令牌、可选自定义端点 | 需要令牌；自定义预设也需要端点 URL | 为启用的 Claude 分支发出 `ANTHROPIC_*` 变量 |
 | Codex | `CODEX_API_KEY`、可选 `CODEX_BASE_URL` | 启用时需要 `CODEX_API_KEY` | 仅发出 `CODEX_*` 变量 |
-| Copilot CLI | `COPILOT_API_KEY`、可选 `COPILOT_BASE_URL`、标准镜像标签 `0`、工作区切换 | 启用时需要 API 密钥 | 发出 `COPILOT_*` 变量和可选边车服务，不更改标准 HagiCode 镜像标签 |
-| CodeBuddy | `CODEBUDDY_API_KEY`、`CODEBUDDY_INTERNET_ENVIRONMENT` | 启用时需要 API 密钥；网络环境默认为 `ioa` 但仍可编辑 | 发出显式 CodeBuddy provider/platform 密钥加上 `CODEBUDDY_*` 变量 |
-| IFlow CLI | 仅信息分支 | 不需要发明的私有 `IFLOW_*` 字段 | 发出显式 IFlow provider/platform 引导密钥，并期望先前的 CLI 登录或挂载的运行时状态 |
-| OpenCode | 可选托管运行时模型 | 除了正常部署验证外不需要额外必填字段 | 发出显式 OpenCode provider 注册加上 `AI__OpenCode__*` 托管运行时密钥 |
+| OpenCode | 可选托管运行时模型、配置来源切换、可选宿主机 `opencode.json` 路径 | `default-managed` 无需额外字段；`host-file` 需要与所选宿主机系统匹配的绝对 `.json` 路径 | 发出显式 OpenCode provider 注册加上 `AI__OpenCode__*` 托管运行时密钥，并根据模式挂载 `opencode-config-data:/home/hagicode/.config/opencode` 或 `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
 
-##### Copilot CLI 运行时说明
+##### 其他 CLI 工具
 
-- **模板 ID**：`copilot-cli`（为显式模板流程保留）
-- **必需环境**：`COPILOT_API_KEY`
-- **标准标签合约**：标准 HagiCode 镜像标签保持固定在 `0`
-- **可选环境**：`COPILOT_BASE_URL`
-- **工作区挂载**：可选的绑定挂载到 `/workspace`
+HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前还不完整。
 
-发布索引元数据仍可用于兼容性检查和未来显式 Copilot 模板流程。标准构建器默认值和刷新路径将 `imageTag` 保持在 `0`。
+- 容器配置相关 PR 请提交到 `https://github.com/HagiCode-org/docker-compose-builder`
+- 发布与运行时契约相关 PR 请提交到 `https://github.com/HagiCode-org/releases`
 
-##### CodeBuddy、IFlow 和 OpenCode 说明
+##### OpenCode 说明
 
-- CodeBuddy 导出现在依赖于显式 provider/platform 注册，而不是已移除的默认 provider 路由。提供 `CODEBUDDY_API_KEY`，并使 `CODEBUDDY_INTERNET_ENVIRONMENT` 与您的 CLI 登录上下文保持一致。
-- IFlow 导出保持为文档化的引导合约 `iflow --experimental-acp --port {port}`。构建器故意不发明的额外 `IFLOW_*` 变量；您仍然需要先前的 `iflow` 登录或等效的挂载运行时状态。
 - OpenCode 导出使用统一镜像中已文档化的托管运行时合约。构建器显式发出 `AI__OpenCode__*` 设置，不依赖回退默认执行器。
+- OpenCode 在容器内始终使用固定目标路径 `/home/hagicode/.config/opencode/opencode.json`。推荐的 `default-managed` 模式会自动挂载 `opencode-config-data:/home/hagicode/.config/opencode`，无需额外输入即可在容器重启后保留配置。
+- 如果切换到 `host-file` 模式，请手动填写宿主机绝对路径，例如 `/srv/opencode/opencode.json` 或 `C:\\opencode\\opencode.json`。浏览器无法替您发现 Docker 可用的宿主机 bind mount 路径，因此导出的 compose 会原样使用手工输入的路径。
+
+##### 默认 CLI 持久化卷
+
+所有托管 CLI 卷都只会在对应保留执行器启用时输出；如果某个卷没有出现在服务挂载列表中，它也不会出现在顶层 `volumes:` 段。
+
+| 执行器 | 默认卷名 | 容器内路径 | 覆盖规则 |
+|----------|----------|------------|----------|
+| Claude | `claude-data` | `/home/hagicode/.claude` | 无；仅在启用 Claude 时输出 |
+| Codex | `codex-data` | `/home/hagicode/.codex` | 无 |
+| OpenCode | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` 模式会将托管卷替换为 `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
 
 应用程序从 docs 仓库 `https://docs.hagicode.com/presets/claude-code/providers/` 动态加载 provider 配置。可用的 provider 包括：
 
@@ -165,12 +168,6 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 
 默认值为 `https://docs.hagicode.com`。
 
-您还可以覆盖用于 Copilot 模板默认值的发布索引 URL：
-
-```bash
-VITE_RELEASE_INDEX_URL=https://your-release-index-url/index.json npm run dev
-```
-
 ##### 嵌入式备份同步
 
 嵌入式备份配置（`src/lib/docker-compose/providerConfigLoader.ts`）与 docs 仓库预设同步。当在 docs 仓库中添加新 provider 或更新现有 provider 时，更新 `EMBEDDED_BACKUP` 常量以包含最新数据。
@@ -179,7 +176,6 @@ VITE_RELEASE_INDEX_URL=https://your-release-index-url/index.json npm run dev
 - **工作目录**：您的代码仓库路径
 - **根用户警告**：检测并警告 root 拥有的目录
 - **用户权限映射**：Linux 的 PUID/PGID 配置
-- **Copilot 工作区切换**：Copilot CLI 服务块的可选 `/workspace` 挂载
 
 #### HTTPS（仅完整自定义模式）
 - **启用 HTTPS 代理**：切换 Caddy 反向代理生成
@@ -197,8 +193,7 @@ VITE_RELEASE_INDEX_URL=https://your-release-index-url/index.json npm run dev
 - 卷定义
 - 健康检查配置
 - 环境变量
-- Copilot CLI 服务块（当启用 `copilot-cli` 执行器时）
-- 当这些能力启用时，显式的 CodeBuddy、IFlow 和 OpenCode 执行器分支
+- 当这些能力启用时，显式的 Claude、Codex 和 OpenCode 执行器分支
 
 ## 分析配置
 
@@ -277,12 +272,6 @@ src/
 - Safari（最新版本）
 
 ## SEO 配置
-
-## Copilot 故障排除
-
-有关常见 Copilot 模板问题（元数据获取失败、无效镜像标签、缺少环境变量），请参阅：
-
-- `docs/copilot-cli-troubleshooting.md`
 
 应用程序包含全面的 SEO（搜索引擎优化）功能：
 

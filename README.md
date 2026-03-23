@@ -9,8 +9,7 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 - **Interactive Configuration Form**: Step-by-step configuration with real-time validation
 - **Docker Compose YAML Generation**: Automatic YAML file generation based on user input
 - **Multiple Database Options**: Support for internal PostgreSQL or external database connections
-- **Explicit Executor Configuration**: Enable Claude/Codex/Copilot CLI/CodeBuddy/IFlow/OpenCode in parallel without a default-provider route
-- **Copilot CLI Support**: Optional `copilot-cli` executor support while the standard Hagicode image tag remains fixed at `0`
+- **Explicit Executor Configuration**: Enable Claude/Codex/OpenCode in parallel without a default-provider route
 - **LAN HTTPS Support**: Optional Caddy reverse proxy with `tls internal`
 - **Volume Management**: Configure volume mounts for data persistence
 - **User Permissions**: Linux user permission mapping (PUID/PGID) support
@@ -102,36 +101,40 @@ This will build the application and deploy it to the `gh-pages` branch.
 
 #### Executor & API Configuration
 
-- **Parallel Enablement**: Claude, Codex, Copilot CLI, CodeBuddy, IFlow CLI, and OpenCode can be enabled together (non-exclusive)
-- **Explicit Selection Only**: Generated YAML exports enabled executor branches only; it no longer writes `AI__Providers__DefaultProvider`
+- **Parallel Enablement**: Claude, Codex, and OpenCode can be enabled together (non-exclusive)
+- **Explicit Selection Only**: Generated YAML exports enabled executor branches only; it does not write `AI__Providers__DefaultProvider`
 - **Capability vs Routing**: Enabling one executor does not disable others, and runtime selection must now be explicit
 
-##### Explicit Executor Matrix
+##### Retained Integrated Executor Matrix
 
 | Executor | Form Fields | Validation | Export Behavior |
 |----------|-------------|------------|-----------------|
 | Claude | Provider preset, token, optional custom endpoint | Requires token; custom preset also requires endpoint URL | Emits `ANTHROPIC_*` variables for the enabled Claude branch |
 | Codex | `CODEX_API_KEY`, optional `CODEX_BASE_URL` | Requires `CODEX_API_KEY` when enabled | Emits `CODEX_*` variables only |
-| Copilot CLI | `COPILOT_API_KEY`, optional `COPILOT_BASE_URL`, standard image tag `0`, workspace toggle | Requires API key when enabled | Emits `COPILOT_*` variables and optional sidecar service without changing the standard Hagicode image tag |
-| CodeBuddy | `CODEBUDDY_API_KEY`, `CODEBUDDY_INTERNET_ENVIRONMENT` | Requires API key when enabled; network environment defaults to `ioa` but remains editable | Emits explicit CodeBuddy provider/platform keys plus `CODEBUDDY_*` variables |
-| IFlow CLI | Informational branch only | No invented private `IFLOW_*` field is required | Emits explicit IFlow provider/platform bootstrap keys and expects prior CLI login or mounted runtime state |
-| OpenCode | Optional managed runtime model | No extra required field beyond normal deployment validation | Emits explicit OpenCode provider registration plus `AI__OpenCode__*` managed runtime keys |
+| OpenCode | Optional managed runtime model, config source toggle, optional host `opencode.json` path | `default-managed` needs no extra field; `host-file` requires an absolute `.json` path that matches the selected host OS | Emits explicit OpenCode provider registration plus `AI__OpenCode__*` managed runtime keys, then mounts either `opencode-config-data:/home/hagicode/.config/opencode` or `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
 
-##### Copilot CLI Runtime Notes
+##### Other CLI Tools
 
-- **Template ID**: `copilot-cli` (reserved for explicit template flows)
-- **Required env**: `COPILOT_API_KEY`
-- **Standard tag contract**: the standard Hagicode image tag stays fixed at `0`
-- **Optional env**: `COPILOT_BASE_URL`
-- **Workspace mount**: Optional bind mount to `/workspace`
+HagiCode also supports other CLI tools, but the container integration documentation for them is not complete yet.
 
-Release index metadata remains available for compatibility checks and future explicit Copilot template flows. Standard builder defaults and refresh paths keep `imageTag` at `0`.
+- Contribute container configuration changes in `https://github.com/HagiCode-org/docker-compose-builder`
+- Contribute release and runtime contract changes in `https://github.com/HagiCode-org/releases`
 
-##### CodeBuddy, IFlow, and OpenCode Notes
+##### OpenCode Notes
 
-- CodeBuddy export now relies on explicit provider/platform registration instead of a removed default-provider route. Provide `CODEBUDDY_API_KEY`, and keep `CODEBUDDY_INTERNET_ENVIRONMENT` aligned with your CLI login context.
-- IFlow export keeps to the documented bootstrap contract `iflow --experimental-acp --port {port}`. The builder intentionally does not invent extra `IFLOW_*` variables; you still need prior `iflow` login or equivalent mounted runtime state.
 - OpenCode export uses the managed runtime contract already documented in the unified image. The builder emits `AI__OpenCode__*` settings explicitly and does not depend on a fallback default executor.
+- OpenCode always targets `/home/hagicode/.config/opencode/opencode.json` inside the container. In the recommended `default-managed` mode, the builder mounts `opencode-config-data:/home/hagicode/.config/opencode` so the config survives restarts without extra input.
+- If you switch OpenCode to `host-file`, enter an absolute host path such as `/srv/opencode/opencode.json` or `C:\\opencode\\opencode.json`. Browsers cannot discover the Docker host bind path for you, so the exported compose file uses the manually entered path exactly as typed.
+
+##### Default CLI Persistence Volumes
+
+All managed CLI volumes are emitted only when the related retained executor is enabled. If a volume is omitted from the service mount list, it is also omitted from the top-level `volumes:` section.
+
+| Executor | Default volume | Container path | Override rule |
+|----------|----------------|----------------|---------------|
+| Claude | `claude-data` | `/home/hagicode/.claude` | None; emitted only when Claude is enabled |
+| Codex | `codex-data` | `/home/hagicode/.codex` | None |
+| OpenCode | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` mode replaces the managed volume with `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
 
 The application dynamically loads provider configurations from the docs repository at `https://docs.hagicode.com/presets/claude-code/providers/`. Available providers include:
 
@@ -165,12 +168,6 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 
 The default value is `https://docs.hagicode.com`.
 
-You can also override the release index URL used for Copilot template defaults:
-
-```bash
-VITE_RELEASE_INDEX_URL=https://your-release-index-url/index.json npm run dev
-```
-
 ##### Embedded Backup Synchronization
 
 The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.ts`) is synchronized with the docs repository presets. When adding new providers or updating existing ones in the docs repository, update the `EMBEDDED_BACKUP` constant to include the latest data.
@@ -179,7 +176,6 @@ The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.
 - **Work Directory**: Path to your code repository
 - **Root User Warning**: Detection and warning for root-owned directories
 - **User Permission Mapping**: PUID/PGID configuration for Linux
-- **Copilot Workspace Toggle**: Optional `/workspace` mount for Copilot CLI service block
 
 #### HTTPS (Full Custom mode only)
 - **Enable HTTPS Proxy**: Toggle Caddy reverse proxy generation
@@ -197,8 +193,7 @@ The generator creates a complete `docker-compose.yml` file with:
 - Volume definitions
 - Health check configurations
 - Environment variables
-- Copilot CLI service block (when `copilot-cli` executor is enabled)
-- Explicit CodeBuddy, IFlow, and OpenCode executor branches when those capabilities are enabled
+- Explicit Claude, Codex, and OpenCode executor branches when those capabilities are enabled
 
 ## Analytics Configuration
 
@@ -277,12 +272,6 @@ src/
 - Safari (latest)
 
 ## SEO Configuration
-
-## Copilot Troubleshooting
-
-For common Copilot template issues (metadata fetch failure, invalid image tag, missing environment variables), see:
-
-- `docs/copilot-cli-troubleshooting.md`
 
 The application includes comprehensive SEO (Search Engine Optimization) features:
 
