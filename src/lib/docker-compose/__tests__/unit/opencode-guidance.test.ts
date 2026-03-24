@@ -6,7 +6,6 @@ import {
   OPENCODE_AUTH_TARGET_FILE,
   OPENCODE_CONFIG_TARGET_FILE,
   OPENCODE_MODELS_TARGET_FILE,
-  OPENCODE_RUNTIME_HOME,
 } from '../../types';
 
 describe('OpenCode guidance copy', () => {
