@@ -11,7 +11,9 @@ import {
 
 describe('OpenCode guidance copy', () => {
   it('keeps the zh-CN guidance aligned with the hagicode container paths', () => {
-    expect(zhCN.configForm.openCodeManagedVolumeHint).toContain(OPENCODE_RUNTIME_HOME);
+    expect(zhCN.configForm.openCodeManagedVolumeHint).toContain('opencode-config-data');
+    expect(zhCN.configForm.openCodeManagedVolumeHint).toContain('opencode-auth-data');
+    expect(zhCN.configForm.openCodeManagedVolumeHint).toContain('opencode-models-data');
     expect(zhCN.configForm.openCodeConfigAuthWarningHint).toContain('opencode.json');
     expect(zhCN.configForm.openCodeConfigAuthWarningHint).toContain('auth.json');
     expect(zhCN.configForm.openCodeConfigAuthWarningHint).toContain('models.json');
@@ -20,7 +22,9 @@ describe('OpenCode guidance copy', () => {
   });
 
   it('keeps the en-US guidance aligned with the hagicode container paths', () => {
-    expect(enUS.configForm.openCodeManagedVolumeHint).toContain(OPENCODE_RUNTIME_HOME);
+    expect(enUS.configForm.openCodeManagedVolumeHint).toContain('opencode-config-data');
+    expect(enUS.configForm.openCodeManagedVolumeHint).toContain('opencode-auth-data');
+    expect(enUS.configForm.openCodeManagedVolumeHint).toContain('opencode-models-data');
     expect(enUS.configForm.openCodeConfigAuthWarningHint).toContain('opencode.json');
     expect(enUS.configForm.openCodeConfigAuthWarningHint).toContain('auth.json');
     expect(enUS.configForm.openCodeConfigAuthWarningHint).toContain('models.json');

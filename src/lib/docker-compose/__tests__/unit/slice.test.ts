@@ -94,6 +94,6 @@ describe('docker compose slice executor sanitization', () => {
     expect(state.config.openCodeModel).toBe('openai/gpt-5');
     expect(state.config.openCodeConfigMode).toBe('default-managed');
     expect(state.config.openCodeConfigHostPath).toBe('');
-    expect(localStorage.getItem('docker-compose-config-version')).toBe('2.8');
+    expect(localStorage.getItem('docker-compose-config-version')).toBe('2.9');
   });
 });
