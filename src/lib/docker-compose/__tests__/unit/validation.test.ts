@@ -62,16 +62,36 @@ describe('validateConfig', () => {
   it('accepts OpenCode host-file paths that match the selected host OS', () => {
     const linuxErrors = validateConfig(createOpenCodeConfig({
       openCodeConfigMode: 'host-file',
-      openCodeConfigHostPath: '/srv/opencode/opencode.json'
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
+      openCodeAuthHostPath: '/srv/opencode/auth.json',
+      openCodeModelsHostPath: '/srv/opencode/models.json',
     }));
     const windowsErrors = validateConfig(createOpenCodeConfig({
       hostOS: 'windows',
       openCodeConfigMode: 'host-file',
-      openCodeConfigHostPath: 'C:\\\\opencode\\\\opencode.json'
+      openCodeConfigHostPath: 'C:\\\\opencode\\\\opencode.json',
+      openCodeAuthHostPath: 'C:\\\\opencode\\\\auth.json',
+      openCodeModelsHostPath: 'C:\\\\opencode\\\\models.json',
     }));
 
     expect(linuxErrors.some((error) => error.field === 'openCodeConfigHostPath')).toBe(false);
+    expect(linuxErrors.some((error) => error.field === 'openCodeAuthHostPath')).toBe(false);
+    expect(linuxErrors.some((error) => error.field === 'openCodeModelsHostPath')).toBe(false);
     expect(windowsErrors.some((error) => error.field === 'openCodeConfigHostPath')).toBe(false);
+    expect(windowsErrors.some((error) => error.field === 'openCodeAuthHostPath')).toBe(false);
+    expect(windowsErrors.some((error) => error.field === 'openCodeModelsHostPath')).toBe(false);
+  });
+
+  it('validates optional OpenCode auth and models paths when they are provided', () => {
+    const errors = validateConfig(createOpenCodeConfig({
+      openCodeConfigMode: 'host-file',
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
+      openCodeAuthHostPath: '/srv/opencode/auth/',
+      openCodeModelsHostPath: 'models.json',
+    }));
+
+    expect(errors.some((error) => error.field === 'openCodeAuthHostPath')).toBe(true);
+    expect(errors.some((error) => error.field === 'openCodeModelsHostPath')).toBe(true);
   });
 
   it('validates custom Claude endpoint when Claude custom provider is enabled', () => {

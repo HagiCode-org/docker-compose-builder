@@ -111,7 +111,7 @@ npm run deploy
 |----------|-------------|------------|-----------------|
 | Claude | Provider 预设、令牌、可选自定义端点 | 需要令牌；自定义预设也需要端点 URL | 为启用的 Claude 分支发出 `ANTHROPIC_*` 变量 |
 | Codex | `CODEX_API_KEY`、可选 `CODEX_BASE_URL` | 启用时需要 `CODEX_API_KEY` | 仅发出 `CODEX_*` 变量 |
-| OpenCode | 可选托管运行时模型、配置来源切换、可选宿主机 `opencode.json` 路径 | `default-managed` 无需额外字段；`host-file` 需要与所选宿主机系统匹配的绝对 `.json` 路径 | 发出显式 OpenCode provider 注册加上 `AI__OpenCode__*` 托管运行时密钥，并根据模式挂载 `opencode-config-data:/home/hagicode/.config/opencode` 或 `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode | 可选托管运行时模型、配置来源切换、宿主机 `opencode.json` 路径，外加可选的 `auth.json` / `models.json` 路径 | `default-managed` 无需额外字段；`host-file` 需要 `opencode.json` 绝对路径，`auth.json` / `models.json` 若填写也必须是与所选宿主机系统匹配的绝对 `.json` 路径 | 发出显式 OpenCode provider 注册加上 `AI__OpenCode__*` 托管运行时密钥，并根据模式挂载三个默认卷，或在 `host-file` 模式下挂载 `opencode.json` 并按需追加 `auth.json` / `models.json` |
 
 ##### 其他 CLI 工具
 
@@ -123,8 +123,30 @@ HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前
 ##### OpenCode 说明
 
 - OpenCode 导出使用统一镜像中已文档化的托管运行时合约。构建器显式发出 `AI__OpenCode__*` 设置，不依赖回退默认执行器。
-- OpenCode 在容器内始终使用固定目标路径 `/home/hagicode/.config/opencode/opencode.json`。推荐的 `default-managed` 模式会自动挂载 `opencode-config-data:/home/hagicode/.config/opencode`，无需额外输入即可在容器重启后保留配置。
+- 容器内的 OpenCode 运行用户固定为 `hagicode`。因此文档里的容器路径都以 `/home/hagicode/` 为前缀，而不是宿主机上的 `~`。
+- OpenCode 在容器内始终使用固定目标路径 `/home/hagicode/.config/opencode/opencode.json`。推荐的 `default-managed` 模式会自动挂载三个命名卷：`opencode-config-data:/home/hagicode/.config/opencode`、`opencode-auth-data:/home/hagicode/.local/share/opencode`、`opencode-models-data:/home/hagicode/.cache/opencode`，让配置、认证状态和模型缓存一起保留。
 - 如果切换到 `host-file` 模式，请手动填写宿主机绝对路径，例如 `/srv/opencode/opencode.json` 或 `C:\\opencode\\opencode.json`。浏览器无法替您发现 Docker 可用的宿主机 bind mount 路径，因此导出的 compose 会原样使用手工输入的路径。
+- `host-file` 模式现在支持三类宿主机文件映射：`opencode.json`、`auth.json`、`models.json`。其中配置文件路径必填；认证文件和模型缓存路径按需填写，留空时不会输出对应挂载。
+
+##### OpenCode 默认路径映射
+
+下表使用 OpenCode 在 macOS/Linux 上的默认 XDG 目录来说明宿主机路径，并给出统一镜像内 `hagicode` 用户可直接读取的容器目标路径：
+
+| 文件 | 默认宿主机路径（macOS/Linux） | 容器内 `hagicode` 路径 | 说明 |
+|------|------------------------------|------------------------|------|
+| `opencode.json` | `~/.config/opencode/opencode.json` | `/home/hagicode/.config/opencode/opencode.json` | Builder 会管理；在 `host-file` 模式下也会绑定这个文件 |
+| `auth.json` | `~/.local/share/opencode/auth.json` | `/home/hagicode/.local/share/opencode/auth.json` | 可在 `host-file` 模式下显式绑定；否则需要你自行迁移 |
+| `models.json` | `~/.cache/opencode/models.json` | `/home/hagicode/.cache/opencode/models.json` | 可在 `host-file` 模式下显式绑定；留空则不挂载 |
+
+##### `auth.json` 手动迁移步骤
+
+`opencode.json` 的持久化成功，并不代表认证状态已经一起进入容器。若你要复用宿主机上已经登录过的 OpenCode，请按下面步骤处理：
+
+1. 在宿主机定位现有的 `auth.json`，默认路径通常是 `~/.local/share/opencode/auth.json`。
+2. 如果你使用 Builder 的 `host-file` 模式，请把这个宿主机绝对路径填写到 `auth.json` 映射字段；如果不用该字段，也可以继续通过你自己的 bind mount、预置文件或镜像初始化步骤来准备 `/home/hagicode/.local/share/opencode/auth.json`。
+3. 如需复用模型缓存，也可以同样提供 `models.json` 的宿主机绝对路径，让 Builder 额外挂载到 `/home/hagicode/.cache/opencode/models.json`。
+4. 确保目标文件与父目录对容器内 `hagicode` 用户可读。
+5. 再导出并启动 compose。Builder 只会使用你显式填写的宿主机路径进行绑定，不会自动发现、复制或迁移这些文件。
 
 ##### 默认 CLI 持久化卷
 
@@ -134,7 +156,9 @@ HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前
 |----------|----------|------------|----------|
 | Claude | `claude-data` | `/home/hagicode/.claude` | 无；仅在启用 Claude 时输出 |
 | Codex | `codex-data` | `/home/hagicode/.codex` | 无 |
-| OpenCode | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` 模式会将托管卷替换为 `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode Config | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` 模式会将该托管卷替换为 `<configHostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode Auth | `opencode-auth-data` | `/home/hagicode/.local/share/opencode` | `host-file` 模式下若填写 `auth.json` 路径，则改为文件挂载到 `/home/hagicode/.local/share/opencode/auth.json` |
+| OpenCode Models | `opencode-models-data` | `/home/hagicode/.cache/opencode` | `host-file` 模式下若填写 `models.json` 路径，则改为文件挂载到 `/home/hagicode/.cache/opencode/models.json` |
 
 应用程序从 docs 仓库 `https://docs.hagicode.com/presets/claude-code/providers/` 动态加载 provider 配置。可用的 provider 包括：
 

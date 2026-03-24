@@ -59,8 +59,13 @@ export type { ProviderPreset } from './providerConfigLoader';
 export const ZAI_API_URL = 'https://open.bigmodel.cn/api/anthropic';
 export const ALIYUN_API_URL = 'https://coding.dashscope.aliyuncs.com/apps/anthropic';
 export const VOLCENGINE_API_URL = 'https://ark.cn-beijing.volces.com/api/coding';
-export const OPENCODE_CONFIG_TARGET_DIR = '/home/hagicode/.config/opencode';
+export const OPENCODE_RUNTIME_HOME = '/home/hagicode';
+export const OPENCODE_CONFIG_TARGET_DIR = `${OPENCODE_RUNTIME_HOME}/.config/opencode`;
 export const OPENCODE_CONFIG_TARGET_FILE = `${OPENCODE_CONFIG_TARGET_DIR}/opencode.json`;
+export const OPENCODE_AUTH_TARGET_DIR = `${OPENCODE_RUNTIME_HOME}/.local/share/opencode`;
+export const OPENCODE_AUTH_TARGET_FILE = `${OPENCODE_AUTH_TARGET_DIR}/auth.json`;
+export const OPENCODE_MODELS_TARGET_DIR = `${OPENCODE_RUNTIME_HOME}/.cache/opencode`;
+export const OPENCODE_MODELS_TARGET_FILE = `${OPENCODE_MODELS_TARGET_DIR}/models.json`;
 
 /**
  * Image Registry Configuration Interface
@@ -163,8 +168,12 @@ export interface DockerComposeConfig {
   openCodeModel?: string;
   /** Determines how opencode.json is persisted for the container runtime */
   openCodeConfigMode: OpenCodeConfigMode;
-  /** Optional host file path used when OpenCode config persistence is set to host-file */
+  /** Host file path used when OpenCode config persistence is set to host-file */
   openCodeConfigHostPath: string;
+  /** Optional host auth.json path used when OpenCode auth state should be mounted explicitly */
+  openCodeAuthHostPath: string;
+  /** Optional host models.json path used when OpenCode model cache should be mounted explicitly */
+  openCodeModelsHostPath: string;
 
   // Volume mounts
   workdirPath: string;

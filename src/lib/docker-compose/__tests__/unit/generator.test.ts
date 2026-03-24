@@ -58,6 +58,8 @@ describe('buildAppService', () => {
     expect(appService).toContain('AI__OpenCode__ExecutablePath: "opencode"');
     expect(appService).toContain('AI__OpenCode__Model: "anthropic/claude-sonnet-4"');
     expect(appService).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(appService).toContain('opencode-auth-data:/home/hagicode/.local/share/opencode');
+    expect(appService).toContain('opencode-models-data:/home/hagicode/.cache/opencode');
   });
 
   it('renders a bind mount when OpenCode host-file mode is selected', () => {
@@ -68,6 +70,19 @@ describe('buildAppService', () => {
 
     expect(appService).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
     expect(appService).not.toContain('opencode-config-data:/home/hagicode/.config/opencode');
+  });
+
+  it('renders optional auth and models bind mounts when OpenCode host-file paths are provided', () => {
+    const appService = buildAppService(createOpenCodeConfig({
+      openCodeConfigMode: 'host-file',
+      openCodeConfigHostPath: '/srv/opencode/opencode.json',
+      openCodeAuthHostPath: '/srv/opencode/auth.json',
+      openCodeModelsHostPath: '/srv/opencode/models.json',
+    })).join('\n');
+
+    expect(appService).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
+    expect(appService).toContain('/srv/opencode/auth.json:/home/hagicode/.local/share/opencode/auth.json');
+    expect(appService).toContain('/srv/opencode/models.json:/home/hagicode/.cache/opencode/models.json');
   });
 
   it('mounts only retained executor state volumes when enabled', () => {
@@ -162,7 +177,11 @@ describe('section builders', () => {
     })).join('\n');
 
     expect(managedVolumes).toContain('opencode-config-data:');
+    expect(managedVolumes).toContain('opencode-auth-data:');
+    expect(managedVolumes).toContain('opencode-models-data:');
     expect(hostFileVolumes).not.toContain('opencode-config-data:');
+    expect(hostFileVolumes).not.toContain('opencode-auth-data:');
+    expect(hostFileVolumes).not.toContain('opencode-models-data:');
   });
 
   it('declares only the managed executor volumes that are actually used', () => {
@@ -175,6 +194,8 @@ describe('section builders', () => {
 
     expect(hasVolume(yaml, 'codex-data')).toBe(true);
     expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-auth-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-models-data')).toBe(true);
     expect(hasVolume(yaml, 'claude-data')).toBe(false);
     expect(hasVolume(yaml, 'kimi-data')).toBe(false);
     expect(hasVolume(yaml, 'copilot-data')).toBe(false);

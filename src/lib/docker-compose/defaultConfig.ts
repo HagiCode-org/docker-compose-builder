@@ -32,6 +32,8 @@ export const defaultConfig: DockerComposeConfig = {
   openCodeModel: 'anthropic/claude-sonnet-4',
   openCodeConfigMode: 'default-managed',
   openCodeConfigHostPath: '',
+  openCodeAuthHostPath: '',
+  openCodeModelsHostPath: '',
   workdirPath: '',
   workdirCreatedByRoot: false,
   puid: '1000',

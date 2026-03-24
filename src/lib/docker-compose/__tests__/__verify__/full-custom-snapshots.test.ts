@@ -219,6 +219,8 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     const volumes = getServiceVolumes(yaml, 'hagicode');
     expect(volumes).toContain('codex-data:/home/hagicode/.codex');
     expect(volumes).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(volumes).toContain('opencode-auth-data:/home/hagicode/.local/share/opencode');
+    expect(volumes).toContain('opencode-models-data:/home/hagicode/.cache/opencode');
     expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
     expect(hasVolume(yaml, 'kimi-data')).toBe(false);
     expect(hasVolume(yaml, 'qoder-data')).toBe(false);

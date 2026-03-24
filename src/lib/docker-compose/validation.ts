@@ -3,30 +3,36 @@ import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipV
 
 const WINDOWS_FILE_PATH_PATTERN = /^[A-Za-z]:[\\/].+$/;
 
-function getOpenCodeHostPathError(config: DockerComposeConfig): string | null {
-  const path = config.openCodeConfigHostPath.trim();
+function getOpenCodeHostPathError(
+  pathValue: string,
+  config: DockerComposeConfig,
+  label: string,
+  required: boolean,
+  exampleFilename: string
+): string | null {
+  const path = pathValue.trim();
 
   if (path.length === 0) {
-    return 'OpenCode host file path is required when host-file mode is enabled';
+    return required ? `${label} is required when host-file mode is enabled` : null;
   }
 
   if (path.endsWith('/') || path.endsWith('\\')) {
-    return 'OpenCode host file path must point to a .json file, not a directory';
+    return `${label} must point to a .json file, not a directory`;
   }
 
   if (!path.toLowerCase().endsWith('.json')) {
-    return 'OpenCode host file path must end with .json';
+    return `${label} must end with .json`;
   }
 
   if (config.hostOS === 'windows') {
     return WINDOWS_FILE_PATH_PATTERN.test(path)
       ? null
-      : 'OpenCode host file path must be an absolute Windows path such as C:\\opencode\\opencode.json';
+      : `${label} must be an absolute Windows path such as C:\\opencode\\${exampleFilename}`;
   }
 
   return path.startsWith('/')
     ? null
-    : 'OpenCode host file path must be an absolute Linux path such as /srv/opencode/opencode.json';
+    : `${label} must be an absolute Linux path such as /srv/opencode/${exampleFilename}`;
 }
 
 /**
@@ -155,11 +161,45 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   }
 
   if (openCodeEnabled && config.openCodeConfigMode === 'host-file') {
-    const openCodeHostPathError = getOpenCodeHostPathError(config);
-    if (openCodeHostPathError) {
+    const openCodeConfigHostPathError = getOpenCodeHostPathError(
+      config.openCodeConfigHostPath,
+      config,
+      'OpenCode config host file path',
+      true,
+      'opencode.json'
+    );
+    if (openCodeConfigHostPathError) {
       errors.push({
         field: 'openCodeConfigHostPath',
-        message: openCodeHostPathError
+        message: openCodeConfigHostPathError
+      });
+    }
+
+    const openCodeAuthHostPathError = getOpenCodeHostPathError(
+      config.openCodeAuthHostPath,
+      config,
+      'OpenCode auth host file path',
+      false,
+      'auth.json'
+    );
+    if (openCodeAuthHostPathError) {
+      errors.push({
+        field: 'openCodeAuthHostPath',
+        message: openCodeAuthHostPathError
+      });
+    }
+
+    const openCodeModelsHostPathError = getOpenCodeHostPathError(
+      config.openCodeModelsHostPath,
+      config,
+      'OpenCode models host file path',
+      false,
+      'models.json'
+    );
+    if (openCodeModelsHostPathError) {
+      errors.push({
+        field: 'openCodeModelsHostPath',
+        message: openCodeModelsHostPathError
       });
     }
   }

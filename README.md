@@ -111,7 +111,7 @@ This will build the application and deploy it to the `gh-pages` branch.
 |----------|-------------|------------|-----------------|
 | Claude | Provider preset, token, optional custom endpoint | Requires token; custom preset also requires endpoint URL | Emits `ANTHROPIC_*` variables for the enabled Claude branch |
 | Codex | `CODEX_API_KEY`, optional `CODEX_BASE_URL` | Requires `CODEX_API_KEY` when enabled | Emits `CODEX_*` variables only |
-| OpenCode | Optional managed runtime model, config source toggle, optional host `opencode.json` path | `default-managed` needs no extra field; `host-file` requires an absolute `.json` path that matches the selected host OS | Emits explicit OpenCode provider registration plus `AI__OpenCode__*` managed runtime keys, then mounts either `opencode-config-data:/home/hagicode/.config/opencode` or `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode | Optional managed runtime model, config source toggle, host `opencode.json` path, plus optional `auth.json` / `models.json` paths | `default-managed` needs no extra field; `host-file` requires an absolute `opencode.json` path, and any provided `auth.json` / `models.json` path must also be an absolute `.json` path for the selected host OS | Emits explicit OpenCode provider registration plus `AI__OpenCode__*` managed runtime keys, then either mounts three managed volumes, or in `host-file` mode binds `opencode.json` and optionally adds `auth.json` / `models.json` mounts |
 
 ##### Other CLI Tools
 
@@ -123,8 +123,30 @@ HagiCode also supports other CLI tools, but the container integration documentat
 ##### OpenCode Notes
 
 - OpenCode export uses the managed runtime contract already documented in the unified image. The builder emits `AI__OpenCode__*` settings explicitly and does not depend on a fallback default executor.
-- OpenCode always targets `/home/hagicode/.config/opencode/opencode.json` inside the container. In the recommended `default-managed` mode, the builder mounts `opencode-config-data:/home/hagicode/.config/opencode` so the config survives restarts without extra input.
+- The OpenCode runtime user inside the unified image is always `hagicode`. Every in-container path in this guide therefore uses the `/home/hagicode/` prefix instead of the host `~` directory.
+- OpenCode always targets `/home/hagicode/.config/opencode/opencode.json` inside the container. In the recommended `default-managed` mode, the builder mounts three named volumes: `opencode-config-data:/home/hagicode/.config/opencode`, `opencode-auth-data:/home/hagicode/.local/share/opencode`, and `opencode-models-data:/home/hagicode/.cache/opencode`, so config, auth state, and model cache survive together.
 - If you switch OpenCode to `host-file`, enter an absolute host path such as `/srv/opencode/opencode.json` or `C:\\opencode\\opencode.json`. Browsers cannot discover the Docker host bind path for you, so the exported compose file uses the manually entered path exactly as typed.
+- `host-file` mode now supports three host file mappings: `opencode.json`, `auth.json`, and `models.json`. The config path is required, while the auth and model cache paths are optional and skipped when left empty.
+
+##### OpenCode Default Path Mapping
+
+The table below uses OpenCode's default macOS/Linux XDG directories for host-side examples and shows the corresponding in-container target paths for the `hagicode` user:
+
+| File | Default host path (macOS/Linux) | In-container `hagicode` path | Notes |
+|------|---------------------------------|------------------------------|-------|
+| `opencode.json` | `~/.config/opencode/opencode.json` | `/home/hagicode/.config/opencode/opencode.json` | Config file managed by Builder and also bound in `host-file` mode |
+| `auth.json` | `~/.local/share/opencode/auth.json` | `/home/hagicode/.local/share/opencode/auth.json` | Can be bound explicitly in `host-file` mode; otherwise you still prepare it yourself |
+| `models.json` | `~/.cache/opencode/models.json` | `/home/hagicode/.cache/opencode/models.json` | Can be bound explicitly in `host-file` mode and skipped when empty |
+
+##### Manual `auth.json` Migration
+
+Persisting `opencode.json` does not mean the authentication state is already available inside the container. If you want the containerized OpenCode runtime to reuse an existing host login, follow these steps:
+
+1. Locate the current host `auth.json`, usually at `~/.local/share/opencode/auth.json`.
+2. If you use Builder's `host-file` mode, place that absolute host path in the `auth.json` mapping field. If you do not use that field, you can still prepare `/home/hagicode/.local/share/opencode/auth.json` with your own bind mount, pre-seeded file, or image initialization step.
+3. If you also want to reuse the host model cache, provide the absolute host path to `models.json` so Builder can add `/home/hagicode/.cache/opencode/models.json` as another bind mount.
+4. Make sure the files and their parent directories stay readable by the `hagicode` user inside the container.
+5. Export and start the compose stack after that. Builder only binds the host paths you explicitly provide; it does not automatically discover, copy, or migrate these files.
 
 ##### Default CLI Persistence Volumes
 
@@ -134,7 +156,9 @@ All managed CLI volumes are emitted only when the related retained executor is e
 |----------|----------------|----------------|---------------|
 | Claude | `claude-data` | `/home/hagicode/.claude` | None; emitted only when Claude is enabled |
 | Codex | `codex-data` | `/home/hagicode/.codex` | None |
-| OpenCode | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` mode replaces the managed volume with `<hostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode Config | `opencode-config-data` | `/home/hagicode/.config/opencode` | `host-file` mode replaces this managed volume with `<configHostPath>:/home/hagicode/.config/opencode/opencode.json` |
+| OpenCode Auth | `opencode-auth-data` | `/home/hagicode/.local/share/opencode` | In `host-file` mode, providing `auth.json` switches this to a file mount at `/home/hagicode/.local/share/opencode/auth.json` |
+| OpenCode Models | `opencode-models-data` | `/home/hagicode/.cache/opencode` | In `host-file` mode, providing `models.json` switches this to a file mount at `/home/hagicode/.cache/opencode/models.json` |
 
 The application dynamically loads provider configurations from the docs repository at `https://docs.hagicode.com/presets/claude-code/providers/`. Available providers include:
 

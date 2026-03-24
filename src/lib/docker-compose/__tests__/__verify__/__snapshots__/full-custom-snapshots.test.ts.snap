@@ -459,6 +459,8 @@ services:
       - hagicode_data:/app/data
       - codex-data:/home/hagicode/.codex
       - opencode-config-data:/home/hagicode/.config/opencode
+      - opencode-auth-data:/home/hagicode/.local/share/opencode
+      - opencode-models-data:/home/hagicode/.cache/opencode
     networks:
       - pcode-network
     restart: unless-stopped
@@ -467,6 +469,8 @@ volumes:
   hagicode_data:
   codex-data:
   opencode-config-data:
+  opencode-auth-data:
+  opencode-models-data:
 
 networks:
   pcode-network:

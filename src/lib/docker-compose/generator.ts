@@ -1,12 +1,16 @@
 import type { DockerComposeConfig } from './types';
 import type { ProviderPreset } from './providerConfigLoader';
 import {
+  OPENCODE_AUTH_TARGET_FILE,
+  OPENCODE_AUTH_TARGET_DIR,
   REGISTRIES,
   ZAI_API_URL,
   ALIYUN_API_URL,
   VOLCENGINE_API_URL,
   OPENCODE_CONFIG_TARGET_DIR,
-  OPENCODE_CONFIG_TARGET_FILE
+  OPENCODE_CONFIG_TARGET_FILE,
+  OPENCODE_MODELS_TARGET_DIR,
+  OPENCODE_MODELS_TARGET_FILE,
 } from './types';
 
 /**
@@ -97,6 +101,11 @@ function hasTextValue(value: string | undefined): value is string {
   return Boolean(value?.trim());
 }
 
+type OpenCodeHostFileMount = {
+  hostPath: string | undefined;
+  targetPath: string;
+};
+
 type ExecutorVolumeSpec = {
   executor: DockerComposeConfig['enabledExecutors'][number];
   volumeName: string;
@@ -113,6 +122,8 @@ const EXECUTOR_VOLUME_DECLARATION_ORDER = [
   'claude-data',
   'codex-data',
   'opencode-config-data',
+  'opencode-auth-data',
+  'opencode-models-data',
 ] as const;
 
 function getExecutorVolumeSource(
@@ -144,8 +155,27 @@ function getAppExecutorVolumeMounts(config: DockerComposeConfig): string[] {
   if (isExecutorEnabled(config, 'opencode')) {
     if (config.openCodeConfigMode === 'host-file' && hasTextValue(config.openCodeConfigHostPath)) {
       mounts.push(`      - ${config.openCodeConfigHostPath}:${OPENCODE_CONFIG_TARGET_FILE}`);
+
+      const additionalOpenCodeFiles: OpenCodeHostFileMount[] = [
+        {
+          hostPath: config.openCodeAuthHostPath,
+          targetPath: OPENCODE_AUTH_TARGET_FILE,
+        },
+        {
+          hostPath: config.openCodeModelsHostPath,
+          targetPath: OPENCODE_MODELS_TARGET_FILE,
+        },
+      ];
+
+      for (const file of additionalOpenCodeFiles) {
+        if (hasTextValue(file.hostPath)) {
+          mounts.push(`      - ${file.hostPath}:${file.targetPath}`);
+        }
+      }
     } else {
       mounts.push(`      - opencode-config-data:${OPENCODE_CONFIG_TARGET_DIR}`);
+      mounts.push(`      - opencode-auth-data:${OPENCODE_AUTH_TARGET_DIR}`);
+      mounts.push(`      - opencode-models-data:${OPENCODE_MODELS_TARGET_DIR}`);
     }
   }
 
@@ -168,6 +198,8 @@ function getUsedExecutorNamedVolumes(config: DockerComposeConfig): Set<string> {
 
     if (usesManagedOpenCodeVolume) {
       usedVolumes.add('opencode-config-data');
+      usedVolumes.add('opencode-auth-data');
+      usedVolumes.add('opencode-models-data');
     }
   }
 

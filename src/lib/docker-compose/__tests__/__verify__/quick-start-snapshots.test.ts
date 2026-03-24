@@ -235,7 +235,11 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
     expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-auth-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-models-data')).toBe(true);
     expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-auth-data:/home/hagicode/.local/share/opencode');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-models-data:/home/hagicode/.cache/opencode');
 
     expect(yaml).toMatchSnapshot('quick-start-opencode-managed-volume-zh-CN');
   });
@@ -256,8 +260,12 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
     expect(hasVolume(yaml, 'codex-data')).toBe(true);
     expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-auth-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-models-data')).toBe(true);
     expect(getServiceVolumes(yaml, 'hagicode')).toContain('codex-data:/home/hagicode/.codex');
     expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-auth-data:/home/hagicode/.local/share/opencode');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('opencode-models-data:/home/hagicode/.cache/opencode');
     expect(hasService(yaml, 'copilot-cli')).toBe(false);
     expect(hasVolume(yaml, 'copilot-data')).toBe(false);
     expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);

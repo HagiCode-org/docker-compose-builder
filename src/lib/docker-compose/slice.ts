@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.8';
+const CONFIG_VERSION = '2.9';
 const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
@@ -69,7 +69,9 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
     openCodeConfigMode: isOpenCodeConfigMode(normalizedConfig.openCodeConfigMode)
       ? normalizedConfig.openCodeConfigMode
       : defaultConfig.openCodeConfigMode,
-    openCodeConfigHostPath: normalizedConfig.openCodeConfigHostPath ?? defaultConfig.openCodeConfigHostPath
+    openCodeConfigHostPath: normalizedConfig.openCodeConfigHostPath ?? defaultConfig.openCodeConfigHostPath,
+    openCodeAuthHostPath: normalizedConfig.openCodeAuthHostPath ?? defaultConfig.openCodeAuthHostPath,
+    openCodeModelsHostPath: normalizedConfig.openCodeModelsHostPath ?? defaultConfig.openCodeModelsHostPath,
   };
 };
 

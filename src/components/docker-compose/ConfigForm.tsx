@@ -8,7 +8,9 @@ import {
   selectProviderById,
 } from '@/lib/docker-compose/slice';
 import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
-import { OPENCODE_CONFIG_TARGET_FILE, REGISTRIES } from '@/lib/docker-compose/types';
+import {
+  REGISTRIES,
+} from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -504,12 +506,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     <p className="text-sm text-muted-foreground">{t('configForm.openCodeModelHint')}</p>
                   </div>
 
-                  <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
-                    <p className="text-sm font-medium">{t('configForm.openCodeTargetPathLabel')}</p>
-                    <p className="mt-2 font-mono text-sm text-primary">{OPENCODE_CONFIG_TARGET_FILE}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">{t('configForm.openCodeTargetPathHint')}</p>
-                  </div>
-
                   <div className="space-y-3">
                     <div className="space-y-1">
                       <Label>{t('configForm.openCodeConfigSource')}</Label>
@@ -547,31 +543,83 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   </div>
 
                   {config.openCodeConfigMode === 'host-file' ? (
-                    <div className="space-y-2">
-                      <Label htmlFor="openCodeConfigHostPath">
-                        {t('configForm.openCodeConfigHostPath')} <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        id="openCodeConfigHostPath"
-                        type="text"
-                        value={config.openCodeConfigHostPath}
-                        onChange={(event) => updateConfig('openCodeConfigHostPath', event.target.value)}
-                        placeholder={config.hostOS === 'windows'
-                          ? 'C:\\opencode\\opencode.json'
-                          : '/srv/opencode/opencode.json'}
-                      />
-                      {renderFieldError('openCodeConfigHostPath')}
-                      <p className="text-sm text-muted-foreground">
-                        {t('configForm.openCodeConfigHostPathHint', {
-                          example: config.hostOS === 'windows'
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="openCodeConfigHostPath">
+                          {t('configForm.openCodeConfigHostPath')} <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="openCodeConfigHostPath"
+                          type="text"
+                          value={config.openCodeConfigHostPath}
+                          onChange={(event) => updateConfig('openCodeConfigHostPath', event.target.value)}
+                          placeholder={config.hostOS === 'windows'
                             ? 'C:\\opencode\\opencode.json'
-                            : '/srv/opencode/opencode.json'
-                        })}
-                      </p>
+                            : '/srv/opencode/opencode.json'}
+                        />
+                        {renderFieldError('openCodeConfigHostPath')}
+                        <p className="text-sm text-muted-foreground">
+                          {t('configForm.openCodeConfigHostPathHint', {
+                            example: config.hostOS === 'windows'
+                              ? 'C:\\opencode\\opencode.json'
+                              : '/srv/opencode/opencode.json'
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="openCodeAuthHostPath" className="flex items-center gap-2">
+                          <span>{t('configForm.openCodeAuthHostPath')}</span>
+                          <Badge variant="outline">{t('configForm.optional')}</Badge>
+                        </Label>
+                        <Input
+                          id="openCodeAuthHostPath"
+                          type="text"
+                          value={config.openCodeAuthHostPath}
+                          onChange={(event) => updateConfig('openCodeAuthHostPath', event.target.value)}
+                          placeholder={config.hostOS === 'windows'
+                            ? 'C:\\opencode\\auth.json'
+                            : '/srv/opencode/auth.json'}
+                        />
+                        {renderFieldError('openCodeAuthHostPath')}
+                        <p className="text-sm text-muted-foreground">
+                          {t('configForm.openCodeAuthHostPathHint', {
+                            example: config.hostOS === 'windows'
+                              ? 'C:\\opencode\\auth.json'
+                              : '/srv/opencode/auth.json'
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="openCodeModelsHostPath" className="flex items-center gap-2">
+                          <span>{t('configForm.openCodeModelsHostPath')}</span>
+                          <Badge variant="outline">{t('configForm.optional')}</Badge>
+                        </Label>
+                        <Input
+                          id="openCodeModelsHostPath"
+                          type="text"
+                          value={config.openCodeModelsHostPath}
+                          onChange={(event) => updateConfig('openCodeModelsHostPath', event.target.value)}
+                          placeholder={config.hostOS === 'windows'
+                            ? 'C:\\opencode\\models.json'
+                            : '/srv/opencode/models.json'}
+                        />
+                        {renderFieldError('openCodeModelsHostPath')}
+                        <p className="text-sm text-muted-foreground">
+                          {t('configForm.openCodeModelsHostPathHint', {
+                            example: config.hostOS === 'windows'
+                              ? 'C:\\opencode\\models.json'
+                              : '/srv/opencode/models.json'
+                          })}
+                        </p>
+                      </div>
+
                       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
                         <p className="font-medium">{t('configForm.openCodeConfigBrowserLimitTitle')}</p>
                         <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigBrowserLimitHint')}</p>
                         <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigManualPriorityHint')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeAdditionalHostFilesHint')}</p>
                       </div>
                     </div>
                   ) : (
@@ -580,6 +628,12 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       <p className="mt-1 text-muted-foreground">{t('configForm.openCodeManagedVolumeHint')}</p>
                     </div>
                   )}
+
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
+                    <p className="font-medium">{t('configForm.openCodeConfigAuthWarningTitle')}</p>
+                    <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigAuthWarningHint')}</p>
+                    <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigAuthMigrationHint')}</p>
+                  </div>
                 </div>
               </div>
             ) : null}

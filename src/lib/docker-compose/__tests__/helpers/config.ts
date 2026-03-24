@@ -37,6 +37,8 @@ export function createMockConfig(
     openCodeModel: 'anthropic/claude-sonnet-4',
     openCodeConfigMode: 'default-managed',
     openCodeConfigHostPath: '',
+    openCodeAuthHostPath: '',
+    openCodeModelsHostPath: '',
     workdirPath: '/home/user/repos',
     workdirCreatedByRoot: true,
     puid: '1000',
