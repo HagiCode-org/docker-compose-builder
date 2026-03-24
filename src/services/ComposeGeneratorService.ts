@@ -1,5 +1,7 @@
 import type { DockerComposeConfig } from '@/lib/docker-compose/types';
 import { buildCaddyService, generateYAML } from '@/lib/docker-compose/generator';
+// Deployment builds may skip the optional DefinitelyTyped package for this library.
+// @ts-ignore
 import yaml from 'js-yaml';
 
 export class ComposeGeneratorService {
