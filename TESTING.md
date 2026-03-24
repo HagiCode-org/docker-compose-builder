@@ -28,6 +28,8 @@ Location: `src/lib/docker-compose/__tests__/__verify__/`
 
 ## Running Tests
 
+Use Node.js `^20.19.0 || >=22.12.0` before running the commands below. This matches the Vite 8 runtime floor used by local development and CI.
+
 ### Run All Tests
 ```bash
 npm test

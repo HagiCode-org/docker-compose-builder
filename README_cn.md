@@ -24,6 +24,8 @@
 
 ### 安装
 
+安装前请使用 Node.js `^20.19.0 || >=22.12.0`。这个要求同时适用于 `npm run dev`、`npm run build` 和 `npm test`。
+
 ```bash
 npm install
 ```
@@ -47,6 +49,22 @@ npm run build
 ```bash
 npm run preview
 ```
+
+### 推荐验证
+
+依赖升级后。或 CI 运行时变更后。建议执行：
+
+```bash
+npm run build
+npm test
+npm run dev
+```
+
+预期行为：
+
+- `npm run build` 完成 TypeScript 编译。并输出到 `dist/`
+- `npm test` 完成全部 Vitest 用例。包含快照校验
+- `npm run dev` 成功启动 Vite 8 开发服务器。并可在 `http://localhost:5174` 访问
 
 ### 部署到 GitHub Pages
 
@@ -266,8 +284,8 @@ BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
 
 ## 技术栈
 
-- **React 18** 配合 TypeScript
-- **Vite** - 构建工具和开发服务器
+- **React 19.2.0** 配合 TypeScript
+- **Vite 8** - 构建工具和开发服务器
 - **shadcn/ui** - 组件库
 - **Tailwind CSS** - 样式
 - **Radix UI** - 无头 UI 原语

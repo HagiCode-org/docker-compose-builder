@@ -24,6 +24,8 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 
 ### Installation
 
+Use Node.js `^20.19.0 || >=22.12.0` before installing dependencies. This applies to `npm run dev`, `npm run build`, and `npm test`.
+
 ```bash
 npm install
 ```
@@ -47,6 +49,22 @@ npm run build
 ```bash
 npm run preview
 ```
+
+### Recommended Validation
+
+Run these commands after dependency upgrades or CI/runtime changes:
+
+```bash
+npm run build
+npm test
+npm run dev
+```
+
+Expected behavior:
+
+- `npm run build` completes TypeScript compilation and writes assets to `dist/`
+- `npm test` completes the Vitest suite, including snapshot verification
+- `npm run dev` starts the Vite 8 dev server and keeps the app reachable on `http://localhost:5174`
 
 ### Deploy to GitHub Pages
 
@@ -266,8 +284,8 @@ To verify analytics integration in production:
 
 ## Technology Stack
 
-- **React 18** with TypeScript
-- **Vite** - Build tool and dev server
+- **React 19.2.0** with TypeScript
+- **Vite 8** - Build tool and dev server
 - **shadcn/ui** - Component library
 - **Tailwind CSS** - Styling
 - **Radix UI** - Headless UI primitives

@@ -32,7 +32,7 @@ Docker Compose Builder Web is a web-based tool for generating Docker Compose con
 | **React** | 19.2.0 | UI framework |
 | **React DOM** | 19.2.0 | DOM rendering |
 | **TypeScript** | ~5.9.3 | Type safety (strict mode enabled) |
-| **Vite** | 7.2.4 | Build tool and dev server |
+| **Vite** | 8.x | Build tool and dev server |
 
 ### State Management
 | Technology | Version | Purpose |
@@ -43,8 +43,8 @@ Docker Compose Builder Web is a web-based tool for generating Docker Compose con
 ### Styling
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Tailwind CSS** | ^4.1.17 | Utility-first CSS |
-| **@tailwindcss/vite** | ^4.1.18 | Tailwind Vite plugin |
+| **Tailwind CSS** | ^4.2.2 | Utility-first CSS |
+| **@tailwindcss/vite** | ^4.2.2 | Tailwind Vite plugin |
 | **tw-animate-css** | ^1.4.0 | Tailwind animations |
 | **Radix UI** | Multiple | Headless UI primitives |
 | **Base UI** | ^1.1.0 | Base UI components |
@@ -85,8 +85,8 @@ Docker Compose Builder Web is a web-based tool for generating Docker Compose con
 ### Testing
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Vitest** | ^4.0.18 | Unit testing framework |
-| **@vitest/ui** | ^4.0.18 | Test UI |
+| **Vitest** | ^4.1.1 | Unit testing framework |
+| **@vitest/ui** | ^4.1.1 | Test UI |
 | **verifyjs** | ^0.0.2 | Snapshot testing |
 
 ### Fonts
@@ -305,7 +305,7 @@ The `verify.config.json` configures snapshot behavior:
 
 **Workflow Steps:**
 1. **Checkout**: Repository code
-2. **Setup Node.js**: Version 20 with npm caching
+2. **Setup Node.js**: Version 20.19.0 with npm caching
 3. **Install dependencies**: `npm ci` for clean installs
 4. **Verify Snapshot Files**: Explicit check for snapshot existence
 5. **Build**: TypeScript compilation
