@@ -22,11 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js 20 with npm caching
+      # Step 2: Setup Node.js 20.19.0 with npm caching
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "20.19.0"
           cache: "npm"
 
       # Step 3: Install dependencies using npm ci for clean, reproducible installs
