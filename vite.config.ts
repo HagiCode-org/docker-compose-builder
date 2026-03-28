@@ -26,10 +26,9 @@ export default defineConfig({
     'import.meta.env.VITE_51LA_ID': JSON.stringify(process.env.VITE_51LA_ID || 'L6b88a5yK4h2Xnci'),
   },
   // Base path configuration
-  // Set VITE_BASE_PATH environment variable to override (e.g., VITE_BASE_PATH=/custom-path/)
-  // - Defaults to "/" for development
-  // - Defaults to "/docker-compose-builder/" for production (GitHub Pages)
-  base: process.env.VITE_BASE_PATH || (process.env.NODE_ENV === "production" ? "/docker-compose-builder/" : "/"),
+  // Set VITE_BASE_PATH to opt into sub-path deployments explicitly.
+  // The default production domain now serves from the root path, so keep "/" as the baseline.
+  base: process.env.VITE_BASE_PATH || "/",
   build: {
     outDir: "dist",
     assetsDir: "assets",
