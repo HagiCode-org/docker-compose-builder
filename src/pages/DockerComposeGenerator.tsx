@@ -9,6 +9,7 @@ import { MobilePreviewDrawer } from '@/components/docker-compose/layout/MobilePr
 import { SectionRail } from '@/components/docker-compose/layout/SectionRail';
 import { WorkspaceIntro } from '@/components/docker-compose/layout/WorkspaceIntro';
 import { WorkspaceShell } from '@/components/docker-compose/layout/WorkspaceShell';
+import { SiteFooter } from '@/components/Footer/SiteFooter';
 import {
   findFirstErrorSection,
   getWorkspaceSections,
@@ -217,6 +218,7 @@ export function DockerComposeGenerator() {
           preview={previewPanel}
         />
       </main>
+      <SiteFooter />
     </div>
   );
 }
