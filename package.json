@@ -8,11 +8,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run sync:footer-sites && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
+    "sync:footer-sites": "node ./scripts/fetch-sites-snapshot.mjs",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
