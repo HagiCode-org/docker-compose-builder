@@ -94,6 +94,28 @@ describe('workspace section metadata', () => {
     expect(openCodeChild?.errorCount).toBe(0);
   });
 
+  it('tracks the Code Server child item only in full-custom mode', () => {
+    const config = {
+      ...defaultConfig,
+      profile: 'full-custom' as const,
+      anthropicAuthToken: 'sk-ant-test',
+      workdirPath: '/workspace/repos',
+      codeServerHost: '127.0.0.1',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '',
+    };
+
+    const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
+    const codeServerChild = sections
+      .find((section) => section.id === 'executors')
+      ?.children.find((child) => child.id === 'executor-code-server');
+
+    expect(codeServerChild).toBeDefined();
+    expect(codeServerChild?.errorCount).toBe(2);
+    expect(isWorkspaceExportReady(sections)).toBe(false);
+  });
+
   it('reports a fully ready workspace summary when all required inputs are present', () => {
     const config = {
       ...defaultConfig,

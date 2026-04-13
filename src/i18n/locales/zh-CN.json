@@ -203,7 +203,36 @@
     "puid": "PUID（用户 ID）",
     "pgid": "PGID（组 ID）",
     "permissionNotRequired": "无需权限配置",
-    "permissionNotRequiredDescription": "当工作目录由 root 用户创建时，不需要权限映射。"
+    "permissionNotRequiredDescription": "当工作目录由 root 用户创建时，不需要权限映射。",
+    "codeServerConfiguration": "Code Server 配置",
+    "codeServerDescription": "只在完整自定义模式下导出托管浏览器 IDE 的部署默认值。",
+    "codeServerEnable": "将 code-server 设为默认浏览器 IDE",
+    "codeServerEnableHint": "关闭后会保留你填写的值，但导出的默认实现会切回 code serve-web。",
+    "codeServerPrivateTitle": "默认保持私有",
+    "codeServerPrivateHint": "只有在下方显式开启宿主机发布后，Builder 才会额外导出专用端口映射。",
+    "codeServerPersistenceTitle": "持久化继续复用现有数据卷",
+    "codeServerPersistenceHint": "Compose 中导出的是部署默认值；容器启动后的运行时状态仍会继续落在共享的 HagiCode 数据卷里。",
+    "codeServerPersistencePathValue": "hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerHost": "监听 Host",
+    "codeServerHostHint": "默认使用 127.0.0.1 保持容器内私有访问。若要开启宿主机发布，请先切换为 0.0.0.0 或 ::。",
+    "codeServerPort": "容器端口",
+    "codeServerPortHint": "有效范围：1-65535。36529 与 HagiCode 当前的 code-server 默认端口一致。",
+    "codeServerAuthMode": "认证模式",
+    "codeServerAuthModeNone": "none",
+    "codeServerAuthModePassword": "password",
+    "codeServerAuthModeHint": "当你希望 Builder 一并导出 code-server 的启动密码时，请选择 password。",
+    "codeServerPassword": "CODE_SERVER_PASSWORD",
+    "codeServerPasswordHint": "该值会交给容器启动引导桥接到 code-server，不会在注释里明文解释。",
+    "codeServerPasswordSkippedHint": "当认证模式为 none 时，不会导出密码类环境变量。",
+    "codeServerPublishToHost": "发布到宿主机",
+    "codeServerPublishToHostHint": "为 code-server 增加独立的宿主机到容器端口映射，同时把宿主机绑定地址固定为回环地址。",
+    "codeServerPublishedPort": "宿主机发布端口",
+    "codeServerPublishedPortHint": "Builder 会为该端口生成一条仅回环可访问的独立映射。",
+    "codeServerPublishBindTitle": "宿主机绑定地址",
+    "codeServerPublishBindHint": "Builder 首阶段固定绑定到 loopback；如果你需要更广泛的暴露范围，请在外层显式增加反向代理。",
+    "codeServerPublishBindValue": "127.0.0.1:<宿主机端口>:<容器端口>",
+    "codeServerDisabledTitle": "当前未启用 code-server 默认值",
+    "codeServerDisabledHint": "在重新启用之前，Builder 会导出 code serve-web 作为当前配置模式的默认实现。"
   },
   "configPreview": {
     "generatedConfiguration": "生成的配置",
@@ -318,6 +347,10 @@
       "opencode": {
         "title": "OpenCode 运行时",
         "description": "托管模型选择与配置持久化模式。"
+      },
+      "codeServer": {
+        "title": "Code Server 默认值",
+        "description": "配置 code-server 的容器 host/port、认证模式，以及可选的宿主机端口发布。"
       }
     }
   }

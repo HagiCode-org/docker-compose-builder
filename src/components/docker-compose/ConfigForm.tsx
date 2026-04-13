@@ -638,6 +638,153 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               </div>
             ) : null}
 
+            {config.profile === 'full-custom' ? (
+              <div id="executor-code-server" tabIndex={-1} className={subSectionClass}>
+                <div>
+                  <h4 className="text-base font-semibold">{t('configForm.codeServerConfiguration')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('configForm.codeServerDescription')}</p>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="enableCodeServer"
+                      checked={config.enableCodeServer}
+                      onCheckedChange={(checked) => updateConfig('enableCodeServer', checked === true)}
+                    />
+                    <div className="space-y-1">
+                      <Label htmlFor="enableCodeServer" className="cursor-pointer text-sm font-medium">
+                        {t('configForm.codeServerEnable')}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">{t('configForm.codeServerEnableHint')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
+                  <p className="font-medium">{t('configForm.codeServerPrivateTitle')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPrivateHint')}</p>
+                </div>
+
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-950 dark:bg-emerald-950/25">
+                  <p className="font-medium">{t('configForm.codeServerPersistenceTitle')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPersistenceHint')}</p>
+                  <p className="mt-2 text-xs font-mono">{t('configForm.codeServerPersistencePathValue')}</p>
+                </div>
+
+                {config.enableCodeServer ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <FieldBlock label={t('configForm.codeServerHost')} htmlFor="codeServerHost">
+                        <Input
+                          id="codeServerHost"
+                          type="text"
+                          value={config.codeServerHost}
+                          onChange={(event) => updateConfig('codeServerHost', event.target.value)}
+                          placeholder="127.0.0.1"
+                        />
+                        {renderFieldError('codeServerHost')}
+                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerHostHint')}</p>
+                      </FieldBlock>
+
+                      <FieldBlock label={t('configForm.codeServerPort')} htmlFor="codeServerPort">
+                        <Input
+                          id="codeServerPort"
+                          type="number"
+                          value={config.codeServerPort}
+                          onChange={(event) => updateConfig('codeServerPort', event.target.value)}
+                          placeholder="36529"
+                        />
+                        {renderFieldError('codeServerPort')}
+                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerPortHint')}</p>
+                      </FieldBlock>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <FieldBlock label={t('configForm.codeServerAuthMode')} htmlFor="codeServerAuthMode">
+                        <Select
+                          value={config.codeServerAuthMode}
+                          onValueChange={(value: DockerComposeConfig['codeServerAuthMode']) => updateConfig('codeServerAuthMode', value)}
+                        >
+                          <SelectTrigger id="codeServerAuthMode">
+                            <SelectValue placeholder={t('configForm.codeServerAuthMode')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">{t('configForm.codeServerAuthModeNone')}</SelectItem>
+                            <SelectItem value="password">{t('configForm.codeServerAuthModePassword')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {renderFieldError('codeServerAuthMode')}
+                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerAuthModeHint')}</p>
+                      </FieldBlock>
+
+                      {config.codeServerAuthMode === 'password' ? (
+                        <FieldBlock label={t('configForm.codeServerPassword')} htmlFor="codeServerPassword">
+                          <Input
+                            id="codeServerPassword"
+                            type="password"
+                            value={config.codeServerPassword}
+                            onChange={(event) => updateConfig('codeServerPassword', event.target.value)}
+                            placeholder="change-me"
+                          />
+                          {renderFieldError('codeServerPassword')}
+                          <p className="text-xs text-muted-foreground">{t('configForm.codeServerPasswordHint')}</p>
+                        </FieldBlock>
+                      ) : (
+                        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+                          <p className="font-medium">{t('configForm.codeServerAuthModeNone')}</p>
+                          <p className="mt-1">{t('configForm.codeServerPasswordSkippedHint')}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4 rounded-2xl border border-border/60 bg-background/80 p-4">
+                      <div className="flex items-start gap-3">
+                        <Checkbox
+                          id="codeServerPublishToHost"
+                          checked={config.codeServerPublishToHost}
+                          onCheckedChange={(checked) => updateConfig('codeServerPublishToHost', checked === true)}
+                        />
+                        <div className="space-y-1">
+                          <Label htmlFor="codeServerPublishToHost" className="cursor-pointer text-sm font-medium">
+                            {t('configForm.codeServerPublishToHost')}
+                          </Label>
+                          <p className="text-sm text-muted-foreground">{t('configForm.codeServerPublishToHostHint')}</p>
+                        </div>
+                      </div>
+
+                      {config.codeServerPublishToHost ? (
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <FieldBlock label={t('configForm.codeServerPublishedPort')} htmlFor="codeServerPublishedPort">
+                            <Input
+                              id="codeServerPublishedPort"
+                              type="number"
+                              value={config.codeServerPublishedPort}
+                              onChange={(event) => updateConfig('codeServerPublishedPort', event.target.value)}
+                              placeholder="36529"
+                            />
+                            {renderFieldError('codeServerPublishedPort')}
+                            <p className="text-xs text-muted-foreground">{t('configForm.codeServerPublishedPortHint')}</p>
+                          </FieldBlock>
+
+                          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
+                            <p className="font-medium">{t('configForm.codeServerPublishBindTitle')}</p>
+                            <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPublishBindHint')}</p>
+                            <p className="mt-2 text-xs font-mono">{t('configForm.codeServerPublishBindValue')}</p>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border/70 bg-muted/15 p-4 text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground">{t('configForm.codeServerDisabledTitle')}</p>
+                    <p className="mt-1">{t('configForm.codeServerDisabledHint')}</p>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
           </div>
         </ConfigSectionCard>
       ) : null}

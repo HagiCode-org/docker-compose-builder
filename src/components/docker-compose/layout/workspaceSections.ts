@@ -12,7 +12,8 @@ export type WorkspaceSectionId =
 export type WorkspaceSectionChildId =
   | 'executor-claude'
   | 'executor-codex'
-  | 'executor-opencode';
+  | 'executor-opencode'
+  | 'executor-code-server';
 
 export type WorkspaceSectionStatus = 'active' | 'complete' | 'error' | 'pending';
 
@@ -105,6 +106,13 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       'openCodeModel',
       'openCodeConfigMode',
       'openCodeConfigHostPath',
+      'enableCodeServer',
+      'codeServerHost',
+      'codeServerPort',
+      'codeServerPublishToHost',
+      'codeServerPublishedPort',
+      'codeServerAuthMode',
+      'codeServerPassword',
     ],
     isVisible: () => true,
     isComplete: (config) => {
@@ -119,10 +127,19 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       const openCodeReady = !config.enabledExecutors.includes('opencode')
         || config.openCodeConfigMode === 'default-managed'
         || hasTextValue(config.openCodeConfigHostPath);
+      const codeServerReady = config.profile !== 'full-custom'
+        || !config.enableCodeServer
+        || (
+          hasTextValue(config.codeServerHost)
+          && hasTextValue(config.codeServerPort)
+          && (!config.codeServerPublishToHost || hasTextValue(config.codeServerPublishedPort))
+          && (config.codeServerAuthMode !== 'password' || hasTextValue(config.codeServerPassword))
+        );
 
       return claudeReady
         && codexReady
-        && openCodeReady;
+        && openCodeReady
+        && codeServerReady;
     },
   },
   {
@@ -232,6 +249,30 @@ const childDefinitions: WorkspaceSectionChildDefinition[] = [
     isVisible: (config) => config.enabledExecutors.includes('opencode'),
     isComplete: (config) =>
       config.openCodeConfigMode === 'default-managed' || hasTextValue(config.openCodeConfigHostPath),
+  },
+  {
+    id: 'executor-code-server',
+    parentId: 'executors',
+    titleKey: 'workspace.executorItems.codeServer.title',
+    descriptionKey: 'workspace.executorItems.codeServer.description',
+    fieldIds: [
+      'enableCodeServer',
+      'codeServerHost',
+      'codeServerPort',
+      'codeServerPublishToHost',
+      'codeServerPublishedPort',
+      'codeServerAuthMode',
+      'codeServerPassword',
+    ],
+    isVisible: (config) => config.profile === 'full-custom',
+    isComplete: (config) =>
+      !config.enableCodeServer
+      || (
+        hasTextValue(config.codeServerHost)
+        && hasTextValue(config.codeServerPort)
+        && (!config.codeServerPublishToHost || hasTextValue(config.codeServerPublishedPort))
+        && (config.codeServerAuthMode !== 'password' || hasTextValue(config.codeServerPassword))
+      ),
   },
 ];
 

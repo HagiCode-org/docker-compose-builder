@@ -50,6 +50,50 @@ describe('validateConfig', () => {
     expect(errors.some((error) => error.field === 'openCodeConfigHostPath')).toBe(false);
   });
 
+  it('ignores retained Code Server custom-mode errors while quick-start is active', () => {
+    const errors = validateConfig(createMockConfig({
+      profile: 'quick-start',
+      codeServerHost: 'not-a-host',
+      codeServerPort: '70000',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '',
+      codeServerAuthMode: 'password',
+      codeServerPassword: '',
+    }));
+
+    expect(errors.some((error) => error.field.startsWith('codeServer'))).toBe(false);
+  });
+
+  it('requires deployable Code Server settings in full-custom mode', () => {
+    const errors = validateConfig(createMockConfig({
+      profile: 'full-custom',
+      codeServerHost: '127.0.0.1',
+      codeServerPort: '45000',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '8080',
+      codeServerAuthMode: 'password',
+      codeServerPassword: '',
+    }));
+
+    expect(errors.some((error) => error.field === 'codeServerHost')).toBe(true);
+    expect(errors.some((error) => error.field === 'codeServerPort')).toBe(true);
+    expect(errors.some((error) => error.field === 'codeServerPassword')).toBe(true);
+  });
+
+  it('accepts a publishable Code Server configuration in full-custom mode', () => {
+    const errors = validateConfig(createMockConfig({
+      profile: 'full-custom',
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '36530',
+      codeServerAuthMode: 'password',
+      codeServerPassword: 'super-secret',
+    }));
+
+    expect(errors.some((error) => error.field.startsWith('codeServer'))).toBe(false);
+  });
+
   it('requires a valid OpenCode host-file path only when host-file mode is enabled', () => {
     const errors = validateConfig(createOpenCodeConfig({
       openCodeConfigMode: 'host-file',
@@ -125,6 +169,18 @@ describe('isValidConfig', () => {
       anthropicAuthToken: 'test-token',
       codexApiKey: 'test-codex-key',
       openCodeModel: 'openai/gpt-5'
+    }))).toBe(true);
+  });
+
+  it('returns true for a valid full-custom Code Server publish configuration', () => {
+    expect(isValidConfig(createMockConfig({
+      profile: 'full-custom',
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '36531',
+      codeServerAuthMode: 'password',
+      codeServerPassword: 'super-secret',
     }))).toBe(true);
   });
 });

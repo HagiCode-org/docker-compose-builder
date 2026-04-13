@@ -2,6 +2,15 @@ import type { DockerComposeConfig } from './types';
 import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
 
 const WINDOWS_FILE_PATH_PATTERN = /^[A-Za-z]:[\\/].+$/;
+const CODE_SERVER_PUBLIC_LISTEN_HOSTS = new Set(['0.0.0.0', '::']);
+
+function parseRequiredPort(value: string): number | null {
+  if (!value || Number.isNaN(parseInt(value, 10))) {
+    return null;
+  }
+
+  return parseInt(value, 10);
+}
 
 function getOpenCodeHostPathError(
   pathValue: string,
@@ -201,6 +210,56 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
         field: 'openCodeModelsHostPath',
         message: openCodeModelsHostPathError
       });
+    }
+  }
+
+  if (config.profile === 'full-custom' && config.enableCodeServer) {
+    const parsedCodeServerHost = parseHostWithOptionalPort(config.codeServerHost || '');
+    if (!parsedCodeServerHost) {
+      errors.push({ field: 'codeServerHost', message: 'Code Server listen host must be a valid IPv4/IPv6 address' });
+    } else if (parsedCodeServerHost.port !== undefined) {
+      errors.push({ field: 'codeServerHost', message: 'Code Server listen host must not include a port' });
+    }
+
+    const codeServerPort = parseRequiredPort(config.codeServerPort);
+    if (codeServerPort === null) {
+      errors.push({ field: 'codeServerPort', message: 'Code Server container port must be a valid number' });
+    } else if (codeServerPort < 1 || codeServerPort > 65535) {
+      errors.push({ field: 'codeServerPort', message: 'Code Server container port must be between 1 and 65535' });
+    } else if (codeServerPort === 45000) {
+      errors.push({ field: 'codeServerPort', message: 'Code Server container port cannot reuse the HagiCode app port 45000' });
+    }
+
+    if (config.codeServerAuthMode !== 'none' && config.codeServerAuthMode !== 'password') {
+      errors.push({ field: 'codeServerAuthMode', message: 'Code Server auth mode must be none or password' });
+    }
+
+    if (config.codeServerAuthMode === 'password' && (!config.codeServerPassword || config.codeServerPassword.trim() === '')) {
+      errors.push({ field: 'codeServerPassword', message: 'Code Server password is required when auth mode is password' });
+    }
+
+    if (config.codeServerPublishToHost) {
+      const publishedPort = parseRequiredPort(config.codeServerPublishedPort);
+      if (publishedPort === null) {
+        errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port must be a valid number' });
+      } else if (publishedPort < 1 || publishedPort > 65535) {
+        errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port must be between 1 and 65535' });
+      } else {
+        if (!config.enableHttps && hasPortConflict(config.httpPort, config.codeServerPublishedPort)) {
+          errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port cannot match the HagiCode HTTP port' });
+        }
+
+        if (config.enableHttps && hasPortConflict(config.httpsPort, config.codeServerPublishedPort)) {
+          errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port cannot match the HTTPS proxy port' });
+        }
+      }
+
+      if (parsedCodeServerHost && !CODE_SERVER_PUBLIC_LISTEN_HOSTS.has(parsedCodeServerHost.host.trim())) {
+        errors.push({
+          field: 'codeServerHost',
+          message: 'Code Server listen host must be 0.0.0.0 or :: when host publishing is enabled'
+        });
+      }
     }
   }
 

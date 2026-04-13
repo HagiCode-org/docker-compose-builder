@@ -9,6 +9,7 @@ export type LicenseKeyType = 'public' | 'custom';
 export type VolumeType = 'named' | 'bind';
 export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
 export type OpenCodeConfigMode = 'default-managed' | 'host-file';
+export type CodeServerAuthMode = 'none' | 'password';
 
 /**
  * Configuration Profile Type
@@ -174,6 +175,22 @@ export interface DockerComposeConfig {
   openCodeAuthHostPath: string;
   /** Optional host models.json path used when OpenCode model cache should be mounted explicitly */
   openCodeModelsHostPath: string;
+
+  // Code Server Deployment Configuration (full-custom only)
+  /** Whether the generated compose file should prefer code-server as the default browser IDE */
+  enableCodeServer: boolean;
+  /** Container listen host for code-server */
+  codeServerHost: string;
+  /** Container listen port for code-server */
+  codeServerPort: string;
+  /** Whether Builder should publish a dedicated host port for code-server */
+  codeServerPublishToHost: boolean;
+  /** Host port used when code-server publishing is enabled */
+  codeServerPublishedPort: string;
+  /** code-server authentication mode */
+  codeServerAuthMode: CodeServerAuthMode;
+  /** Deployment secret bridged to code-server PASSWORD at container startup */
+  codeServerPassword: string;
 
   // Volume mounts
   workdirPath: string;

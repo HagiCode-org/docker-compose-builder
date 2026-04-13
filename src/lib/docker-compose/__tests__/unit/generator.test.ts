@@ -13,10 +13,11 @@ import {
 } from '../../generator';
 import {
   FIXED_DATE,
+  createFullCustomConfig,
   createMockConfig,
   createOpenCodeConfig,
 } from '../helpers/config';
-import { getServiceVolumes, hasService, hasVolume } from '../helpers/yaml';
+import { getServicePorts, getServiceVolumes, hasService, hasVolume } from '../helpers/yaml';
 
 describe('buildHeader', () => {
   it('generates localized support metadata', () => {
@@ -110,6 +111,41 @@ describe('buildAppService', () => {
     expect(appService).toContain('PUID: 1000');
     expect(appService).toContain('PGID: 1000');
     expect(appService).toContain('claude-data:/home/hagicode/.claude');
+  });
+
+  it('exports Code Server defaults only in full-custom mode', () => {
+    const appService = buildAppService(createFullCustomConfig({
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerAuthMode: 'password',
+      codeServerPassword: 'super-secret',
+    }), undefined, 'en-US').join('\n');
+
+    expect(appService).toContain('VsCodeServer__DefaultActiveImplementation: "code-server"');
+    expect(appService).toContain('VsCodeServer__CodeServerDefaultHost: "0.0.0.0"');
+    expect(appService).toContain('VsCodeServer__CodeServerDefaultPort: 36529');
+    expect(appService).toContain('VsCodeServer__CodeServerAuthMode: "password"');
+    expect(appService).toContain('CODE_SERVER_PASSWORD: "super-secret"');
+    expect(appService).toContain('Code Server runtime state continues to use hagicode_data:/app/data');
+  });
+
+  it('adds a dedicated loopback port mapping when Code Server publishing is enabled', () => {
+    const yaml = generateYAML(createFullCustomConfig({
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '36531',
+    }), undefined, 'en-US', FIXED_DATE);
+
+    expect(getServicePorts(yaml, 'hagicode')).toContain('8080:45000');
+    expect(getServicePorts(yaml, 'hagicode')).toContain('127.0.0.1:36531:36529');
+  });
+
+  it('keeps quick-start output free of Code Server defaults', () => {
+    const yaml = generateYAML(createMockConfig(), undefined, 'en-US', FIXED_DATE);
+
+    expect(yaml).not.toContain('VsCodeServer__DefaultActiveImplementation');
+    expect(yaml).not.toContain('CODE_SERVER_PASSWORD');
   });
 });
 

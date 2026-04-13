@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.9';
+const CONFIG_VERSION = '2.10';
 const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
@@ -33,6 +33,9 @@ const isExecutorType = (value: unknown): value is ExecutorType =>
 
 const isOpenCodeConfigMode = (value: unknown): value is DockerComposeConfig['openCodeConfigMode'] =>
   value === 'default-managed' || value === 'host-file';
+
+const isCodeServerAuthMode = (value: unknown): value is DockerComposeConfig['codeServerAuthMode'] =>
+  value === 'none' || value === 'password';
 
 const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
   const normalizedEnabled = Array.isArray(config.enabledExecutors)
@@ -72,6 +75,15 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
     openCodeConfigHostPath: normalizedConfig.openCodeConfigHostPath ?? defaultConfig.openCodeConfigHostPath,
     openCodeAuthHostPath: normalizedConfig.openCodeAuthHostPath ?? defaultConfig.openCodeAuthHostPath,
     openCodeModelsHostPath: normalizedConfig.openCodeModelsHostPath ?? defaultConfig.openCodeModelsHostPath,
+    enableCodeServer: normalizedConfig.enableCodeServer ?? defaultConfig.enableCodeServer,
+    codeServerHost: normalizedConfig.codeServerHost ?? defaultConfig.codeServerHost,
+    codeServerPort: normalizedConfig.codeServerPort ?? defaultConfig.codeServerPort,
+    codeServerPublishToHost: normalizedConfig.codeServerPublishToHost ?? defaultConfig.codeServerPublishToHost,
+    codeServerPublishedPort: normalizedConfig.codeServerPublishedPort ?? defaultConfig.codeServerPublishedPort,
+    codeServerAuthMode: isCodeServerAuthMode(normalizedConfig.codeServerAuthMode)
+      ? normalizedConfig.codeServerAuthMode
+      : defaultConfig.codeServerAuthMode,
+    codeServerPassword: normalizedConfig.codeServerPassword ?? defaultConfig.codeServerPassword,
   };
 };
 

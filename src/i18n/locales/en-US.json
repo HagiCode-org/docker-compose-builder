@@ -170,7 +170,7 @@
     "customApiEndpoint": "Custom API Endpoint",
     "apiEndpointUrl": "API Endpoint URL",
     "apiToken": "API Token",
-    "getApiToken": "Get API Token →",
+    "getApiToken": "Get API Token \u2192",
     "enterApiToken": "Enter your API Token",
     "enterAnthropicApiToken": "Enter your Anthropic API Token (sk-ant-...)",
     "apiEndpointAutoSet": "API Endpoint will be automatically set to",
@@ -189,7 +189,7 @@
     "claudeCodeExperimentalAgentTeamsHint": "Enable experimental Agent Teams collaboration feature",
     "volumeMounts": "Volume Mounts",
     "workdirDescription": "Work directory points to a folder containing your code repositories. We will scan multiple repositories within this folder and it will be mapped to /app/workdir inside the container.",
-    "workdirRecommendation": "💡 Recommendation: Point to a parent folder that contains multiple repositories (e.g., /home/user/repos or C:\\Users\\YourName\\source\\repos). The application will scan all subfolders to detect repositories.",
+    "workdirRecommendation": "\ud83d\udca1 Recommendation: Point to a parent folder that contains multiple repositories (e.g., /home/user/repos or C:\\Users\\YourName\\source\\repos). The application will scan all subfolders to detect repositories.",
     "workdirPath": "Work Directory Path",
     "workdirCreatedByRoot": "Work directory created by root user",
     "permissionIssueWarning": "Permission Issue Warning",
@@ -203,7 +203,36 @@
     "puid": "PUID (User ID)",
     "pgid": "PGID (Group ID)",
     "permissionNotRequired": "Permission Not Required",
-    "permissionNotRequiredDescription": "When workdir is created by root, permission mapping is not required."
+    "permissionNotRequiredDescription": "When workdir is created by root, permission mapping is not required.",
+    "codeServerConfiguration": "Code Server Configuration",
+    "codeServerDescription": "Configure the managed browser IDE defaults exported only in full custom mode.",
+    "codeServerEnable": "Enable code-server as the default browser IDE",
+    "codeServerEnableHint": "When disabled, Builder keeps your saved values but exports code serve-web as the default implementation instead.",
+    "codeServerPrivateTitle": "Private by default",
+    "codeServerPrivateHint": "No dedicated host port is published until you explicitly enable host publishing below.",
+    "codeServerPersistenceTitle": "Persistence stays shared",
+    "codeServerPersistenceHint": "Deployment defaults are exported into compose, while runtime state continues to live under the shared HagiCode data volume after the container starts.",
+    "codeServerPersistencePathValue": "hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerHost": "Listen Host",
+    "codeServerHostHint": "Use 127.0.0.1 for private container-only access. Switch to 0.0.0.0 or :: before enabling host publishing.",
+    "codeServerPort": "Container Port",
+    "codeServerPortHint": "Valid range: 1-65535. Port 36529 matches the HagiCode code-server default.",
+    "codeServerAuthMode": "Auth Mode",
+    "codeServerAuthModeNone": "none",
+    "codeServerAuthModePassword": "password",
+    "codeServerAuthModeHint": "Use password when you want Builder to export a startup secret for code-server.",
+    "codeServerPassword": "CODE_SERVER_PASSWORD",
+    "codeServerPasswordHint": "This value is passed to the container bootstrap path and bridged to code-server without being echoed in comments.",
+    "codeServerPasswordSkippedHint": "No password secret is exported while auth mode stays set to none.",
+    "codeServerPublishToHost": "Publish Code Server to Host",
+    "codeServerPublishToHostHint": "Adds a dedicated host-to-container port mapping for code-server while keeping the bind address fixed to host loopback.",
+    "codeServerPublishedPort": "Published Host Port",
+    "codeServerPublishedPortHint": "Builder emits a separate loopback-only mapping for this host port.",
+    "codeServerPublishBindTitle": "Host bind address",
+    "codeServerPublishBindHint": "Builder keeps the host-side bind fixed to loopback for the first publish step. Add a reverse proxy if you need wider exposure.",
+    "codeServerPublishBindValue": "127.0.0.1:<published-port>:<container-port>",
+    "codeServerDisabledTitle": "code-server defaults are currently disabled",
+    "codeServerDisabledHint": "Builder will export code serve-web as the active implementation until you re-enable code-server for this profile."
   },
   "configPreview": {
     "generatedConfiguration": "Generated Configuration",
@@ -318,6 +347,10 @@
       "opencode": {
         "title": "OpenCode runtime",
         "description": "Managed model selection plus config persistence mode."
+      },
+      "codeServer": {
+        "title": "Code Server defaults",
+        "description": "Container host/port, auth mode, and optional host publishing for code-server."
       }
     }
   }

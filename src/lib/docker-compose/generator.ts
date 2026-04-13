@@ -101,6 +101,59 @@ function hasTextValue(value: string | undefined): value is string {
   return Boolean(value?.trim());
 }
 
+function getCodeServerCommentCopy(language: string) {
+  return language === 'zh-CN'
+    ? {
+      title: 'Code Server 部署默认值',
+      privateHint: '默认不公开宿主机端口；只有开启宿主机发布后才会导出独立映射',
+      persistenceHint: 'Code Server 运行时状态继续复用 hagicode_data:/app/data，不会新增必需的数据卷',
+      disabledHint: '当前未将 code-server 设为默认实现，运行时会回退到 code serve-web',
+      publishHint: '宿主机发布固定绑定到 127.0.0.1；如需更广泛访问，请在外层反向代理中显式放开',
+      volumeHint: '共享应用数据卷；Code Server 运行时状态会落在 /app/data/code-server'
+    }
+    : {
+      title: 'Code Server deployment defaults',
+      privateHint: 'Private by default: no host port is published unless you explicitly enable it',
+      persistenceHint: 'Code Server runtime state continues to use hagicode_data:/app/data instead of a separate mandatory volume',
+      disabledHint: 'code-server is not the default implementation for this deployment; runtime falls back to code serve-web',
+      publishHint: 'Host publishing is loopback-only at 127.0.0.1; add a reverse proxy explicitly if you need broader exposure',
+      volumeHint: 'Shared application data volume; Code Server runtime state lives under /app/data/code-server'
+    };
+}
+
+function buildCodeServerEnvVars(config: DockerComposeConfig, language: string): string[] {
+  if (config.profile !== 'full-custom') {
+    return [];
+  }
+
+  const copy = getCodeServerCommentCopy(language);
+  const lines: string[] = [
+    '      # ==================================================',
+    `      # ${copy.title}`,
+    '      # ==================================================',
+    `      # ${copy.privateHint}`,
+    `      # ${copy.persistenceHint}`,
+  ];
+
+  if (!config.enableCodeServer) {
+    lines.push(`      # ${copy.disabledHint}`);
+    lines.push('      VsCodeServer__DefaultActiveImplementation: "code-serve-web"');
+    return lines;
+  }
+
+  lines.push('      VsCodeServer__DefaultActiveImplementation: "code-server"');
+  lines.push(`      VsCodeServer__CodeServerDefaultHost: "${config.codeServerHost}"`);
+  lines.push(`      VsCodeServer__CodeServerDefaultPort: ${config.codeServerPort}`);
+  lines.push('      VsCodeServer__CodeServerExecutablePath: "code-server"');
+  lines.push(`      VsCodeServer__CodeServerAuthMode: "${config.codeServerAuthMode}"`);
+
+  if (config.codeServerAuthMode === 'password' && hasTextValue(config.codeServerPassword)) {
+    lines.push(`      CODE_SERVER_PASSWORD: "${config.codeServerPassword}"`);
+  }
+
+  return lines;
+}
+
 type OpenCodeHostFileMount = {
   hostPath: string | undefined;
   targetPath: string;
@@ -386,9 +439,11 @@ export function buildHeader(
  */
 export function buildAppService(
   config: DockerComposeConfig,
-  providerConfig?: ProviderPreset
+  providerConfig?: ProviderPreset,
+  language: string = 'zh-CN'
 ): string[] {
   const lines: string[] = [];
+  const codeServerCopy = getCodeServerCommentCopy(language);
 
   lines.push('  hagicode:');
   const imagePrefix = REGISTRIES[config.imageRegistry].imagePrefix;
@@ -430,6 +485,7 @@ export function buildAppService(
   // Runtime provider configuration (Claude/Codex can both be enabled).
   const providerEnvVars = buildProviderEnvVars(config, providerConfig);
   lines.push(...providerEnvVars);
+  lines.push(...buildCodeServerEnvVars(config, language));
 
   // Claude Code Extended Configuration (only when Claude capability is enabled)
   if (isExecutorEnabled(config, 'claude')) {
@@ -447,9 +503,19 @@ export function buildAppService(
     }
   }
 
+  const portMappings: string[] = [];
   if (!config.enableHttps) {
+    portMappings.push(`      - "${config.httpPort}:45000"`);
+  }
+
+  if (config.profile === 'full-custom' && config.enableCodeServer && config.codeServerPublishToHost) {
+    portMappings.push(`      # ${codeServerCopy.publishHint}`);
+    portMappings.push(`      - "127.0.0.1:${config.codeServerPublishedPort}:${config.codeServerPort}"`);
+  }
+
+  if (portMappings.length > 0) {
     lines.push('    ports:');
-    lines.push(`      - "${config.httpPort}:45000"`);
+    lines.push(...portMappings);
   }
   lines.push('    volumes:');
 
@@ -462,6 +528,9 @@ export function buildAppService(
 
   // Application data volume (always present for all database types)
   // Contains SQLite database file when using SQLite, or Orleans grain storage, logs, etc. for PostgreSQL
+  if (config.profile === 'full-custom') {
+    lines.push(`      # ${codeServerCopy.volumeHint}`);
+  }
   lines.push('      - hagicode_data:/app/data');
 
   lines.push(...getAppExecutorVolumeMounts(config));
@@ -615,14 +684,15 @@ export function buildPostgresService(config: DockerComposeConfig): string[] {
  */
 export function buildServicesSection(
   config: DockerComposeConfig,
-  providerConfig?: ProviderPreset
+  providerConfig?: ProviderPreset,
+  language: string = 'zh-CN'
 ): string[] {
   const lines: string[] = [];
 
   lines.push('services:');
 
   // Add app service
-  const appServiceLines = buildAppService(config, providerConfig);
+  const appServiceLines = buildAppService(config, providerConfig, language);
   lines.push(...appServiceLines);
 
   if (config.enableHttps) {
@@ -710,8 +780,8 @@ export function generateYAML(
   lines.push(...headerLines);
 
   // Build services section
-  const servicesLines = buildServicesSection(config, providerConfig);
-  lines.push(...servicesLines);
+  const localizedServicesLines = buildServicesSection(config, providerConfig, language);
+  lines.push(...localizedServicesLines);
 
   // Build volumes section
   const volumesLines = buildVolumesSection(config);

@@ -19,6 +19,7 @@ import {
 describe('Full Custom Profiles - Complete File Verification with YAML Parsing', () => {
   it('should generate valid YAML structure for Windows deployment with internal database', async () => {
     const config = createWindowsConfig({
+      profile: 'full-custom',
       databaseType: 'internal',
       volumeType: 'named',
       volumeName: 'postgres-data'
@@ -48,6 +49,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for Linux root user with internal database', async () => {
     const config = createMockConfig({
+      profile: 'full-custom',
       hostOS: 'linux',
       workdirCreatedByRoot: true,
       databaseType: 'internal',
@@ -79,6 +81,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for Linux non-root user with internal database', async () => {
     const config = createLinuxNonRootConfig({
+      profile: 'full-custom',
       databaseType: 'internal',
       volumeType: 'named',
       volumeName: 'postgres-data'
@@ -110,6 +113,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for external database configuration', async () => {
     const config = createExternalDbConfig({
+      profile: 'full-custom',
       externalDbHost: 'external-postgres.example.com',
       externalDbPort: '5432'
     });
@@ -138,6 +142,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
   it('should generate valid YAML structure for bind mount volume configuration', async () => {
     const config = createMockConfig({
+      profile: 'full-custom',
       hostOS: 'linux',
       databaseType: 'internal',
       volumeType: 'bind',
@@ -175,6 +180,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
   it('should validate volume mount paths for different OS', async () => {
     // Windows 测试
     const windowsConfig = createWindowsConfig({
+      profile: 'full-custom',
       databaseType: 'internal',
       volumeType: 'bind',
       volumePath: 'C:\\\\data\\\\postgres'
@@ -189,6 +195,7 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
     // Linux 测试
     const linuxConfig = createMockConfig({
+      profile: 'full-custom',
       hostOS: 'linux',
       databaseType: 'internal',
       volumeType: 'bind',
@@ -266,5 +273,30 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     expect(yaml).not.toContain('COPILOT_API_KEY');
 
     expect(yaml).toMatchSnapshot('full-custom-no-removed-executors-zh-CN');
+  });
+
+  it('should export Code Server defaults and optional host publishing only in full custom mode', async () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '36531',
+      codeServerAuthMode: 'password',
+      codeServerPassword: 'super-secret',
+    });
+    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
+
+    const validation = validateDockerComposeStructure(yaml);
+    expect(validation.valid).toBe(true);
+    expect(hasEnvVar(yaml, 'hagicode', 'VsCodeServer__DefaultActiveImplementation')).toBe(true);
+    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__DefaultActiveImplementation')).toBe('code-server');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerDefaultHost')).toBe('0.0.0.0');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerDefaultPort')).toBe('36529');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerAuthMode')).toBe('password');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'CODE_SERVER_PASSWORD')).toBe('super-secret');
+    expect(validation.parsed?.services?.hagicode?.ports).toContain('127.0.0.1:36531:36529');
+
+    expect(yaml).toMatchSnapshot('full-custom-code-server-publish-zh-CN');
   });
 });
