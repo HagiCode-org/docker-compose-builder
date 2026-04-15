@@ -12,12 +12,23 @@ export const PROMO_LINKS = {
   },
 };
 
+export const DOCS_LINKS = {
+  eula: {
+    'zh-CN': 'https://docs.hagicode.com/legal/eula/',
+    'en-US': 'https://docs.hagicode.com/en/legal/eula/',
+  },
+} as const;
+
 /**
  * 获取阿里云千问 Coding Plan 推广链接
  * @returns 阿里云千问 Coding Plan 推广链接 URL
  */
 export function getAliyunPromoUrl(): string {
   return PROMO_LINKS.aliyun.url;
+}
+
+export function getDocsEulaUrl(language?: string): string {
+  return language === 'zh-CN' ? DOCS_LINKS.eula['zh-CN'] : DOCS_LINKS.eula['en-US'];
 }
 
 export default PROMO_LINKS;

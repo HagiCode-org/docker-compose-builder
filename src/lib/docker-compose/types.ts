@@ -175,6 +175,8 @@ export interface DockerComposeConfig {
   openCodeAuthHostPath: string;
   /** Optional host models.json path used when OpenCode model cache should be mounted explicitly */
   openCodeModelsHostPath: string;
+  /** Explicit opt-in required by the container entrypoint before startup */
+  acceptEula: boolean;
 
   // Code Server Deployment Configuration (full-custom only)
   /** Whether the generated compose file should prefer code-server as the default browser IDE */

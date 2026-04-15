@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.10';
+const CONFIG_VERSION = '2.11';
 const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
@@ -36,6 +36,9 @@ const isOpenCodeConfigMode = (value: unknown): value is DockerComposeConfig['ope
 
 const isCodeServerAuthMode = (value: unknown): value is DockerComposeConfig['codeServerAuthMode'] =>
   value === 'none' || value === 'password';
+
+const isBoolean = (value: unknown): value is boolean =>
+  value === true || value === false;
 
 const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
   const normalizedEnabled = Array.isArray(config.enabledExecutors)
@@ -75,6 +78,9 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
     openCodeConfigHostPath: normalizedConfig.openCodeConfigHostPath ?? defaultConfig.openCodeConfigHostPath,
     openCodeAuthHostPath: normalizedConfig.openCodeAuthHostPath ?? defaultConfig.openCodeAuthHostPath,
     openCodeModelsHostPath: normalizedConfig.openCodeModelsHostPath ?? defaultConfig.openCodeModelsHostPath,
+    acceptEula: isBoolean(normalizedConfig.acceptEula)
+      ? normalizedConfig.acceptEula
+      : defaultConfig.acceptEula,
     enableCodeServer: normalizedConfig.enableCodeServer ?? defaultConfig.enableCodeServer,
     codeServerHost: normalizedConfig.codeServerHost ?? defaultConfig.codeServerHost,
     codeServerPort: normalizedConfig.codeServerPort ?? defaultConfig.codeServerPort,

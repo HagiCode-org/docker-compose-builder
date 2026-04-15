@@ -475,6 +475,9 @@ export function buildAppService(
   }
 
   lines.push(`      License__Activation__LicenseKey: "${config.licenseKey}"`);
+  if (config.acceptEula) {
+    lines.push('      ACCEPT_EULA: "Y"');
+  }
 
   // User mapping for Linux
   if (config.hostOS === 'linux' && !config.workdirCreatedByRoot && (config.puid || config.pgid)) {
