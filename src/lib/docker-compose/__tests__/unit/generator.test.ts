@@ -147,6 +147,19 @@ describe('buildAppService', () => {
     expect(yaml).not.toContain('VsCodeServer__DefaultActiveImplementation');
     expect(yaml).not.toContain('CODE_SERVER_PASSWORD');
   });
+
+  it('exports ACCEPT_EULA only when the shared toggle is enabled', () => {
+    const enabledYaml = generateYAML(createMockConfig({
+      acceptEula: true,
+    }), undefined, 'en-US', FIXED_DATE);
+    const disabledYaml = generateYAML(createMockConfig({
+      acceptEula: false,
+    }), undefined, 'en-US', FIXED_DATE);
+
+    expect(enabledYaml).toContain('ACCEPT_EULA: "Y"');
+    expect(enabledYaml).not.toContain('VsCodeServer__DefaultActiveImplementation');
+    expect(disabledYaml).not.toContain('ACCEPT_EULA');
+  });
 });
 
 describe('proxy and service helpers', () => {

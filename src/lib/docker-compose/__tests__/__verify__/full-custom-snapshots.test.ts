@@ -299,4 +299,22 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
 
     expect(yaml).toMatchSnapshot('full-custom-code-server-publish-zh-CN');
   });
+
+  it('should cover enabled and disabled EULA exports in full custom mode', async () => {
+    const enabledYaml = generateYAML(createMockConfig({
+      profile: 'full-custom',
+      acceptEula: true,
+    }), undefined, 'zh-CN', FIXED_DATE);
+    const disabledYaml = generateYAML(createMockConfig({
+      profile: 'full-custom',
+      acceptEula: false,
+    }), undefined, 'zh-CN', FIXED_DATE);
+
+    expect(hasEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(true);
+    expect(getServiceEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe('Y');
+    expect(hasEnvVar(disabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(false);
+
+    expect(enabledYaml).toMatchSnapshot('full-custom-eula-enabled-zh-CN');
+    expect(disabledYaml).toMatchSnapshot('full-custom-eula-disabled-zh-CN');
+  });
 });

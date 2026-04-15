@@ -84,6 +84,22 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(yaml).toMatchSnapshot('quick-start-default-en-US');
   });
 
+  it('should cover enabled and disabled EULA exports in quick-start mode', async () => {
+    const enabledYaml = generateYAML(createQuickStartConfig({
+      acceptEula: true,
+    }), undefined, 'zh-CN', FIXED_DATE);
+    const disabledYaml = generateYAML(createQuickStartConfig({
+      acceptEula: false,
+    }), undefined, 'zh-CN', FIXED_DATE);
+
+    expect(hasEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(true);
+    expect(getServiceEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe('Y');
+    expect(hasEnvVar(disabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(false);
+
+    expect(enabledYaml).toMatchSnapshot('quick-start-eula-enabled-zh-CN');
+    expect(disabledYaml).toMatchSnapshot('quick-start-eula-disabled-zh-CN');
+  });
+
   it('should generate valid YAML structure for ZAI provider (zh-CN)', async () => {
     const config = createZaiProviderConfig();
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);

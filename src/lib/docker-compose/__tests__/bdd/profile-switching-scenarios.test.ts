@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import dockerComposeReducer, { setConfigField, updateConfig } from '../../slice';
 
 const initAction = { type: '@@INIT' };
 
 describe('Docker Compose Configuration: Profile Switching', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('preserves retained executor enablement across quick-start/full-custom switches', () => {
     let state = dockerComposeReducer(undefined, initAction);
 
@@ -63,6 +67,31 @@ describe('Docker Compose Configuration: Profile Switching', () => {
     expect(state.config.codeServerPublishedPort).toBe('36532');
     expect(state.config.codeServerAuthMode).toBe('password');
     expect(state.config.codeServerPassword).toBe('secret-value');
+  });
+
+  it('preserves one shared EULA toggle across quick-start/full-custom switches', () => {
+    let state = dockerComposeReducer(undefined, initAction);
+
+    state = dockerComposeReducer(state, setConfigField({ field: 'acceptEula', value: true }));
+    state = dockerComposeReducer(state, setConfigField({ field: 'profile', value: 'full-custom' }));
+    state = dockerComposeReducer(state, setConfigField({ field: 'profile', value: 'quick-start' }));
+    state = dockerComposeReducer(state, setConfigField({ field: 'profile', value: 'full-custom' }));
+
+    expect(state.config.acceptEula).toBe(true);
+  });
+
+  it('migrates saved configs without an EULA toggle and persists the normalized value', () => {
+    localStorage.setItem('docker-compose-config-version', '2.10');
+    localStorage.setItem('docker-compose-config', JSON.stringify({
+      profile: 'quick-start',
+      enabledExecutors: ['claude'],
+      anthropicAuthToken: 'saved-token',
+    }));
+
+    const state = dockerComposeReducer(undefined, initAction);
+
+    expect(state.config.acceptEula).toBe(false);
+    expect(JSON.parse(localStorage.getItem('docker-compose-config') || '{}').acceptEula).toBe(false);
   });
 
   it('drops removed legacy routing and executor fields during update-style normalization', () => {

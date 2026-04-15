@@ -39,6 +39,7 @@ export function createMockConfig(
     openCodeConfigHostPath: '',
     openCodeAuthHostPath: '',
     openCodeModelsHostPath: '',
+    acceptEula: false,
     enableCodeServer: true,
     codeServerHost: '127.0.0.1',
     codeServerPort: '36529',

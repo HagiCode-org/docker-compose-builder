@@ -66,10 +66,12 @@ describe('workspace section metadata', () => {
     expect(executorSection?.errorCount).toBe(4);
     expect(executorSection?.status).toBe('active');
     expect(executorSection?.children.map((child) => child.id)).toEqual([
+      'executor-eula',
       'executor-claude',
       'executor-codex',
       'executor-opencode',
     ]);
+    expect(executorSection?.children.find((child) => child.id === 'executor-eula')?.isComplete).toBe(true);
     expect(executorSection?.children.find((child) => child.id === 'executor-claude')?.errorCount).toBe(2);
     expect(executorSection?.children.find((child) => child.id === 'executor-codex')?.errorCount).toBe(1);
     expect(executorSection?.children.find((child) => child.id === 'executor-opencode')?.errorCount).toBe(1);
@@ -114,6 +116,24 @@ describe('workspace section metadata', () => {
     expect(codeServerChild).toBeDefined();
     expect(codeServerChild?.errorCount).toBe(2);
     expect(isWorkspaceExportReady(sections)).toBe(false);
+  });
+
+  it('always exposes the shared EULA child item for section navigation', () => {
+    const config = {
+      ...defaultConfig,
+      anthropicAuthToken: 'sk-ant-test',
+      workdirPath: '/workspace/repos',
+      acceptEula: true,
+    };
+
+    const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
+    const eulaChild = sections
+      .find((section) => section.id === 'executors')
+      ?.children.find((child) => child.id === 'executor-eula');
+
+    expect(eulaChild).toBeDefined();
+    expect(eulaChild?.errorCount).toBe(0);
+    expect(eulaChild?.isComplete).toBe(true);
   });
 
   it('reports a fully ready workspace summary when all required inputs are present', () => {
