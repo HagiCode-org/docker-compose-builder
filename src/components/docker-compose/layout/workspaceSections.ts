@@ -10,6 +10,7 @@ export type WorkspaceSectionId =
   | 'advanced';
 
 export type WorkspaceSectionChildId =
+  | 'executor-eula'
   | 'executor-claude'
   | 'executor-codex'
   | 'executor-opencode'
@@ -106,6 +107,7 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       'openCodeModel',
       'openCodeConfigMode',
       'openCodeConfigHostPath',
+      'acceptEula',
       'enableCodeServer',
       'codeServerHost',
       'codeServerPort',
@@ -220,6 +222,15 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
 ];
 
 const childDefinitions: WorkspaceSectionChildDefinition[] = [
+  {
+    id: 'executor-eula',
+    parentId: 'executors',
+    titleKey: 'workspace.executorItems.eula.title',
+    descriptionKey: 'workspace.executorItems.eula.description',
+    fieldIds: ['acceptEula'],
+    isVisible: () => true,
+    isComplete: (config) => typeof config.acceptEula === 'boolean',
+  },
   {
     id: 'executor-claude',
     parentId: 'executors',

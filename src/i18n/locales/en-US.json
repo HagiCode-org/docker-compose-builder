@@ -170,7 +170,7 @@
     "customApiEndpoint": "Custom API Endpoint",
     "apiEndpointUrl": "API Endpoint URL",
     "apiToken": "API Token",
-    "getApiToken": "Get API Token \u2192",
+    "getApiToken": "Get API Token →",
     "enterApiToken": "Enter your API Token",
     "enterAnthropicApiToken": "Enter your Anthropic API Token (sk-ant-...)",
     "apiEndpointAutoSet": "API Endpoint will be automatically set to",
@@ -189,7 +189,7 @@
     "claudeCodeExperimentalAgentTeamsHint": "Enable experimental Agent Teams collaboration feature",
     "volumeMounts": "Volume Mounts",
     "workdirDescription": "Work directory points to a folder containing your code repositories. We will scan multiple repositories within this folder and it will be mapped to /app/workdir inside the container.",
-    "workdirRecommendation": "\ud83d\udca1 Recommendation: Point to a parent folder that contains multiple repositories (e.g., /home/user/repos or C:\\Users\\YourName\\source\\repos). The application will scan all subfolders to detect repositories.",
+    "workdirRecommendation": "💡 Recommendation: Point to a parent folder that contains multiple repositories (e.g., /home/user/repos or C:\\Users\\YourName\\source\\repos). The application will scan all subfolders to detect repositories.",
     "workdirPath": "Work Directory Path",
     "workdirCreatedByRoot": "Work directory created by root user",
     "permissionIssueWarning": "Permission Issue Warning",
@@ -232,7 +232,13 @@
     "codeServerPublishBindHint": "Builder keeps the host-side bind fixed to loopback for the first publish step. Add a reverse proxy if you need wider exposure.",
     "codeServerPublishBindValue": "127.0.0.1:<published-port>:<container-port>",
     "codeServerDisabledTitle": "code-server defaults are currently disabled",
-    "codeServerDisabledHint": "Builder will export code serve-web as the active implementation until you re-enable code-server for this profile."
+    "codeServerDisabledHint": "Builder will export code serve-web as the active implementation until you re-enable code-server for this profile.",
+    "eulaConfiguration": "Container EULA",
+    "eulaDescription": "Review and confirm the runtime agreement shared across quick start and full custom.",
+    "acceptEula": "Accept the container EULA before startup",
+    "acceptEulaHint": "Builder exports ACCEPT_EULA=Y only when enabled, and the release entrypoint refuses startup until it sees an accepted opt-in value.",
+    "readEula": "Read the EULA on docs",
+    "acceptEulaSharedStateHint": "This selection is shared across quick start and full custom."
   },
   "configPreview": {
     "generatedConfiguration": "Generated Configuration",
@@ -351,6 +357,10 @@
       "codeServer": {
         "title": "Code Server defaults",
         "description": "Container host/port, auth mode, and optional host publishing for code-server."
+      },
+      "eula": {
+        "title": "Container EULA",
+        "description": "Shared ACCEPT_EULA opt-in plus the docs agreement link."
       }
     }
   }

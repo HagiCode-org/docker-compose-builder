@@ -21,12 +21,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { HttpsConfigPanel } from '@/components/docker-compose/HttpsConfigPanel';
 import { ConfigSectionCard } from '@/components/docker-compose/layout/ConfigSectionCard';
 import type { WorkspaceSection, WorkspaceSectionId } from '@/components/docker-compose/layout/workspaceSections';
-import { Settings2, Loader2, AlertCircle, FolderOpenDot, Sparkles } from 'lucide-react';
+import { Settings2, Loader2, AlertCircle, FolderOpenDot, Sparkles, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NAVIGATION_LINKS } from '@/config/navigationLinks';
 import { type ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { validateConfig } from '@/lib/docker-compose/validation';
 import { Button } from '@/components/ui/button';
+import { getDocsEulaUrl } from '@/lib/links';
 import { cn } from '@/lib/utils';
 
 interface ConfigFormProps {
@@ -37,7 +38,7 @@ interface ConfigFormProps {
 const subSectionClass = 'scroll-mt-28 space-y-4 rounded-2xl border border-border/60 bg-muted/20 p-4 outline-none';
 
 export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const config = useSelector(selectConfig);
   const providers = useSelector(selectProviders);
@@ -91,6 +92,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
   }, [enabledExecutors, setEnabledExecutors, updateConfig]);
 
   const sectionMap = useMemo(() => new Map(sections.map((section) => [section.id, section])), [sections]);
+  const eulaDocsUrl = useMemo(
+    () => getDocsEulaUrl(i18n.resolvedLanguage),
+    [i18n.resolvedLanguage]
+  );
   const renderFieldError = useCallback((field: string) => {
     const message = validationMap[field];
     if (!message) {
@@ -308,6 +313,41 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               <p className="mt-1 text-muted-foreground">{t('configForm.communitySupportDescription')}</p>
               <p className="mt-3 text-muted-foreground">{t('configForm.communityContributeBuilder')}</p>
               <p className="text-muted-foreground">{t('configForm.communityContributeRelease')}</p>
+            </div>
+
+            <div id="executor-eula" tabIndex={-1} className={subSectionClass}>
+              <div>
+                <h4 className="text-base font-semibold">{t('configForm.eulaConfiguration')}</h4>
+                <p className="text-sm text-muted-foreground">{t('configForm.eulaDescription')}</p>
+              </div>
+
+              <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="acceptEula"
+                    checked={config.acceptEula}
+                    onCheckedChange={(checked) => updateConfig('acceptEula', checked === true)}
+                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="acceptEula" className="cursor-pointer text-sm font-medium">
+                      {t('configForm.acceptEula')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">{t('configForm.acceptEulaHint')}</p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <a
+                        href={eulaDocsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-opacity hover:opacity-80"
+                      >
+                        <ExternalLink className="size-4" />
+                        <span>{t('configForm.readEula')}</span>
+                      </a>
+                      <span className="text-xs text-muted-foreground">{t('configForm.acceptEulaSharedStateHint')}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {claudeEnabled ? (

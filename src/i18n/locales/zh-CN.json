@@ -232,7 +232,13 @@
     "codeServerPublishBindHint": "Builder 首阶段固定绑定到 loopback；如果你需要更广泛的暴露范围，请在外层显式增加反向代理。",
     "codeServerPublishBindValue": "127.0.0.1:<宿主机端口>:<容器端口>",
     "codeServerDisabledTitle": "当前未启用 code-server 默认值",
-    "codeServerDisabledHint": "在重新启用之前，Builder 会导出 code serve-web 作为当前配置模式的默认实现。"
+    "codeServerDisabledHint": "在重新启用之前，Builder 会导出 code serve-web 作为当前配置模式的默认实现。",
+    "eulaConfiguration": "容器 EULA",
+    "eulaDescription": "在 quick-start 与 full-custom 之间共享同一份运行时协议确认开关。",
+    "acceptEula": "在启动前接受容器 EULA",
+    "acceptEulaHint": "仅在启用时导出 ACCEPT_EULA=Y；发布镜像的 entrypoint 只有在检测到有效同意值后才会继续启动。",
+    "readEula": "在 docs 中查看 EULA",
+    "acceptEulaSharedStateHint": "该选择会在 quick-start 与 full-custom 之间共享。"
   },
   "configPreview": {
     "generatedConfiguration": "生成的配置",
@@ -351,6 +357,10 @@
       "codeServer": {
         "title": "Code Server 默认值",
         "description": "配置 code-server 的容器 host/port、认证模式，以及可选的宿主机端口发布。"
+      },
+      "eula": {
+        "title": "容器 EULA",
+        "description": "共享的 ACCEPT_EULA 同意开关，以及对应的 docs 协议入口。"
       }
     }
   }
