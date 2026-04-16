@@ -19,8 +19,8 @@ export function SiteFooter() {
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">
             {locale === 'zh-CN'
-              ? '共享站点入口来自已签入 snapshot；Builder 自身的 GitHub、Discord 与 QQ 支持入口仍保留在本仓。'
-              : 'Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, and QQ support actions.'}
+              ? '共享站点入口来自已签入 snapshot；Builder 自身的 GitHub、Discord、QQ 与 Steam 支持入口仍保留在本仓。'
+              : 'Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, QQ, and Steam support actions.'}
           </p>
         </section>
 
@@ -57,6 +57,9 @@ export function SiteFooter() {
             </a>
             <a href="https://qm.qq.com/q/Fwb0o094kw" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">
               {locale === 'zh-CN' ? 'QQ 群 610394020' : 'QQ Group 610394020'}
+            </a>
+            <a href="https://store.steampowered.com/app/4625540/Hagicode/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">
+              Steam
             </a>
           </div>
         </nav>
