@@ -1,4 +1,4 @@
-import { Globe, Github, MessageSquare } from 'lucide-react';
+import { BookOpen, Globe, Github, MessageSquare } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export const NAVIGATION_LINKS = {
@@ -6,6 +6,12 @@ export const NAVIGATION_LINKS = {
     url: 'https://hagicode.com',
     labelKey: 'header.navigation.officialSite',
     icon: Globe,
+    external: true,
+  },
+  officialDocs: {
+    url: 'https://docs.hagicode.com/installation/docker-compose/',
+    labelKey: 'header.navigation.officialDocs',
+    icon: BookOpen,
     external: true,
   },
   githubRepo: {

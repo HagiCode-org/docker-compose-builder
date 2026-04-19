@@ -17,6 +17,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const externalLinks = [
     NAVIGATION_LINKS.officialSite,
+    NAVIGATION_LINKS.officialDocs,
     NAVIGATION_LINKS.discord,
     NAVIGATION_LINKS.githubRepo,
   ];

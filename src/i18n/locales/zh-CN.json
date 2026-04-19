@@ -14,6 +14,7 @@
     "languageLabel": "语言：",
     "navigation": {
       "officialSite": "Hagicode 官网",
+      "officialDocs": "部署文档",
       "discord": "Discord 社区",
       "githubRepo": "GitHub 仓库",
       "qqGroup": "QQ 群：{{groupNumber}}",
