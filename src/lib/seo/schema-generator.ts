@@ -1,5 +1,18 @@
 import { siteConfig, defaultSEOConfig } from '../../config/seo';
 
+const HAGICODE_MAIN_URL = 'https://hagicode.com/';
+const HAGICODE_DOCS_URL = 'https://docs.hagicode.com/';
+const HAGICODE_COST_URL = 'https://cost.hagicode.com/';
+const HAGICODE_SOUL_URL = 'https://soul.hagicode.com/';
+const HAGICODE_TRAIT_URL = 'https://trait.hagicode.com/';
+
+interface SiteReference {
+  '@type': 'WebSite';
+  '@id'?: string;
+  name: string;
+  url: string;
+}
+
 export interface WebApplicationSchema {
   '@context': string;
   '@type': 'WebApplication';
@@ -18,6 +31,7 @@ export interface WebApplicationSchema {
     name: string;
     url: string;
   };
+  isPartOf?: SiteReference;
 }
 
 export interface OrganizationSchema {
@@ -42,6 +56,7 @@ export interface SoftwareApplicationSchema {
     name: string;
     url: string;
   };
+  isPartOf?: SiteReference;
   offers?: {
     '@type': 'Offer';
     price: string;
@@ -67,6 +82,12 @@ export function generateWebApplicationSchema(): WebApplicationSchema {
       '@type': 'Organization',
       name: siteConfig.organization.name,
       url: siteConfig.organization.url
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': `${HAGICODE_MAIN_URL}#website`,
+      name: 'HagiCode',
+      url: HAGICODE_MAIN_URL
     }
   };
 }
@@ -79,7 +100,12 @@ export function generateOrganizationSchema(): OrganizationSchema {
     url: siteConfig.organization.url,
     description: 'Open source tools for developers',
     sameAs: [
-      siteConfig.githubUrl
+      siteConfig.githubUrl,
+      HAGICODE_MAIN_URL,
+      HAGICODE_DOCS_URL,
+      HAGICODE_COST_URL,
+      HAGICODE_SOUL_URL,
+      HAGICODE_TRAIT_URL
     ]
   };
 }
@@ -97,6 +123,12 @@ export function generateSoftwareApplicationSchema(): SoftwareApplicationSchema {
       '@type': 'Organization',
       name: siteConfig.organization.name,
       url: siteConfig.organization.url
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': `${HAGICODE_MAIN_URL}#website`,
+      name: 'HagiCode',
+      url: HAGICODE_MAIN_URL
     },
     offers: {
       '@type': 'Offer',
