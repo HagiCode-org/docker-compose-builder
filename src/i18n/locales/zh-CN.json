@@ -29,7 +29,7 @@
     "profile": "配置模式",
     "profileLabel": "配置模式",
     "quickStart": "本地快速体验 (推荐新用户)",
-    "quickStartDescription": "使用 SQLite 数据库快速开始，无需额外配置 PostgreSQL",
+    "quickStartDescription": "使用 SQLite 快速开始，无需额外的数据库设置",
     "fullCustom": "完整自定义",
     "fullCustomDescription": "完全控制所有配置选项",
     "profileHelp": "选择您的配置体验。您可以随时切换模式。",
@@ -90,23 +90,11 @@
     "resetHttps": "重置 HTTPS 默认值",
     "databaseConfig": "数据库配置",
     "databaseType": "数据库类型",
-    "selectDatabaseType": "选择数据库类型",
+    "databaseTypeFixed": "仅支持 SQLite",
     "sqliteDatabase": "SQLite 数据库",
-    "sqliteDescription": "轻量级嵌入式数据库，无需额外容器，适合快速体验和开发环境。",
+    "sqliteDescription": "轻量级嵌入式数据库，无需额外容器，适合快速体验和当前受支持的部署路径。",
     "sqliteDataLocation": "数据存储位置",
-    "internalPostgresql": "内部 PostgreSQL",
-    "externalDatabase": "外部数据库",
-    "databaseName": "数据库名称",
-    "username": "用户名",
-    "password": "密码",
-    "volumeType": "卷类型",
-    "selectVolumeType": "选择卷类型",
-    "namedVolume": "命名卷（Docker 管理）",
-    "bindMount": "绑定挂载（指定路径）",
-    "volumeName": "卷名称",
-    "volumePath": "卷路径",
-    "databaseHost": "数据库主机",
-    "port": "端口",
+    "sqliteOnlySupport": "当前构建器只导出内嵌 SQLite 部署路径，这里不再提供旧数据库模式、凭据或数据库卷配置。",
     "licenseConfig": "Hagicode 许可证配置",
     "licenseKeyType": "许可证密钥类型",
     "selectLicenseType": "选择许可证类型",
@@ -212,8 +200,9 @@
     "codeServerPrivateTitle": "默认保持私有",
     "codeServerPrivateHint": "只有在下方显式开启宿主机发布后，Builder 才会额外导出专用端口映射。",
     "codeServerPersistenceTitle": "持久化继续复用现有数据卷",
-    "codeServerPersistenceHint": "Compose 中导出的是部署默认值；容器启动后的运行时状态仍会继续落在共享的 HagiCode 数据卷里。",
-    "codeServerPersistencePathValue": "hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerPersistenceHint": "Builder 现在会把系统级资源持久化到 /app/data，把 save-scoped 的 HagiCode 运行时状态持久化到 /app/saves/save0/...；Code Server 仍保留在系统级根目录。",
+    "codeServerPersistencePathValue": "系统级：hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerSaveStatePathValue": "存档级：hagicode_saves:/app/saves  ->  /app/saves/save0/...",
     "codeServerHost": "监听 Host",
     "codeServerHostHint": "默认使用 127.0.0.1 保持容器内私有访问。若要开启宿主机发布，请先切换为 0.0.0.0 或 ::。",
     "codeServerPort": "容器端口",
@@ -333,19 +322,19 @@
       "database": {
         "title": "数据库策略",
         "shortTitle": "数据库",
-        "description": "在 SQLite、内置 PostgreSQL 与外部数据库之间切换。"
+        "description": "查看导出部署固定使用的 SQLite 运行时配置。"
       },
       "advanced": {
         "title": "高级配置",
         "shortTitle": "高级",
-        "description": "处理工作区挂载、权限、许可证以及 Claude 扩展选项。"
+        "description": "处理工作区挂载、权限与许可证等部署级设置。"
       }
     },
     "executorItemsTitle": "已启用的执行器分支",
     "executorItems": {
       "claude": {
         "title": "Claude 凭据",
-        "description": "Anthropic 兼容 provider、端点与 token 设置。"
+        "description": "Anthropic 兼容 provider、端点、token 与 Claude Code 扩展选项。"
       },
       "codex": {
         "title": "Codex 运行时",

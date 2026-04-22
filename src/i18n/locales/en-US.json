@@ -29,7 +29,7 @@
     "profile": "Profile",
     "profileLabel": "Configuration Mode",
     "quickStart": "Quick Start (Recommended for new users)",
-    "quickStartDescription": "Get started quickly with SQLite database, no PostgreSQL configuration needed",
+    "quickStartDescription": "Get started quickly with SQLite, with no extra database setup required",
     "fullCustom": "Full Custom",
     "fullCustomDescription": "Complete control over all configuration options",
     "profileHelp": "Choose your configuration experience. You can switch modes at any time.",
@@ -90,23 +90,11 @@
     "resetHttps": "Reset HTTPS defaults",
     "databaseConfig": "Database Configuration",
     "databaseType": "Database Type",
-    "selectDatabaseType": "Select database type",
+    "databaseTypeFixed": "SQLite only",
     "sqliteDatabase": "SQLite Database",
-    "sqliteDescription": "Lightweight embedded database, no additional container needed, ideal for quick start and development environments.",
+    "sqliteDescription": "Lightweight embedded database, no additional container needed, ideal for quick start and supported deployments.",
     "sqliteDataLocation": "Data storage location",
-    "internalPostgresql": "Internal PostgreSQL",
-    "externalDatabase": "External Database",
-    "databaseName": "Database Name",
-    "username": "Username",
-    "password": "Password",
-    "volumeType": "Volume Type",
-    "selectVolumeType": "Select volume type",
-    "namedVolume": "Named Volume (Docker Managed)",
-    "bindMount": "Bind Mount (Specified Path)",
-    "volumeName": "Volume Name",
-    "volumePath": "Volume Path",
-    "databaseHost": "Database Host",
-    "port": "Port",
+    "sqliteOnlySupport": "This builder now exports only the embedded SQLite deployment path. Legacy database modes and credentials are no longer configurable here.",
     "licenseConfig": "Hagicode License Configuration",
     "licenseKeyType": "License Key Type",
     "selectLicenseType": "Select license type",
@@ -212,8 +200,9 @@
     "codeServerPrivateTitle": "Private by default",
     "codeServerPrivateHint": "No dedicated host port is published until you explicitly enable host publishing below.",
     "codeServerPersistenceTitle": "Persistence stays shared",
-    "codeServerPersistenceHint": "Deployment defaults are exported into compose, while runtime state continues to live under the shared HagiCode data volume after the container starts.",
-    "codeServerPersistencePathValue": "hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerPersistenceHint": "Builder now persists system-scoped assets under /app/data and save-scoped HagiCode runtime state under /app/saves/save0/..., while Code Server stays in the system root.",
+    "codeServerPersistencePathValue": "System: hagicode_data:/app/data  ->  /app/data/code-server",
+    "codeServerSaveStatePathValue": "Save state: hagicode_saves:/app/saves  ->  /app/saves/save0/...",
     "codeServerHost": "Listen Host",
     "codeServerHostHint": "Use 127.0.0.1 for private container-only access. Switch to 0.0.0.0 or :: before enabling host publishing.",
     "codeServerPort": "Container Port",
@@ -333,19 +322,19 @@
       "database": {
         "title": "Database strategy",
         "shortTitle": "Database",
-        "description": "Pick SQLite, an internal PostgreSQL service, or an external database."
+        "description": "Review the fixed SQLite runtime used by exported deployments."
       },
       "advanced": {
         "title": "Advanced setup",
         "shortTitle": "Advanced",
-        "description": "Handle workspace mounts, permissions, license settings, and optional Claude tuning."
+        "description": "Handle workspace mounts, permissions, and other deployment-level license settings."
       }
     },
     "executorItemsTitle": "Enabled executor branches",
     "executorItems": {
       "claude": {
         "title": "Claude credentials",
-        "description": "Anthropic-compatible provider, endpoint, and token settings."
+        "description": "Anthropic-compatible provider, endpoint, token, and Claude Code tuning settings."
       },
       "codex": {
         "title": "Codex runtime",
