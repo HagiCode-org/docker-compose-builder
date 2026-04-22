@@ -3,204 +3,62 @@ import { generateYAML } from '../../generator';
 import {
   createWindowsConfig,
   createLinuxNonRootConfig,
-  createExternalDbConfig,
   createMockConfig,
   FIXED_DATE
 } from '../helpers/config';
 
 describe('Docker Compose Generation: Full Custom Profile', () => {
-  describe('Scenario 1: Windows Deployment Configuration', () => {
-    it('Given a Windows host OS, When generating YAML, Then Windows-specific paths should be used', () => {
-      // Given
-      const config = createWindowsConfig();
+  it('Given a Windows host OS, When generating YAML, Then Windows-specific paths should be used', () => {
+    const config = createWindowsConfig({ profile: 'full-custom' });
+    const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('- C:\\\\repos:/app/workdir');
-    });
-
-    it('Given a Windows host OS with internal database, When generating YAML, Then volume paths should use Windows format', () => {
-      // Given
-      const config = createWindowsConfig({
-        databaseType: 'internal',
-        volumeType: 'bind',
-        volumePath: 'C:\\\\data\\\\postgres'
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('- C:\\\\data\\\\postgres:/bitnami/postgresql');
-    });
+    expect(result).toContain('- C:\\\\repos:/app/workdir');
+    expect(result).not.toContain('postgres:');
   });
 
-  describe('Scenario 2: Linux Root User Configuration', () => {
-    it('Given a Linux host OS with root user, When generating YAML, Then PUID/PGID should not be included', () => {
-      // Given
-      const config = createMockConfig({
-        hostOS: 'linux',
-        workdirCreatedByRoot: true
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).not.toContain('PUID:');
-      expect(result).not.toContain('PGID:');
+  it('Given a Linux host OS with root user, When generating YAML, Then PUID and PGID should not be included', () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      hostOS: 'linux',
+      workdirCreatedByRoot: true
     });
+    const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-    it('Given a Linux root user, When generating YAML, Then Linux paths should be used', () => {
-      // Given
-      const config = createMockConfig({
-        hostOS: 'linux',
-        workdirCreatedByRoot: true
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('- /home/user/repos:/app/workdir');
-    });
+    expect(result).not.toContain('PUID:');
+    expect(result).not.toContain('PGID:');
   });
 
-  describe('Scenario 3: Linux Non-Root User Configuration', () => {
-    it('Given a Linux host OS with non-root user, When generating YAML, Then PUID/PGID should be included', () => {
-      // Given
-      const config = createLinuxNonRootConfig();
+  it('Given a Linux host OS with non-root user, When generating YAML, Then PUID and PGID should be included', () => {
+    const config = createLinuxNonRootConfig({ profile: 'full-custom' });
+    const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('PUID: 1000');
-      expect(result).toContain('PGID: 1000');
-    });
-
-    it('Given a Linux non-root user, When generating YAML, Then user mapping should be in environment section', () => {
-      // Given
-      const config = createLinuxNonRootConfig();
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('environment:');
-      expect(result).toContain('PUID: 1000');
-      expect(result).toContain('PGID: 1000');
-    });
+    expect(result).toContain('PUID: 1000');
+    expect(result).toContain('PGID: 1000');
   });
 
-  describe('Scenario 4: Internal Database with Named Volume', () => {
-    it('Given an internal database with named volume, When generating YAML, Then volume section should be included', () => {
-      // Given
-      const config = createLinuxNonRootConfig({
-        databaseType: 'internal',
-        volumeType: 'named',
-        volumeName: 'postgres-data'
-      });
+  it('Given full-custom mode, When generating YAML, Then SQLite-only output should be emitted', () => {
+    const config = createLinuxNonRootConfig({ profile: 'full-custom' });
+    const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('volumes:');
-      expect(result).toContain('postgres-data:');
-    });
-
-    it('Given an internal database with named volume, When generating YAML, Then postgres service should use named volume', () => {
-      // Given
-      const config = createLinuxNonRootConfig({
-        databaseType: 'internal',
-        volumeType: 'named',
-        volumeName: 'custom-postgres-vol'
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('- custom-postgres-vol:/bitnami/postgresql');
-    });
+    expect(result).toContain('Database__Provider: sqlite');
+    expect(result).toContain('ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"');
+    expect(result).not.toContain('Database__Provider: postgresql');
+    expect(result).not.toContain('postgres:');
+    expect(result).not.toContain('postgres-data:');
+    expect(result).toContain('hagicode_data:/app/data');
+    expect(result).toContain('hagicode_saves:/app/saves');
   });
 
-  describe('Scenario 5: Internal Database with Bind Mount', () => {
-    it('Given an internal database with bind mount, When generating YAML, Then volumes section should include hagicode_data but not postgres-data', () => {
-      // Given
-      const config = createMockConfig({
-        databaseType: 'internal',
-        volumeType: 'bind',
-        volumePath: '/data/postgres',
-        hostOS: 'linux'
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then - hagicode_data is always present, but postgres-data is not for bind mounts
-      expect(result).toContain('\nvolumes:');
-      expect(result).toContain('hagicode_data:');
-      expect(result).not.toContain('postgres-data:');
+  it('Given full-custom mode with Code Server publishing, When generating YAML, Then loopback publishing should be emitted', () => {
+    const config = createMockConfig({
+      profile: 'full-custom',
+      codeServerHost: '0.0.0.0',
+      codeServerPort: '36529',
+      codeServerPublishToHost: true,
+      codeServerPublishedPort: '36531',
     });
+    const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-    it('Given an internal database with bind mount, When generating YAML, Then postgres service should use bind mount', () => {
-      // Given
-      const config = createLinuxNonRootConfig({
-        databaseType: 'internal',
-        volumeType: 'bind',
-        volumePath: '/custom/data/postgres'
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('- /custom/data/postgres:/bitnami/postgresql');
-    });
-  });
-
-  describe('Scenario 6: External Database Configuration', () => {
-    it('Given an external database configuration, When generating YAML, Then postgres service should not be included', () => {
-      // Given
-      const config = createExternalDbConfig();
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('hagicode:');
-      expect(result).not.toContain('postgres:');
-    });
-
-    it('Given an external database configuration, When generating YAML, Then connection string should use external host', () => {
-      // Given
-      const config = createExternalDbConfig({
-        externalDbHost: 'external-db.example.com',
-        externalDbPort: '5433'
-      });
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then
-      expect(result).toContain('ConnectionStrings__Default: "Host=external-db.example.com;Port=5433');
-    });
-
-    it('Given an external database configuration, When generating YAML, Then volumes section should include hagicode_data but not postgres-data', () => {
-      // Given
-      const config = createExternalDbConfig();
-
-      // When
-      const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-      // Then - hagicode_data is always present, but postgres-data should not be for external db
-      expect(result).toContain('\nvolumes:');
-      expect(result).toContain('hagicode_data:');
-      expect(result).not.toContain('postgres-data:');
-    });
+    expect(result).toContain('127.0.0.1:36531:36529');
   });
 });

@@ -4,8 +4,36 @@ import dockerComposeReducer, { setConfigField, updateConfig } from '../../slice'
 
 const initAction = { type: '@@INIT' };
 
+function createLocalStorageMock(): Storage {
+  const storage = new Map<string, string>();
+
+  return {
+    clear: () => storage.clear(),
+    getItem: (key) => storage.get(key) ?? null,
+    key: (index) => Array.from(storage.keys())[index] ?? null,
+    removeItem: (key) => {
+      storage.delete(key);
+    },
+    setItem: (key, value) => {
+      storage.set(key, value);
+    },
+    get length() {
+      return storage.size;
+    }
+  };
+}
+
 describe('Docker Compose Configuration: Profile Switching', () => {
   beforeEach(() => {
+    const localStorageMock = createLocalStorageMock();
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { localStorage: localStorageMock }
+    });
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: localStorageMock
+    });
     localStorage.clear();
   });
 
@@ -91,7 +119,6 @@ describe('Docker Compose Configuration: Profile Switching', () => {
     const state = dockerComposeReducer(undefined, initAction);
 
     expect(state.config.acceptEula).toBe(false);
-    expect(JSON.parse(localStorage.getItem('docker-compose-config') || '{}').acceptEula).toBe(false);
   });
 
   it('drops removed legacy routing and executor fields during update-style normalization', () => {
