@@ -14,11 +14,6 @@ export const defaultConfig: DockerComposeConfig = {
   aspNetEnvironment: 'Production',
   timezone: 'Asia/Shanghai',
   databaseType: 'sqlite',
-  postgresDatabase: 'hagicode',
-  postgresUser: 'postgres',
-  postgresPassword: 'postgres',
-  volumeType: 'named',
-  volumeName: 'postgres-data',
   licenseKeyType: 'public',
   licenseKey: 'D76B5C-EC0A70-AEA453-BC9414-0A198D-V3',
   // Anthropic API Configuration (default to Zhipu AI)

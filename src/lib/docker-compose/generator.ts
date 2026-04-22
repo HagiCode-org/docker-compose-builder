@@ -106,18 +106,20 @@ function getCodeServerCommentCopy(language: string) {
     ? {
       title: 'Code Server 部署默认值',
       privateHint: '默认不公开宿主机端口；只有开启宿主机发布后才会导出独立映射',
-      persistenceHint: 'Code Server 运行时状态继续复用 hagicode_data:/app/data，不会新增必需的数据卷',
+      persistenceHint: '系统级资源继续保存在 hagicode_data:/app/data；save-scoped 运行时状态会持久化到 hagicode_saves:/app/saves/save0/...',
       disabledHint: '当前未将 code-server 设为默认实现，运行时会回退到 code serve-web',
       publishHint: '宿主机发布固定绑定到 127.0.0.1；如需更广泛访问，请在外层反向代理中显式放开',
-      volumeHint: '共享应用数据卷；Code Server 运行时状态会落在 /app/data/code-server'
+      systemVolumeHint: '系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server',
+      saveVolumeHint: '存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...'
     }
     : {
       title: 'Code Server deployment defaults',
       privateHint: 'Private by default: no host port is published unless you explicitly enable it',
-      persistenceHint: 'Code Server runtime state continues to use hagicode_data:/app/data instead of a separate mandatory volume',
+      persistenceHint: 'System-scoped assets stay under hagicode_data:/app/data while save-scoped runtime state persists under hagicode_saves:/app/saves/save0/...',
       disabledHint: 'code-server is not the default implementation for this deployment; runtime falls back to code serve-web',
       publishHint: 'Host publishing is loopback-only at 127.0.0.1; add a reverse proxy explicitly if you need broader exposure',
-      volumeHint: 'Shared application data volume; Code Server runtime state lives under /app/data/code-server'
+      systemVolumeHint: 'System data volume; Code Server runtime state lives under /app/data/code-server',
+      saveVolumeHint: 'Save-state volume; the main database and Orleans state live under /app/saves/save0/...'
     };
 }
 
@@ -461,18 +463,8 @@ export function buildAppService(
   lines.push(`      ASPNETCORE_ENVIRONMENT: ${config.aspNetEnvironment}`);
   lines.push('      ASPNETCORE_URLS: http://+:45000');
   lines.push(`      TZ: ${config.timezone}`);
-
-  // Database connection string and provider
-  if (config.databaseType === 'sqlite') {
-    lines.push('      Database__Provider: sqlite');
-    lines.push('      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"');
-  } else if (config.databaseType === 'internal') {
-    lines.push('      Database__Provider: postgresql');
-    lines.push(`      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=${config.postgresDatabase};Username=${config.postgresUser};Password=${config.postgresPassword}"`);
-  } else {
-    lines.push('      Database__Provider: postgresql');
-    lines.push(`      ConnectionStrings__Default: "Host=${config.externalDbHost};Port=${config.externalDbPort};Database=${config.postgresDatabase};Username=${config.postgresUser};Password=${config.postgresPassword}"`);
-  }
+  lines.push('      Database__Provider: sqlite');
+  lines.push('      ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"');
 
   lines.push(`      License__Activation__LicenseKey: "${config.licenseKey}"`);
   if (config.acceptEula) {
@@ -529,21 +521,13 @@ export function buildAppService(
     lines.push(`      - ${config.workdirPath || '/home/user/repos'}:/app/workdir`);
   }
 
-  // Application data volume (always present for all database types)
-  // Contains SQLite database file when using SQLite, or Orleans grain storage, logs, etc. for PostgreSQL
-  if (config.profile === 'full-custom') {
-    lines.push(`      # ${codeServerCopy.volumeHint}`);
-  }
+  // Application persistence roots are always present across database modes.
+  lines.push(`      # ${codeServerCopy.systemVolumeHint}`);
   lines.push('      - hagicode_data:/app/data');
+  lines.push(`      # ${codeServerCopy.saveVolumeHint}`);
+  lines.push('      - hagicode_saves:/app/saves');
 
   lines.push(...getAppExecutorVolumeMounts(config));
-
-  // Depends on (only for internal PostgreSQL)
-  if (config.databaseType === 'internal') {
-    lines.push('    depends_on:');
-    lines.push('      postgres:');
-    lines.push('        condition: service_healthy');
-  }
 
   lines.push('    networks:');
   lines.push('      - pcode-network');
@@ -632,54 +616,6 @@ export function buildCaddyService(config: DockerComposeConfig): string[] {
 }
 
 /**
- * Build PostgreSQL service configuration
- * @param config The configuration object
- * @returns Array of PostgreSQL service configuration lines
- */
-export function buildPostgresService(config: DockerComposeConfig): string[] {
-  const lines: string[] = [];
-
-  const imagePrefix = REGISTRIES[config.imageRegistry].imagePrefix;
-  let dbImage: string;
-
-  if (config.imageRegistry === 'aliyun-acr') {
-    dbImage = `${imagePrefix}/bitnami_postgresql:16`;
-  } else {
-    dbImage = 'bitnami/postgresql:latest';
-  }
-
-  lines.push('');
-  lines.push('  postgres:');
-  lines.push(`    image: ${dbImage}`);
-  lines.push('    environment:');
-  lines.push(`      POSTGRES_DATABASE: ${config.postgresDatabase}`);
-  lines.push(`      POSTGRES_USER: ${config.postgresUser}`);
-  lines.push(`      POSTGRES_PASSWORD: ${config.postgresPassword}`);
-  lines.push('      POSTGRES_HOST_AUTH_METHOD: trust');
-  lines.push(`      TZ: ${config.timezone}`);
-  lines.push('    volumes:');
-
-  if (config.volumeType === 'named') {
-    const volName = config.volumeName || 'postgres-data';
-    lines.push(`      - ${volName}:/bitnami/postgresql`);
-  } else {
-    const defaultPath = config.hostOS === 'windows' ? 'C:\\\\data\\\\postgres' : '/data/postgres';
-    lines.push(`      - ${config.volumePath || defaultPath}:/bitnami/postgresql`);
-  }
-
-  lines.push('    healthcheck:');
-  lines.push(`      test: ["CMD", "pg_isready", "-U", "${config.postgresUser}"]`);
-  lines.push('      interval: 10s');
-  lines.push('      timeout: 3s');
-  lines.push('      retries: 3');
-  lines.push('    networks:');
-  lines.push('      - pcode-network');
-  lines.push('    restart: unless-stopped');
-
-  return lines;
-}
-
-/**
  * Build services section
  * @param config The configuration object
  * @param providerConfig Optional provider configuration
@@ -703,12 +639,6 @@ export function buildServicesSection(
     lines.push(...caddyServiceLines);
   }
 
-  // Add internal PostgreSQL service if needed
-  if (config.databaseType === 'internal') {
-    const postgresServiceLines = buildPostgresService(config);
-    lines.push(...postgresServiceLines);
-  }
-
   return lines;
 }
 
@@ -724,8 +654,9 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
   lines.push('');
   lines.push('volumes:');
 
-  // hagicode_data is always present (contains app data: SQLite database or Orleans grain storage, logs, etc.)
+  // hagicode_data and hagicode_saves are always present for the application service.
   lines.push('  hagicode_data:');
+  lines.push('  hagicode_saves:');
 
   for (const volumeName of EXECUTOR_VOLUME_DECLARATION_ORDER) {
     if (usedExecutorVolumes.has(volumeName)) {
@@ -736,12 +667,6 @@ export function buildVolumesSection(config: DockerComposeConfig): string[] {
   if (config.enableHttps) {
     lines.push('  caddy_data:');
     lines.push('  caddy_config:');
-  }
-
-  // postgres-data volume only for internal PostgreSQL
-  if (config.databaseType === 'internal' && config.volumeType === 'named') {
-    const volName = config.volumeName || 'postgres-data';
-    lines.push(`  ${volName}:`);
   }
 
   return lines;

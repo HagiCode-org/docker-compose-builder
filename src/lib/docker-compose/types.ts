@@ -3,10 +3,9 @@
  * Migrated from pcode-docs project
  */
 
-export type DatabaseType = 'sqlite' | 'internal' | 'external';
+export type DatabaseType = 'sqlite';
 export type HostOS = 'windows' | 'linux';
 export type LicenseKeyType = 'public' | 'custom';
-export type VolumeType = 'named' | 'bind';
 export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
 export type OpenCodeConfigMode = 'default-managed' | 'host-file';
 export type CodeServerAuthMode = 'none' | 'password';
@@ -137,14 +136,6 @@ export interface DockerComposeConfig {
 
   // Database
   databaseType: DatabaseType;
-  postgresDatabase: string;
-  postgresUser: string;
-  postgresPassword: string;
-  externalDbHost?: string;
-  externalDbPort?: string;
-  volumeType: VolumeType;
-  volumeName?: string;
-  volumePath?: string;
 
   // API Keys
   licenseKeyType: LicenseKeyType;

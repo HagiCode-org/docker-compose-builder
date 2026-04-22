@@ -103,45 +103,6 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     errors.push({ field: 'imageTag', message: 'Image tag is required' });
   }
 
-  // Validate database configuration
-  if (config.databaseType === 'internal') {
-    if (!config.postgresDatabase || config.postgresDatabase.trim() === '') {
-      errors.push({ field: 'postgresDatabase', message: 'Database name is required' });
-    }
-    if (!config.postgresUser || config.postgresUser.trim() === '') {
-      errors.push({ field: 'postgresUser', message: 'Database user is required' });
-    }
-    if (!config.postgresPassword || config.postgresPassword.trim() === '') {
-      errors.push({ field: 'postgresPassword', message: 'Database password is required' });
-    }
-
-    if (config.volumeType === 'named') {
-      if (!config.volumeName || config.volumeName.trim() === '') {
-        errors.push({ field: 'volumeName', message: 'Volume name is required for named volumes' });
-      }
-    } else if (config.volumeType === 'bind') {
-      if (!config.volumePath || config.volumePath.trim() === '') {
-        errors.push({ field: 'volumePath', message: 'Volume path is required for bind mounts' });
-      }
-    }
-  } else if (config.databaseType === 'external') {
-    if (!config.externalDbHost || config.externalDbHost.trim() === '') {
-      errors.push({ field: 'externalDbHost', message: 'External database host is required' });
-    }
-    if (!config.externalDbPort || isNaN(parseInt(config.externalDbPort))) {
-      errors.push({ field: 'externalDbPort', message: 'External database port must be a valid number' });
-    }
-    if (!config.postgresDatabase || config.postgresDatabase.trim() === '') {
-      errors.push({ field: 'postgresDatabase', message: 'Database name is required' });
-    }
-    if (!config.postgresUser || config.postgresUser.trim() === '') {
-      errors.push({ field: 'postgresUser', message: 'Database user is required' });
-    }
-    if (!config.postgresPassword || config.postgresPassword.trim() === '') {
-      errors.push({ field: 'postgresPassword', message: 'Database password is required' });
-    }
-  }
-
   // Validate license key
   if (config.licenseKeyType === 'custom') {
     if (!config.licenseKey || config.licenseKey.trim() === '') {

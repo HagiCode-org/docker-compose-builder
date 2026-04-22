@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.11';
+const CONFIG_VERSION = '2.12';
 const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
@@ -13,7 +13,16 @@ const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
   'opencode'
 ];
 
-interface LegacyDockerComposeConfig extends Partial<DockerComposeConfig> {
+interface LegacyDockerComposeConfig extends Omit<Partial<DockerComposeConfig>, 'databaseType'> {
+  databaseType?: unknown;
+  postgresDatabase?: unknown;
+  postgresUser?: unknown;
+  postgresPassword?: unknown;
+  externalDbHost?: unknown;
+  externalDbPort?: unknown;
+  volumeType?: unknown;
+  volumeName?: unknown;
+  volumePath?: unknown;
   runtimeProvider?: unknown;
   defaultExecutor?: unknown;
   codebuddyApiKey?: unknown;
@@ -40,6 +49,11 @@ const isCodeServerAuthMode = (value: unknown): value is DockerComposeConfig['cod
 const isBoolean = (value: unknown): value is boolean =>
   value === true || value === false;
 
+const normalizeDatabaseConfig = (config: DockerComposeConfig): DockerComposeConfig => ({
+  ...config,
+  databaseType: defaultConfig.databaseType,
+});
+
 const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerComposeConfig => {
   const normalizedEnabled = Array.isArray(config.enabledExecutors)
     ? (config.enabledExecutors as string[])
@@ -61,6 +75,15 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
     qoderPersonalAccessToken: _legacyQoderPersonalAccessToken,
     kiroExecutablePath: _legacyKiroExecutablePath,
     kiroStateMountPath: _legacyKiroStateMountPath,
+    databaseType: _legacyDatabaseType,
+    postgresDatabase: _legacyPostgresDatabase,
+    postgresUser: _legacyPostgresUser,
+    postgresPassword: _legacyPostgresPassword,
+    externalDbHost: _legacyExternalDbHost,
+    externalDbPort: _legacyExternalDbPort,
+    volumeType: _legacyVolumeType,
+    volumeName: _legacyVolumeName,
+    volumePath: _legacyVolumePath,
     ...rest
   } = config;
 
@@ -70,7 +93,7 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
     enabledExecutors
   };
 
-  return {
+  return normalizeDatabaseConfig({
     ...normalizedConfig,
     openCodeConfigMode: isOpenCodeConfigMode(normalizedConfig.openCodeConfigMode)
       ? normalizedConfig.openCodeConfigMode
@@ -90,7 +113,7 @@ const normalizeExecutorConfig = (config: LegacyDockerComposeConfig): DockerCompo
       ? normalizedConfig.codeServerAuthMode
       : defaultConfig.codeServerAuthMode,
     codeServerPassword: normalizedConfig.codeServerPassword ?? defaultConfig.codeServerPassword,
-  };
+  });
 };
 
 const normalizeStandardImageTag = (config: DockerComposeConfig): DockerComposeConfig => {
@@ -208,11 +231,6 @@ const dockerComposeSlice = createSlice({
       const { field, value } = action.payload;
       state.config[field] = value;
       state.config = normalizeExecutorConfig(state.config);
-
-      // Auto-reset database type to SQLite when switching to quick-start profile
-      if (field === 'profile' && value === 'quick-start') {
-        state.config.databaseType = 'sqlite';
-      }
 
       if (field === 'profile') {
         state.config = normalizeStandardImageTag(state.config);
