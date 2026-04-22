@@ -480,6 +480,64 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     </div>
                   ) : null}
                 </div>
+
+                {config.profile === 'full-custom' ? (
+                  <div className="space-y-4 rounded-2xl border border-border/60 bg-background/80 p-4">
+                    <div>
+                      <h5 className="text-sm font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h5>
+                      <p className="text-sm text-muted-foreground">{t('configForm.claudeCodeExtendedConfigDescription')}</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                      <FieldBlock label={t('configForm.anthropicSonnetModel')} htmlFor="anthropicSonnetModel">
+                        <Input
+                          id="anthropicSonnetModel"
+                          type="text"
+                          value={config.anthropicSonnetModel || ''}
+                          onChange={(event) => updateConfig('anthropicSonnetModel', event.target.value || undefined)}
+                          placeholder="claude-sonnet-4-20250514"
+                        />
+                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicSonnetModelHint')}</p>
+                      </FieldBlock>
+
+                      <FieldBlock label={t('configForm.anthropicOpusModel')} htmlFor="anthropicOpusModel">
+                        <Input
+                          id="anthropicOpusModel"
+                          type="text"
+                          value={config.anthropicOpusModel || ''}
+                          onChange={(event) => updateConfig('anthropicOpusModel', event.target.value || undefined)}
+                          placeholder="claude-opus-4-20250514"
+                        />
+                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicOpusModelHint')}</p>
+                      </FieldBlock>
+
+                      <FieldBlock label={t('configForm.anthropicHaikuModel')} htmlFor="anthropicHaikuModel">
+                        <Input
+                          id="anthropicHaikuModel"
+                          type="text"
+                          value={config.anthropicHaikuModel || ''}
+                          onChange={(event) => updateConfig('anthropicHaikuModel', event.target.value || undefined)}
+                          placeholder="claude-haiku-4-20250514"
+                        />
+                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicHaikuModelHint')}</p>
+                      </FieldBlock>
+                    </div>
+
+                    <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
+                      <Checkbox
+                        id="claudeCodeExperimentalAgentTeams"
+                        checked={config.claudeCodeExperimentalAgentTeams || false}
+                        onCheckedChange={(checked) => updateConfig('claudeCodeExperimentalAgentTeams', checked as boolean)}
+                      />
+                      <div>
+                        <Label htmlFor="claudeCodeExperimentalAgentTeams" className="cursor-pointer">
+                          {t('configForm.claudeCodeExperimentalAgentTeams')}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">{t('configForm.claudeCodeExperimentalAgentTeamsHint')}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -710,6 +768,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   <p className="font-medium">{t('configForm.codeServerPersistenceTitle')}</p>
                   <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPersistenceHint')}</p>
                   <p className="mt-2 text-xs font-mono">{t('configForm.codeServerPersistencePathValue')}</p>
+                  <p className="mt-2 text-xs font-mono">{t('configForm.codeServerSaveStatePathValue')}</p>
                 </div>
 
                 {config.enableCodeServer ? (
@@ -848,169 +907,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
         </ConfigSectionCard>
       ) : null}
 
-      {getSection('database') ? (
-        <ConfigSectionCard section={getSection('database')!}>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="databaseType">{t('configForm.databaseType')}</Label>
-              <Select
-                value={config.databaseType}
-                onValueChange={(value: 'sqlite' | 'internal' | 'external') => updateConfig('databaseType', value)}
-              >
-                <SelectTrigger id="databaseType">
-                  <SelectValue placeholder={t('configForm.selectDatabaseType')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sqlite">SQLite</SelectItem>
-                  <SelectItem value="internal">{t('configForm.internalPostgresql')}</SelectItem>
-                  <SelectItem value="external">{t('configForm.externalDatabase')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {config.databaseType === 'sqlite' ? (
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-950 dark:bg-emerald-950/25">
-                <p className="font-medium">{t('configForm.sqliteDatabase')}</p>
-                <p className="mt-2 text-muted-foreground">{t('configForm.sqliteDescription')}</p>
-                <p className="mt-1 text-muted-foreground">
-                  {t('configForm.sqliteDataLocation')}: <code className="rounded bg-emerald-100 px-1 dark:bg-emerald-900">/app/data/hagicode.db</code>
-                </p>
-              </div>
-            ) : null}
-
-            {config.databaseType === 'internal' ? (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <FieldBlock label={t('configForm.databaseName')} htmlFor="postgresDatabase">
-                  <Input
-                    id="postgresDatabase"
-                    value={config.postgresDatabase}
-                    onChange={(event) => updateConfig('postgresDatabase', event.target.value)}
-                    placeholder="hagicode"
-                  />
-                  {renderFieldError('postgresDatabase')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.username')} htmlFor="postgresUser">
-                  <Input
-                    id="postgresUser"
-                    value={config.postgresUser}
-                    onChange={(event) => updateConfig('postgresUser', event.target.value)}
-                    placeholder="postgres"
-                  />
-                  {renderFieldError('postgresUser')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.password')} htmlFor="postgresPassword">
-                  <Input
-                    id="postgresPassword"
-                    type="text"
-                    value={config.postgresPassword}
-                    onChange={(event) => updateConfig('postgresPassword', event.target.value)}
-                    placeholder="postgres"
-                  />
-                  {renderFieldError('postgresPassword')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.volumeType')} htmlFor="volumeType">
-                  <Select
-                    value={config.volumeType}
-                    onValueChange={(value: 'named' | 'bind') => updateConfig('volumeType', value)}
-                  >
-                    <SelectTrigger id="volumeType">
-                      <SelectValue placeholder={t('configForm.selectVolumeType')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="named">{t('configForm.namedVolume')}</SelectItem>
-                      <SelectItem value="bind">{t('configForm.bindMount')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-
-                {config.volumeType === 'named' ? (
-                  <FieldBlock label={t('configForm.volumeName')} htmlFor="volumeName">
-                    <Input
-                      id="volumeName"
-                      value={config.volumeName || ''}
-                      onChange={(event) => updateConfig('volumeName', event.target.value)}
-                      placeholder="postgres-data"
-                    />
-                    {renderFieldError('volumeName')}
-                  </FieldBlock>
-                ) : null}
-
-                {config.volumeType === 'bind' ? (
-                  <FieldBlock label={t('configForm.volumePath')} htmlFor="volumePath">
-                    <Input
-                      id="volumePath"
-                      value={config.volumePath || ''}
-                      onChange={(event) => updateConfig('volumePath', event.target.value)}
-                      placeholder={config.hostOS === 'windows' ? 'C:\\data\\postgres' : '/data/postgres'}
-                    />
-                    {renderFieldError('volumePath')}
-                  </FieldBlock>
-                ) : null}
-              </div>
-            ) : null}
-
-            {config.databaseType === 'external' ? (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <FieldBlock label={`${t('configForm.databaseHost')} *`} htmlFor="externalDbHost">
-                  <Input
-                    id="externalDbHost"
-                    value={config.externalDbHost || ''}
-                    onChange={(event) => updateConfig('externalDbHost', event.target.value)}
-                    placeholder="localhost"
-                  />
-                  {renderFieldError('externalDbHost')}
-                </FieldBlock>
-
-                <FieldBlock label={`${t('configForm.port')} *`} htmlFor="externalDbPort">
-                  <Input
-                    id="externalDbPort"
-                    type="number"
-                    value={config.externalDbPort || '5432'}
-                    onChange={(event) => updateConfig('externalDbPort', event.target.value)}
-                    placeholder="5432"
-                  />
-                  {renderFieldError('externalDbPort')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.databaseName')} htmlFor="extDatabase">
-                  <Input
-                    id="extDatabase"
-                    value={config.postgresDatabase}
-                    onChange={(event) => updateConfig('postgresDatabase', event.target.value)}
-                    placeholder="hagicode"
-                  />
-                  {renderFieldError('postgresDatabase')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.username')} htmlFor="extUser">
-                  <Input
-                    id="extUser"
-                    value={config.postgresUser}
-                    onChange={(event) => updateConfig('postgresUser', event.target.value)}
-                    placeholder="postgres"
-                  />
-                  {renderFieldError('postgresUser')}
-                </FieldBlock>
-
-                <FieldBlock label={t('configForm.password')} htmlFor="extPassword">
-                  <Input
-                    id="extPassword"
-                    type="text"
-                    value={config.postgresPassword}
-                    onChange={(event) => updateConfig('postgresPassword', event.target.value)}
-                    placeholder="your-password"
-                  />
-                  {renderFieldError('postgresPassword')}
-                </FieldBlock>
-              </div>
-            ) : null}
-          </div>
-        </ConfigSectionCard>
-      ) : null}
-
       {getSection('advanced') ? (
         <ConfigSectionCard section={getSection('advanced')!}>
           <div className="space-y-6">
@@ -1110,64 +1006,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 </div>
               ) : null}
             </div>
-
-            {config.profile === 'full-custom' && claudeEnabled ? (
-              <div className={subSectionClass}>
-                <div>
-                  <h4 className="text-base font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.claudeCodeExtendedConfigDescription')}</p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <FieldBlock label={t('configForm.anthropicSonnetModel')} htmlFor="anthropicSonnetModel">
-                    <Input
-                      id="anthropicSonnetModel"
-                      type="text"
-                      value={config.anthropicSonnetModel || ''}
-                      onChange={(event) => updateConfig('anthropicSonnetModel', event.target.value || undefined)}
-                      placeholder="claude-sonnet-4-20250514"
-                    />
-                    <p className="text-xs text-muted-foreground">{t('configForm.anthropicSonnetModelHint')}</p>
-                  </FieldBlock>
-
-                  <FieldBlock label={t('configForm.anthropicOpusModel')} htmlFor="anthropicOpusModel">
-                    <Input
-                      id="anthropicOpusModel"
-                      type="text"
-                      value={config.anthropicOpusModel || ''}
-                      onChange={(event) => updateConfig('anthropicOpusModel', event.target.value || undefined)}
-                      placeholder="claude-opus-4-20250514"
-                    />
-                    <p className="text-xs text-muted-foreground">{t('configForm.anthropicOpusModelHint')}</p>
-                  </FieldBlock>
-
-                  <FieldBlock label={t('configForm.anthropicHaikuModel')} htmlFor="anthropicHaikuModel">
-                    <Input
-                      id="anthropicHaikuModel"
-                      type="text"
-                      value={config.anthropicHaikuModel || ''}
-                      onChange={(event) => updateConfig('anthropicHaikuModel', event.target.value || undefined)}
-                      placeholder="claude-haiku-4-20250514"
-                    />
-                    <p className="text-xs text-muted-foreground">{t('configForm.anthropicHaikuModelHint')}</p>
-                  </FieldBlock>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/80 p-4">
-                  <Checkbox
-                    id="claudeCodeExperimentalAgentTeams"
-                    checked={config.claudeCodeExperimentalAgentTeams || false}
-                    onCheckedChange={(checked) => updateConfig('claudeCodeExperimentalAgentTeams', checked as boolean)}
-                  />
-                  <div>
-                    <Label htmlFor="claudeCodeExperimentalAgentTeams" className="cursor-pointer">
-                      {t('configForm.claudeCodeExperimentalAgentTeams')}
-                    </Label>
-                    <p className="text-xs text-muted-foreground">{t('configForm.claudeCodeExperimentalAgentTeamsHint')}</p>
-                  </div>
-                </div>
-              </div>
-            ) : null}
 
             {config.profile === 'full-custom' ? (
               <div className={subSectionClass}>

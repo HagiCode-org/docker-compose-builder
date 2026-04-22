@@ -6,7 +6,6 @@ export type WorkspaceSectionId =
   | 'base'
   | 'executors'
   | 'https'
-  | 'database'
   | 'advanced';
 
 export type WorkspaceSectionChildId =
@@ -102,6 +101,10 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       'anthropicApiProvider',
       'anthropicAuthToken',
       'anthropicUrl',
+      'anthropicSonnetModel',
+      'anthropicOpusModel',
+      'anthropicHaikuModel',
+      'claudeCodeExperimentalAgentTeams',
       'codexApiKey',
       'codexBaseUrl',
       'openCodeModel',
@@ -156,45 +159,6 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       config.enableHttps ? hasTextValue(config.httpsPort) && hasTextValue(config.lanIp) : false,
   },
   {
-    id: 'database',
-    titleKey: 'workspace.sections.database.title',
-    shortTitleKey: 'workspace.sections.database.shortTitle',
-    descriptionKey: 'workspace.sections.database.description',
-    fieldIds: [
-      'databaseType',
-      'postgresDatabase',
-      'postgresUser',
-      'postgresPassword',
-      'externalDbHost',
-      'externalDbPort',
-      'volumeType',
-      'volumeName',
-      'volumePath',
-    ],
-    isVisible: (config) => config.profile === 'full-custom',
-    isComplete: (config) => {
-      if (config.databaseType === 'sqlite') {
-        return true;
-      }
-
-      if (config.databaseType === 'internal') {
-        return hasTextValue(config.postgresDatabase)
-          && hasTextValue(config.postgresUser)
-          && hasTextValue(config.postgresPassword)
-          && (
-            (config.volumeType === 'named' && hasTextValue(config.volumeName))
-            || (config.volumeType === 'bind' && hasTextValue(config.volumePath))
-          );
-      }
-
-      return hasTextValue(config.externalDbHost)
-        && hasTextValue(config.externalDbPort)
-        && hasTextValue(config.postgresDatabase)
-        && hasTextValue(config.postgresUser)
-        && hasTextValue(config.postgresPassword);
-    },
-  },
-  {
     id: 'advanced',
     titleKey: 'workspace.sections.advanced.title',
     shortTitleKey: 'workspace.sections.advanced.shortTitle',
@@ -206,10 +170,6 @@ const sectionDefinitions: WorkspaceSectionDefinition[] = [
       'pgid',
       'licenseKeyType',
       'licenseKey',
-      'anthropicSonnetModel',
-      'anthropicOpusModel',
-      'anthropicHaikuModel',
-      'claudeCodeExperimentalAgentTeams',
     ],
     isVisible: () => true,
     isComplete: (config) =>
@@ -236,7 +196,15 @@ const childDefinitions: WorkspaceSectionChildDefinition[] = [
     parentId: 'executors',
     titleKey: 'workspace.executorItems.claude.title',
     descriptionKey: 'workspace.executorItems.claude.description',
-    fieldIds: ['anthropicApiProvider', 'anthropicAuthToken', 'anthropicUrl'],
+    fieldIds: [
+      'anthropicApiProvider',
+      'anthropicAuthToken',
+      'anthropicUrl',
+      'anthropicSonnetModel',
+      'anthropicOpusModel',
+      'anthropicHaikuModel',
+      'claudeCodeExperimentalAgentTeams',
+    ],
     isVisible: (config) => config.enabledExecutors.includes('claude'),
     isComplete: (config) =>
       hasTextValue(config.anthropicAuthToken)
