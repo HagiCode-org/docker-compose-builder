@@ -35,8 +35,9 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(hasService(yaml, 'hagicode')).toBe(true);
     expect(hasService(yaml, 'postgres')).toBe(false);
 
-    // 验证卷存在（SQLite 只使用 hagicode_data）
+    // 验证卷存在（应用始终使用 data + saves 双根目录）
     expect(hasVolume(yaml, 'hagicode_data')).toBe(true);
+    expect(hasVolume(yaml, 'hagicode_saves')).toBe(true);
     expect(hasVolume(yaml, 'postgres-data')).toBe(false);
 
     // 验证网络存在
@@ -57,6 +58,9 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     // 验证特定环境变量值
     expect(getServiceEnvVar(yaml, 'hagicode', 'TZ')).toBe('Asia/Shanghai');
     expect(getServiceEnvVar(yaml, 'hagicode', 'ASPNETCORE_ENVIRONMENT')).toBe('Production');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default')).toBe('Data Source=/app/data/hagicode.db');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_data:/app/data');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_saves:/app/saves');
 
     // 存储完整文件快照
     expect(yaml).toMatchSnapshot('quick-start-default-zh-CN');
@@ -74,6 +78,11 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     // 验证服务（快速启动现在使用 SQLite，没有 postgres 服务）
     expect(hasService(yaml, 'hagicode')).toBe(true);
     expect(hasService(yaml, 'postgres')).toBe(false);
+    expect(hasVolume(yaml, 'hagicode_data')).toBe(true);
+    expect(hasVolume(yaml, 'hagicode_saves')).toBe(true);
+    expect(getServiceEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default')).toBe('Data Source=/app/data/hagicode.db');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_data:/app/data');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_saves:/app/saves');
 
     // 验证网络
     expect(hasNetwork(yaml, 'pcode-network')).toBe(true);
@@ -231,6 +240,9 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(hasEnvVar(yaml, 'hagicode', 'CODEX_API_KEY')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__Providers__OpenCodeCli__Enabled')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'AI__Providers__DefaultProvider')).toBe(false);
+    expect(hasVolume(yaml, 'hagicode_saves')).toBe(true);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_data:/app/data');
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('hagicode_saves:/app/saves');
     expect(yaml).not.toContain('CODEBUDDY_API_KEY');
     expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
     expect(yaml).not.toContain('copilot-cli:');

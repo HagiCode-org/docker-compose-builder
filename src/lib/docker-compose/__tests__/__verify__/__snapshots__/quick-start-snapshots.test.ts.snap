@@ -37,7 +37,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -45,6 +48,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -90,7 +94,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -98,6 +105,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -153,7 +161,10 @@ services:
       - "8080:45000"
     volumes:
       - /workspace:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - codex-data:/home/hagicode/.codex
       - opencode-config-data:/home/hagicode/.config/opencode
       - opencode-auth-data:/home/hagicode/.local/share/opencode
@@ -164,6 +175,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   codex-data:
   opencode-config-data:
   opencode-auth-data:
@@ -213,7 +225,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - opencode-config-data:/home/hagicode/.config/opencode
       - opencode-auth-data:/home/hagicode/.local/share/opencode
       - opencode-models-data:/home/hagicode/.cache/opencode
@@ -223,6 +238,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   opencode-config-data:
   opencode-auth-data:
   opencode-models-data:
@@ -280,7 +296,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - codex-data:/home/hagicode/.codex
       - opencode-config-data:/home/hagicode/.config/opencode
       - opencode-auth-data:/home/hagicode/.local/share/opencode
@@ -291,6 +310,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   codex-data:
   opencode-config-data:
   opencode-auth-data:
@@ -338,7 +358,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -346,6 +369,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -391,7 +415,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -399,6 +426,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -444,7 +472,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -452,6 +483,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -496,7 +528,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # System data volume; Code Server runtime state lives under /app/data/code-server
       - hagicode_data:/app/data
+      # Save-state volume; the main database and Orleans state live under /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -504,6 +539,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:
@@ -548,7 +584,10 @@ services:
       - "8080:45000"
     volumes:
       - /home/user/repos:/app/workdir
+      # 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
       - hagicode_data:/app/data
+      # 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+      - hagicode_saves:/app/saves
       - claude-data:/home/hagicode/.claude
     networks:
       - pcode-network
@@ -556,6 +595,7 @@ services:
 
 volumes:
   hagicode_data:
+  hagicode_saves:
   claude-data:
 
 networks:

@@ -3,7 +3,6 @@ import { generateYAML } from '../../generator';
 import {
   createWindowsConfig,
   createLinuxNonRootConfig,
-  createExternalDbConfig,
   createMockConfig,
   FIXED_DATE
 } from '../helpers/config';
@@ -17,223 +16,84 @@ import {
 } from '../helpers/yaml';
 
 describe('Full Custom Profiles - Complete File Verification with YAML Parsing', () => {
-  it('should generate valid YAML structure for Windows deployment with internal database', async () => {
+  it('should generate valid YAML structure for Windows deployment in SQLite-only mode', async () => {
     const config = createWindowsConfig({
       profile: 'full-custom',
-      databaseType: 'internal',
-      volumeType: 'named',
-      volumeName: 'postgres-data'
     });
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-    // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
-
-    // 验证服务存在
     expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
-    expect(hasVolume(yaml, 'postgres-data')).toBe(true);
-
-    // 验证 Windows 路径
-    const volumes = getServiceVolumes(yaml, 'hagicode');
-    expect(volumes).toContain('C:\\\\repos:/app/workdir');
-
-    // 验证没有 PUID/PGID（Windows 不需要）
+    expect(hasService(yaml, 'postgres')).toBe(false);
+    expect(hasVolume(yaml, 'hagicode_data')).toBe(true);
+    expect(hasVolume(yaml, 'hagicode_saves')).toBe(true);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('C:\\\\repos:/app/workdir');
     expect(hasEnvVar(yaml, 'hagicode', 'PUID')).toBe(false);
     expect(hasEnvVar(yaml, 'hagicode', 'PGID')).toBe(false);
 
-    expect(yaml).toMatchSnapshot('full-custom-windows-internal-db-zh-CN');
+    expect(yaml).toMatchSnapshot('full-custom-windows-sqlite-zh-CN');
   });
 
-  it('should generate valid YAML structure for Linux root user with internal database', async () => {
+  it('should generate valid YAML structure for Linux root user in SQLite-only mode', async () => {
     const config = createMockConfig({
       profile: 'full-custom',
       hostOS: 'linux',
       workdirCreatedByRoot: true,
-      databaseType: 'internal',
-      volumeType: 'named',
-      volumeName: 'postgres-data'
     });
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-    // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
-
-    // 验证服务存在
     expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
-    expect(hasVolume(yaml, 'postgres-data')).toBe(true);
-
-    // 验证 Linux 路径
-    const volumes = getServiceVolumes(yaml, 'hagicode');
-    expect(volumes).toContain('/home/user/repos:/app/workdir');
-
-    // 验证没有 PUID/PGID（root 用户不需要）
+    expect(hasService(yaml, 'postgres')).toBe(false);
     expect(hasEnvVar(yaml, 'hagicode', 'PUID')).toBe(false);
     expect(hasEnvVar(yaml, 'hagicode', 'PGID')).toBe(false);
+    expect(getServiceVolumes(yaml, 'hagicode')).toContain('/home/user/repos:/app/workdir');
 
-    expect(yaml).toMatchSnapshot('full-custom-linux-root-internal-db-zh-CN');
+    expect(yaml).toMatchSnapshot('full-custom-linux-root-sqlite-zh-CN');
   });
 
-  it('should generate valid YAML structure for Linux non-root user with internal database', async () => {
+  it('should generate valid YAML structure for Linux non-root user in SQLite-only mode', async () => {
     const config = createLinuxNonRootConfig({
       profile: 'full-custom',
-      databaseType: 'internal',
-      volumeType: 'named',
-      volumeName: 'postgres-data'
     });
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
-    // 验证 YAML 结构
     const validation = validateDockerComposeStructure(yaml);
     expect(validation.errors).toEqual([]);
     expect(validation.valid).toBe(true);
-
-    // 验证服务存在
     expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
-    expect(hasVolume(yaml, 'postgres-data')).toBe(true);
-
-    // 验证 Linux 路径
-    const volumes = getServiceVolumes(yaml, 'hagicode');
-    expect(volumes).toContain('/home/user/repos:/app/workdir');
-
-    // 验证 PUID/PGID（非 root 用户需要）
+    expect(hasService(yaml, 'postgres')).toBe(false);
     expect(hasEnvVar(yaml, 'hagicode', 'PUID')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'PGID')).toBe(true);
     expect(getServiceEnvVar(yaml, 'hagicode', 'PUID')).toBe('1000');
     expect(getServiceEnvVar(yaml, 'hagicode', 'PGID')).toBe('1000');
+    expect(getServiceEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default')).toBe('Data Source=/app/data/hagicode.db');
 
-    expect(yaml).toMatchSnapshot('full-custom-linux-nonroot-internal-db-zh-CN');
+    expect(yaml).toMatchSnapshot('full-custom-linux-nonroot-sqlite-zh-CN');
   });
 
-  it('should generate valid YAML structure for external database configuration', async () => {
-    const config = createExternalDbConfig({
-      profile: 'full-custom',
-      externalDbHost: 'external-postgres.example.com',
-      externalDbPort: '5432'
-    });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-    // 验证 YAML 结构
-    const validation = validateDockerComposeStructure(yaml);
-    expect(validation.valid).toBe(true);
-
-    // 验证只有 hagicode 服务
-    expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(false);
-
-    // 验证只有 hagicode_data 卷（没有 postgres-data）
-    expect(validation.parsed.volumes).toBeDefined();
-    expect(validation.parsed.volumes?.hagicode_data).toBeDefined();
-    expect(validation.parsed.volumes?.postgres_data).toBeUndefined();
-
-    // 验证外部数据库连接字符串
-    const connectionString = getServiceEnvVar(yaml, 'hagicode', 'ConnectionStrings__Default');
-    expect(connectionString).toContain('Host=external-postgres.example.com');
-    expect(connectionString).toContain('Port=5432');
-
-    expect(yaml).toMatchSnapshot('full-custom-external-db-zh-CN');
-  });
-
-  it('should generate valid YAML structure for bind mount volume configuration', async () => {
+  it('should keep the database contract free of postgres services, env vars, and named volumes', async () => {
     const config = createMockConfig({
       profile: 'full-custom',
-      hostOS: 'linux',
-      databaseType: 'internal',
-      volumeType: 'bind',
-      volumePath: '/data/postgres',
-      workdirCreatedByRoot: false,
-      puid: '1000',
-      pgid: '1000'
-    });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-    // 验证 YAML 结构
-    const validation = validateDockerComposeStructure(yaml);
-    expect(validation.valid).toBe(true);
-
-    // 验证服务存在
-    expect(hasService(yaml, 'hagicode')).toBe(true);
-    expect(hasService(yaml, 'postgres')).toBe(true);
-
-    // 验证 postgres 使用绑定挂载
-    const postgresVolumes = getServiceVolumes(yaml, 'postgres');
-    expect(postgresVolumes).toContain('/data/postgres:/bitnami/postgresql');
-
-    // 验证只有 hagicode_data 卷（没有 postgres-data，因为使用绑定挂载）
-    expect(validation.parsed.volumes).toBeDefined();
-    expect(validation.parsed.volumes?.hagicode_data).toBeDefined();
-    expect(validation.parsed.volumes?.postgres_data).toBeUndefined();
-
-    // 验证 PUID/PGID
-    expect(hasEnvVar(yaml, 'hagicode', 'PUID')).toBe(true);
-    expect(getServiceEnvVar(yaml, 'hagicode', 'PUID')).toBe('1000');
-
-    expect(yaml).toMatchSnapshot('full-custom-linux-bind-mount-zh-CN');
-  });
-
-  it('should validate volume mount paths for different OS', async () => {
-    // Windows 测试
-    const windowsConfig = createWindowsConfig({
-      profile: 'full-custom',
-      databaseType: 'internal',
-      volumeType: 'bind',
-      volumePath: 'C:\\\\data\\\\postgres'
-    });
-    const windowsYaml = generateYAML(windowsConfig, undefined, 'zh-CN', FIXED_DATE);
-
-    const windowsValidation = validateDockerComposeStructure(windowsYaml);
-    expect(windowsValidation.valid).toBe(true);
-
-    const postgresVolumes = getServiceVolumes(windowsYaml, 'postgres');
-    expect(postgresVolumes).toContain('C:\\\\data\\\\postgres:/bitnami/postgresql');
-
-    // Linux 测试
-    const linuxConfig = createMockConfig({
-      profile: 'full-custom',
-      hostOS: 'linux',
-      databaseType: 'internal',
-      volumeType: 'bind',
-      volumePath: '/mnt/data/postgres'
-    });
-    const linuxYaml = generateYAML(linuxConfig, undefined, 'zh-CN', FIXED_DATE);
-
-    const linuxValidation = validateDockerComposeStructure(linuxYaml);
-    expect(linuxValidation.valid).toBe(true);
-
-    const linuxPostgresVolumes = getServiceVolumes(linuxYaml, 'postgres');
-    expect(linuxPostgresVolumes).toContain('/mnt/data/postgres:/bitnami/postgresql');
-  });
-
-  it('should keep only retained executor volumes in full custom mode', async () => {
-    const config = createMockConfig({
-      profile: 'full-custom',
-      enabledExecutors: ['codex', 'opencode'],
-      anthropicAuthToken: '',
+      enabledExecutors: ['claude', 'codex'],
       codexApiKey: 'test-codex-key',
-      openCodeModel: 'anthropic/claude-sonnet-4',
     });
     const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
     const validation = validateDockerComposeStructure(yaml);
     expect(validation.valid).toBe(true);
+    expect(hasService(yaml, 'postgres')).toBe(false);
+    expect(hasVolume(yaml, 'postgres-data')).toBe(false);
+    expect(yaml).not.toContain('Database__Provider: postgresql');
+    expect(yaml).not.toContain('POSTGRES_PASSWORD');
+    expect(yaml).not.toContain('pg_isready');
+    expect(validation.parsed?.services?.hagicode?.depends_on).toBeUndefined();
 
-    const volumes = getServiceVolumes(yaml, 'hagicode');
-    expect(volumes).toContain('codex-data:/home/hagicode/.codex');
-    expect(volumes).toContain('opencode-config-data:/home/hagicode/.config/opencode');
-    expect(volumes).toContain('opencode-auth-data:/home/hagicode/.local/share/opencode');
-    expect(volumes).toContain('opencode-models-data:/home/hagicode/.cache/opencode');
-    expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
-    expect(hasVolume(yaml, 'kimi-data')).toBe(false);
-    expect(hasVolume(yaml, 'qoder-data')).toBe(false);
-    expect(hasVolume(yaml, 'kiro-data')).toBe(false);
-
-    expect(yaml).toMatchSnapshot('full-custom-retained-executor-volumes-zh-CN');
+    expect(yaml).toMatchSnapshot('full-custom-no-postgres-artifacts-zh-CN');
   });
 
   it('should export an OpenCode host-file bind mount in full custom mode', async () => {
@@ -253,68 +113,5 @@ describe('Full Custom Profiles - Complete File Verification with YAML Parsing', 
     expect(getServiceVolumes(yaml, 'hagicode')).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
 
     expect(yaml).toMatchSnapshot('full-custom-opencode-host-file-zh-CN');
-  });
-
-  it('should not emit removed executor services or volumes in full custom mode', async () => {
-    const config = createMockConfig({
-      profile: 'full-custom',
-      enabledExecutors: ['claude', 'codex'],
-      codexApiKey: 'test-codex-key',
-      anthropicAuthToken: '',
-    });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-    const validation = validateDockerComposeStructure(yaml);
-    expect(validation.valid).toBe(true);
-    expect(hasService(yaml, 'copilot-cli')).toBe(false);
-    expect(hasVolume(yaml, 'copilot-data')).toBe(false);
-    expect(hasVolume(yaml, 'codebuddy-data')).toBe(false);
-    expect(hasVolume(yaml, 'qoder-data')).toBe(false);
-    expect(yaml).not.toContain('COPILOT_API_KEY');
-
-    expect(yaml).toMatchSnapshot('full-custom-no-removed-executors-zh-CN');
-  });
-
-  it('should export Code Server defaults and optional host publishing only in full custom mode', async () => {
-    const config = createMockConfig({
-      profile: 'full-custom',
-      codeServerHost: '0.0.0.0',
-      codeServerPort: '36529',
-      codeServerPublishToHost: true,
-      codeServerPublishedPort: '36531',
-      codeServerAuthMode: 'password',
-      codeServerPassword: 'super-secret',
-    });
-    const yaml = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
-
-    const validation = validateDockerComposeStructure(yaml);
-    expect(validation.valid).toBe(true);
-    expect(hasEnvVar(yaml, 'hagicode', 'VsCodeServer__DefaultActiveImplementation')).toBe(true);
-    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__DefaultActiveImplementation')).toBe('code-server');
-    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerDefaultHost')).toBe('0.0.0.0');
-    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerDefaultPort')).toBe('36529');
-    expect(getServiceEnvVar(yaml, 'hagicode', 'VsCodeServer__CodeServerAuthMode')).toBe('password');
-    expect(getServiceEnvVar(yaml, 'hagicode', 'CODE_SERVER_PASSWORD')).toBe('super-secret');
-    expect(validation.parsed?.services?.hagicode?.ports).toContain('127.0.0.1:36531:36529');
-
-    expect(yaml).toMatchSnapshot('full-custom-code-server-publish-zh-CN');
-  });
-
-  it('should cover enabled and disabled EULA exports in full custom mode', async () => {
-    const enabledYaml = generateYAML(createMockConfig({
-      profile: 'full-custom',
-      acceptEula: true,
-    }), undefined, 'zh-CN', FIXED_DATE);
-    const disabledYaml = generateYAML(createMockConfig({
-      profile: 'full-custom',
-      acceptEula: false,
-    }), undefined, 'zh-CN', FIXED_DATE);
-
-    expect(hasEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(true);
-    expect(getServiceEnvVar(enabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe('Y');
-    expect(hasEnvVar(disabledYaml, 'hagicode', 'ACCEPT_EULA')).toBe(false);
-
-    expect(enabledYaml).toMatchSnapshot('full-custom-eula-enabled-zh-CN');
-    expect(disabledYaml).toMatchSnapshot('full-custom-eula-disabled-zh-CN');
   });
 });
