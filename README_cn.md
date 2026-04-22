@@ -8,7 +8,7 @@
 
 - **交互式配置表单**：分步配置，实时验证
 - **Docker Compose YAML 生成**：根据用户输入自动生成 YAML 文件
-- **多种数据库选项**：支持内置 PostgreSQL 或外部数据库连接
+- **仅支持 SQLite 数据库合同**：只导出当前受支持的内嵌 SQLite 部署路径，不再保留旧数据库分支
 - **显式执行器配置**：并行启用 Claude/Codex/OpenCode，无需默认 provider 路由
 - **局域网 HTTPS 支持**：可选的 Caddy 反向代理，使用 `tls internal`
 - **卷管理**：配置数据持久化的卷挂载
@@ -106,12 +106,11 @@ npm run deploy
 - **容器名称**：Docker 容器名称
 - **镜像标签**：要使用的 Docker 镜像标签
 - **主机操作系统**：目标操作系统（Windows/Linux）
-- **镜像 Registry**：Docker 镜像 Registry（Docker Hub/Azure ACR）
+- **镜像 Registry**：Docker 镜像 Registry（Docker Hub/Azure ACR/阿里云 ACR）
 
 #### 数据库
-- **内置 PostgreSQL**：内置 PostgreSQL 服务
-- **外部数据库**：连接到外部 PostgreSQL 实例
-- **卷类型**：命名卷或绑定挂载用于数据存储
+- **仅 SQLite**：生成的部署始终将应用数据库持久化到 `/app/data/hagicode.db`
+- **不再导出额外数据库侧车**：构建器不再提供不受支持的数据库服务或连接配置
 
 #### 许可证
 - **公共测试密钥**：默认公共测试许可证
@@ -230,11 +229,11 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 
 生成器创建完整的 `docker-compose.yml` 文件，包括：
 - HagiCode 应用程序服务
-- PostgreSQL 服务（如果选择内置数据库）
 - 网络配置
 - 卷定义
 - 健康检查配置
 - 环境变量
+- `hagicode` 服务内的 SQLite 连接设置
 - 当这些能力启用时，显式的 Claude、Codex 和 OpenCode 执行器分支
 
 ## 分析配置

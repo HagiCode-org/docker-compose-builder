@@ -8,7 +8,7 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 
 - **Interactive Configuration Form**: Step-by-step configuration with real-time validation
 - **Docker Compose YAML Generation**: Automatic YAML file generation based on user input
-- **Multiple Database Options**: Support for internal PostgreSQL or external database connections
+- **SQLite-Only Database Contract**: Export the supported embedded SQLite deployment path without legacy database branches
 - **Explicit Executor Configuration**: Enable Claude/Codex/OpenCode in parallel without a default-provider route
 - **LAN HTTPS Support**: Optional Caddy reverse proxy with `tls internal`
 - **Volume Management**: Configure volume mounts for data persistence
@@ -106,12 +106,11 @@ This will build the application and deploy it to the `gh-pages` branch.
 - **Container Name**: Name of the Docker container
 - **Image Tag**: Docker image tag to use
 - **Host OS**: Target operating system (Windows/Linux)
-- **Image Registry**: Docker image registry (Docker Hub/Azure ACR)
+- **Image Registry**: Docker image registry (Docker Hub/Azure ACR/Aliyun ACR)
 
 #### Database
-- **Internal PostgreSQL**: Built-in PostgreSQL service
-- **External Database**: Connect to external PostgreSQL instance
-- **Volume Type**: Named volume or bind mount for data storage
+- **SQLite only**: Generated deployments persist the app database at `/app/data/hagicode.db`
+- **No extra database sidecar**: The builder no longer exports unsupported database service or connection settings
 
 #### License
 - **Public Test Key**: Default public test license
@@ -230,11 +229,11 @@ The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.
 
 The generator creates a complete `docker-compose.yml` file with:
 - Hagicode application service
-- PostgreSQL service (if internal database selected)
 - Network configuration
 - Volume definitions
 - Health check configurations
 - Environment variables
+- SQLite connection settings stored inside the `hagicode` service
 - Explicit Claude, Codex, and OpenCode executor branches when those capabilities are enabled
 
 ## Analytics Configuration
