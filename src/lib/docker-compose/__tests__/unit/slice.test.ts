@@ -21,7 +21,7 @@ function createLocalStorageMock(): Storage {
   };
 }
 
-describe('docker compose slice executor sanitization', () => {
+describe('docker compose slice sanitization', () => {
   beforeEach(() => {
     const localStorageMock = createLocalStorageMock();
     Object.defineProperty(globalThis, 'window', {
@@ -65,18 +65,35 @@ describe('docker compose slice executor sanitization', () => {
     expect('qoderPersonalAccessToken' in persistedConfig).toBe(false);
   });
 
-  it('falls back to the retained default executor when legacy config only contains removed executors', async () => {
-    localStorage.setItem('docker-compose-config-version', '2.7');
+  it('sanitizes legacy PostgreSQL-era configs back to SQLite-only state', async () => {
+    localStorage.setItem('docker-compose-config-version', '2.11');
     localStorage.setItem('docker-compose-config', JSON.stringify({
-      enabledExecutors: ['copilot-cli', 'kimi-cli'],
-      workdirPath: '/workspace/repos'
+      profile: 'full-custom',
+      enabledExecutors: ['claude'],
+      anthropicAuthToken: 'saved-token',
+      workdirPath: '/workspace/repos',
+      databaseType: 'external',
+      externalDbHost: 'legacy-db.example.com',
+      externalDbPort: '5432',
+      postgresDatabase: 'hagicode',
+      postgresUser: 'postgres',
+      postgresPassword: 'postgres',
+      volumeType: 'named',
+      volumeName: 'postgres-data'
     }));
 
     const sliceModule = await import('../../slice');
     const state = sliceModule.default(undefined, initAction);
+    const persistedConfig = JSON.parse(localStorage.getItem('docker-compose-config') ?? '{}') as Record<string, unknown>;
 
-    expect(state.config.enabledExecutors).toEqual(['claude']);
-    expect(state.config.workdirPath).toBe('/workspace/repos');
+    expect(state.config.databaseType).toBe('sqlite');
+    expect('externalDbHost' in persistedConfig).toBe(false);
+    expect('externalDbPort' in persistedConfig).toBe(false);
+    expect('postgresDatabase' in persistedConfig).toBe(false);
+    expect('postgresUser' in persistedConfig).toBe(false);
+    expect('postgresPassword' in persistedConfig).toBe(false);
+    expect('volumeType' in persistedConfig).toBe(false);
+    expect('volumeName' in persistedConfig).toBe(false);
   });
 
   it('hydrates missing OpenCode persistence fields from defaults and updates the saved version', async () => {
@@ -94,6 +111,6 @@ describe('docker compose slice executor sanitization', () => {
     expect(state.config.openCodeModel).toBe('openai/gpt-5');
     expect(state.config.openCodeConfigMode).toBe('default-managed');
     expect(state.config.openCodeConfigHostPath).toBe('');
-    expect(localStorage.getItem('docker-compose-config-version')).toBe('2.9');
+    expect(localStorage.getItem('docker-compose-config-version')).toBe('2.12');
   });
 });

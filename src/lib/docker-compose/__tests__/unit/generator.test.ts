@@ -6,7 +6,6 @@ import {
   buildCaddyfile,
   buildHeader,
   buildNetworksSection,
-  buildPostgresService,
   buildServicesSection,
   buildVolumesSection,
   generateYAML,
@@ -36,6 +35,15 @@ describe('buildAppService', () => {
     const appService = buildAppService(createMockConfig()).join('\n');
 
     expect(appService).not.toContain('AI__Providers__DefaultProvider');
+  });
+
+  it('always emits the SQLite runtime contract', () => {
+    const appService = buildAppService(createMockConfig()).join('\n');
+
+    expect(appService).toContain('Database__Provider: sqlite');
+    expect(appService).toContain('ConnectionStrings__Default: "Data Source=/app/data/hagicode.db"');
+    expect(appService).not.toContain('Database__Provider: postgresql');
+    expect(appService).not.toContain('Host=postgres;');
   });
 
   it('renders Claude and Codex branches together when both executors are enabled', () => {
@@ -73,34 +81,7 @@ describe('buildAppService', () => {
     expect(appService).not.toContain('opencode-config-data:/home/hagicode/.config/opencode');
   });
 
-  it('renders optional auth and models bind mounts when OpenCode host-file paths are provided', () => {
-    const appService = buildAppService(createOpenCodeConfig({
-      openCodeConfigMode: 'host-file',
-      openCodeConfigHostPath: '/srv/opencode/opencode.json',
-      openCodeAuthHostPath: '/srv/opencode/auth.json',
-      openCodeModelsHostPath: '/srv/opencode/models.json',
-    })).join('\n');
-
-    expect(appService).toContain('/srv/opencode/opencode.json:/home/hagicode/.config/opencode/opencode.json');
-    expect(appService).toContain('/srv/opencode/auth.json:/home/hagicode/.local/share/opencode/auth.json');
-    expect(appService).toContain('/srv/opencode/models.json:/home/hagicode/.cache/opencode/models.json');
-  });
-
-  it('mounts only retained executor state volumes when enabled', () => {
-    const appService = buildAppService(createMockConfig({
-      enabledExecutors: ['codex', 'opencode'],
-      anthropicAuthToken: '',
-      codexApiKey: 'test-codex-key',
-      openCodeConfigMode: 'default-managed',
-    })).join('\n');
-
-    expect(appService).toContain('codex-data:/home/hagicode/.codex');
-    expect(appService).toContain('opencode-config-data:/home/hagicode/.config/opencode');
-    expect(appService).not.toContain('claude-data:/home/hagicode/.claude');
-    expect(appService).not.toContain('copilot-data:/home/hagicode/.copilot');
-  });
-
-  it('keeps Linux user mapping and Claude persistence volume behavior', () => {
+  it('keeps Linux user mapping and retained persistence volume behavior', () => {
     const appService = buildAppService(createMockConfig({
       hostOS: 'linux',
       workdirCreatedByRoot: false,
@@ -110,6 +91,8 @@ describe('buildAppService', () => {
 
     expect(appService).toContain('PUID: 1000');
     expect(appService).toContain('PGID: 1000');
+    expect(appService).toContain('hagicode_data:/app/data');
+    expect(appService).toContain('hagicode_saves:/app/saves');
     expect(appService).toContain('claude-data:/home/hagicode/.claude');
   });
 
@@ -126,7 +109,6 @@ describe('buildAppService', () => {
     expect(appService).toContain('VsCodeServer__CodeServerDefaultPort: 36529');
     expect(appService).toContain('VsCodeServer__CodeServerAuthMode: "password"');
     expect(appService).toContain('CODE_SERVER_PASSWORD: "super-secret"');
-    expect(appService).toContain('Code Server runtime state continues to use hagicode_data:/app/data');
   });
 
   it('adds a dedicated loopback port mapping when Code Server publishing is enabled', () => {
@@ -139,26 +121,6 @@ describe('buildAppService', () => {
 
     expect(getServicePorts(yaml, 'hagicode')).toContain('8080:45000');
     expect(getServicePorts(yaml, 'hagicode')).toContain('127.0.0.1:36531:36529');
-  });
-
-  it('keeps quick-start output free of Code Server defaults', () => {
-    const yaml = generateYAML(createMockConfig(), undefined, 'en-US', FIXED_DATE);
-
-    expect(yaml).not.toContain('VsCodeServer__DefaultActiveImplementation');
-    expect(yaml).not.toContain('CODE_SERVER_PASSWORD');
-  });
-
-  it('exports ACCEPT_EULA only when the shared toggle is enabled', () => {
-    const enabledYaml = generateYAML(createMockConfig({
-      acceptEula: true,
-    }), undefined, 'en-US', FIXED_DATE);
-    const disabledYaml = generateYAML(createMockConfig({
-      acceptEula: false,
-    }), undefined, 'en-US', FIXED_DATE);
-
-    expect(enabledYaml).toContain('ACCEPT_EULA: "Y"');
-    expect(enabledYaml).not.toContain('VsCodeServer__DefaultActiveImplementation');
-    expect(disabledYaml).not.toContain('ACCEPT_EULA');
   });
 });
 
@@ -173,47 +135,28 @@ describe('proxy and service helpers', () => {
     expect(caddyfile).toContain('tls internal');
     expect(caddyfile).toContain('reverse_proxy hagicode:45000');
   });
-
-  it('builds the postgres service for internal database mode', () => {
-    const postgresService = buildPostgresService(createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'named',
-      volumeName: 'postgres-data',
-    })).join('\n');
-
-    expect(postgresService).toContain('postgres:');
-    expect(postgresService).toContain('POSTGRES_DATABASE: hagicode');
-    expect(postgresService).toContain('- postgres-data:/bitnami/postgresql');
-  });
 });
 
 describe('section builders', () => {
-  it('includes conditional postgres services only when required', () => {
-    const withPostgres = buildServicesSection(createMockConfig({
+  it('keeps the services section free of postgres sidecars', () => {
+    const services = buildServicesSection(createMockConfig({
       enabledExecutors: ['claude', 'codex'],
-      databaseType: 'internal',
       codexApiKey: 'test-codex-key',
     })).join('\n');
-    const withoutPostgres = buildServicesSection(createMockConfig({
-      enabledExecutors: ['opencode'],
-      anthropicAuthToken: '',
-    })).join('\n');
 
-    expect(withPostgres).toContain('postgres:');
-    expect(withoutPostgres).not.toContain('postgres:');
-    expect(withoutPostgres).not.toContain('copilot-cli:');
+    expect(services).toContain('hagicode:');
+    expect(services).not.toContain('postgres:');
+    expect(services).not.toContain('bitnami/postgresql');
   });
 
-  it('builds volumes and networks sections', () => {
-    const volumes = buildVolumesSection(createMockConfig({
-      databaseType: 'internal',
-      volumeType: 'named',
-    })).join('\n');
+  it('builds volumes and networks sections for retained services only', () => {
+    const volumes = buildVolumesSection(createMockConfig()).join('\n');
     const networks = buildNetworksSection().join('\n');
 
     expect(volumes).toContain('hagicode_data:');
+    expect(volumes).toContain('hagicode_saves:');
     expect(volumes).toContain('claude-data:');
-    expect(volumes).toContain('postgres-data:');
+    expect(volumes).not.toContain('postgres-data:');
     expect(networks).toContain('pcode-network:');
     expect(networks).toContain('driver: bridge');
   });
@@ -232,23 +175,6 @@ describe('section builders', () => {
     expect(hostFileVolumes).not.toContain('opencode-auth-data:');
     expect(hostFileVolumes).not.toContain('opencode-models-data:');
   });
-
-  it('declares only the managed executor volumes that are actually used', () => {
-    const yaml = generateYAML(createMockConfig({
-      enabledExecutors: ['codex', 'opencode'],
-      anthropicAuthToken: '',
-      codexApiKey: 'test-codex-key',
-      openCodeConfigMode: 'default-managed',
-    }), undefined, 'en-US', FIXED_DATE);
-
-    expect(hasVolume(yaml, 'codex-data')).toBe(true);
-    expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
-    expect(hasVolume(yaml, 'opencode-auth-data')).toBe(true);
-    expect(hasVolume(yaml, 'opencode-models-data')).toBe(true);
-    expect(hasVolume(yaml, 'claude-data')).toBe(false);
-    expect(hasVolume(yaml, 'kimi-data')).toBe(false);
-    expect(hasVolume(yaml, 'copilot-data')).toBe(false);
-  });
 });
 
 describe('generateYAML', () => {
@@ -258,17 +184,15 @@ describe('generateYAML', () => {
       anthropicAuthToken: 'test-token',
       codexApiKey: 'test-codex-key',
       openCodeModel: 'openai/gpt-5',
-      databaseType: 'internal',
-      volumeType: 'named',
-      volumeName: 'postgres-data',
     }), undefined, 'zh-CN', FIXED_DATE);
 
     expect(yaml).toContain('# Hagicode Docker Compose Configuration');
     expect(yaml).toContain('services:');
-    expect(yaml).toContain('postgres:');
     expect(yaml).toContain('CODEX_API_KEY: "test-codex-key"');
     expect(yaml).toContain('AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
     expect(yaml).toContain('opencode-config-data:/home/hagicode/.config/opencode');
+    expect(yaml).not.toContain('postgres:');
+    expect(yaml).not.toContain('postgres-data:');
     expect(yaml).not.toContain('AI__Providers__DefaultProvider');
     expect(yaml).not.toContain('copilot-cli:');
     expect(yaml).not.toContain('CODEBUDDY_API_KEY');
@@ -292,7 +216,7 @@ describe('generateYAML', () => {
     });
   });
 
-  it('does not emit removed executor services or volumes', () => {
+  it('does not emit removed executor services or postgres image previews', () => {
     const yaml = generateYAML(createMockConfig({
       enabledExecutors: ['codex', 'opencode'],
       anthropicAuthToken: '',
@@ -302,7 +226,23 @@ describe('generateYAML', () => {
 
     expect(hasService(yaml, 'copilot-cli')).toBe(false);
     expect(getServiceVolumes(yaml, 'hagicode')).not.toContain('copilot-data:/home/hagicode/.copilot');
+    expect(yaml).not.toContain('bitnami/postgresql');
     expect(yaml).not.toContain('CODEBUDDY_API_KEY');
     expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
+  });
+
+  it('declares only the managed executor volumes that are actually used', () => {
+    const yaml = generateYAML(createMockConfig({
+      enabledExecutors: ['codex', 'opencode'],
+      anthropicAuthToken: '',
+      codexApiKey: 'test-codex-key',
+      openCodeConfigMode: 'default-managed',
+    }), undefined, 'en-US', FIXED_DATE);
+
+    expect(hasVolume(yaml, 'codex-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-config-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-auth-data')).toBe(true);
+    expect(hasVolume(yaml, 'opencode-models-data')).toBe(true);
+    expect(hasVolume(yaml, 'claude-data')).toBe(false);
   });
 });

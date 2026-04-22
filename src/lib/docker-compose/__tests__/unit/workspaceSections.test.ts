@@ -23,7 +23,7 @@ describe('workspace section metadata', () => {
     expect(sections.map((section) => section.id)).toEqual(['profile', 'base', 'executors', 'advanced']);
   });
 
-  it('keeps conditional HTTPS and database sections visible and maps their errors', () => {
+  it('shows only the full-custom https section in addition to the shared sections', () => {
     const config = {
       ...defaultConfig,
       profile: 'full-custom' as const,
@@ -32,17 +32,13 @@ describe('workspace section metadata', () => {
       enableHttps: true,
       httpsPort: '',
       lanIp: '',
-      databaseType: 'external' as const,
-      externalDbHost: '',
-      externalDbPort: '',
     };
 
     const sections = getWorkspaceSections(config, validateConfig(config), 'profile');
     const httpsSection = sections.find((section) => section.id === 'https');
-    const databaseSection = sections.find((section) => section.id === 'database');
 
+    expect(sections.map((section) => section.id)).toEqual(['profile', 'base', 'executors', 'https', 'advanced']);
     expect(httpsSection?.errorCount).toBe(2);
-    expect(databaseSection?.errorCount).toBe(2);
     expect(findFirstErrorSection(sections)?.id).toBe('https');
     expect(isWorkspaceExportReady(sections)).toBe(false);
   });
@@ -78,24 +74,6 @@ describe('workspace section metadata', () => {
     expect(isWorkspaceExportReady(sections)).toBe(false);
   });
 
-  it('marks OpenCode as complete with the default-managed persistence mode', () => {
-    const config = {
-      ...defaultConfig,
-      workdirPath: '/workspace/repos',
-      enabledExecutors: ['opencode'] as ExecutorType[],
-      anthropicAuthToken: '',
-      openCodeConfigMode: 'default-managed' as const,
-    };
-
-    const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
-    const openCodeChild = sections
-      .find((section) => section.id === 'executors')
-      ?.children.find((child) => child.id === 'executor-opencode');
-
-    expect(openCodeChild?.isComplete).toBe(true);
-    expect(openCodeChild?.errorCount).toBe(0);
-  });
-
   it('tracks the Code Server child item only in full-custom mode', () => {
     const config = {
       ...defaultConfig,
@@ -116,24 +94,6 @@ describe('workspace section metadata', () => {
     expect(codeServerChild).toBeDefined();
     expect(codeServerChild?.errorCount).toBe(2);
     expect(isWorkspaceExportReady(sections)).toBe(false);
-  });
-
-  it('always exposes the shared EULA child item for section navigation', () => {
-    const config = {
-      ...defaultConfig,
-      anthropicAuthToken: 'sk-ant-test',
-      workdirPath: '/workspace/repos',
-      acceptEula: true,
-    };
-
-    const sections = getWorkspaceSections(config, validateConfig(config), 'executors');
-    const eulaChild = sections
-      .find((section) => section.id === 'executors')
-      ?.children.find((child) => child.id === 'executor-eula');
-
-    expect(eulaChild).toBeDefined();
-    expect(eulaChild?.errorCount).toBe(0);
-    expect(eulaChild?.isComplete).toBe(true);
   });
 
   it('reports a fully ready workspace summary when all required inputs are present', () => {

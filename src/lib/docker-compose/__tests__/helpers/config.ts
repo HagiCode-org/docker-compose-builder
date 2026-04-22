@@ -22,11 +22,6 @@ export function createMockConfig(
     aspNetEnvironment: 'Production',
     timezone: 'Asia/Shanghai',
     databaseType: 'sqlite',
-    postgresDatabase: 'hagicode',
-    postgresUser: 'postgres',
-    postgresPassword: 'postgres',
-    volumeType: 'named',
-    volumeName: 'postgres-data',
     licenseKeyType: 'public',
     licenseKey: 'public-license-key',
     anthropicApiProvider: 'anthropic',
@@ -51,7 +46,6 @@ export function createMockConfig(
     workdirCreatedByRoot: true,
     puid: '1000',
     pgid: '1000',
-    // Claude Code Extended Configuration (optional - undefined by default)
     anthropicSonnetModel: undefined,
     anthropicOpusModel: undefined,
     anthropicHaikuModel: undefined,
@@ -61,11 +55,6 @@ export function createMockConfig(
   return { ...defaults, ...overrides };
 }
 
-/**
- * Create a quick-start profile configuration
- * @param overrides Partial configuration to override defaults
- * @returns Quick-start configuration
- */
 export function createQuickStartConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -73,17 +62,10 @@ export function createQuickStartConfig(
     profile: 'quick-start',
     hostOS: 'linux',
     workdirCreatedByRoot: true,
-    databaseType: 'sqlite',
-    volumeType: 'named',
     ...overrides
   });
 }
 
-/**
- * Create a full-custom profile configuration
- * @param overrides Partial configuration to override defaults
- * @returns Full-custom configuration
- */
 export function createFullCustomConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -93,11 +75,6 @@ export function createFullCustomConfig(
   });
 }
 
-/**
- * Create a Windows deployment configuration
- * @param overrides Partial configuration to override defaults
- * @returns Windows configuration
- */
 export function createWindowsConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -109,11 +86,6 @@ export function createWindowsConfig(
   });
 }
 
-/**
- * Create a Linux non-root user configuration
- * @param overrides Partial configuration to override defaults
- * @returns Linux non-root configuration
- */
 export function createLinuxNonRootConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -126,27 +98,6 @@ export function createLinuxNonRootConfig(
   });
 }
 
-/**
- * Create an external database configuration
- * @param overrides Partial configuration to override defaults
- * @returns External database configuration
- */
-export function createExternalDbConfig(
-  overrides: Partial<DockerComposeConfig> = {}
-): DockerComposeConfig {
-  return createMockConfig({
-    databaseType: 'external',
-    externalDbHost: 'localhost',
-    externalDbPort: '5432',
-    ...overrides
-  });
-}
-
-/**
- * Create a ZAI API provider configuration
- * @param overrides Partial configuration to override defaults
- * @returns ZAI provider configuration
- */
 export function createZaiProviderConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -156,11 +107,6 @@ export function createZaiProviderConfig(
   });
 }
 
-/**
- * Create an Anthropic API provider configuration
- * @param overrides Partial configuration to override defaults
- * @returns Anthropic provider configuration
- */
 export function createAnthropicProviderConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -170,11 +116,6 @@ export function createAnthropicProviderConfig(
   });
 }
 
-/**
- * Create a custom API provider configuration
- * @param overrides Partial configuration to override defaults
- * @returns Custom provider configuration
- */
 export function createCustomProviderConfig(
   overrides: Partial<DockerComposeConfig> = {}
 ): DockerComposeConfig {
@@ -196,7 +137,4 @@ export function createOpenCodeConfig(
   });
 }
 
-/**
- * Fixed date for consistent testing
- */
 export const FIXED_DATE = new Date('2024-01-01T00:00:00Z');

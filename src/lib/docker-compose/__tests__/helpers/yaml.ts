@@ -54,7 +54,8 @@ export function validateDockerComposeStructure(yamlString: string): {
         errors.push('hagicode service missing required field: container_name');
       }
 
-      if (!hagicode.ports) {
+      const hasHttpsProxy = Boolean(parsed.services?.['https-proxy']);
+      if (!hagicode.ports && !hasHttpsProxy) {
         errors.push('hagicode service missing required field: ports');
       }
 
@@ -74,27 +75,6 @@ export function validateDockerComposeStructure(yamlString: string): {
     // 验证网络配置
     if (parsed.networks && !parsed.networks['pcode-network']) {
       errors.push('Missing required network: pcode-network');
-    }
-
-    // 如果有 postgres 服务，验证其结构
-    if (parsed.services?.postgres) {
-      const postgres = parsed.services.postgres;
-
-      if (!postgres.image) {
-        errors.push('postgres service missing required field: image');
-      }
-
-      if (!postgres.environment) {
-        errors.push('postgres service missing required field: environment');
-      }
-
-      if (!postgres.volumes) {
-        errors.push('postgres service missing required field: volumes');
-      }
-
-      if (!postgres.healthcheck) {
-        errors.push('postgres service missing required field: healthcheck');
-      }
     }
 
     // 验证 volumes（如果存在）
