@@ -10,6 +10,8 @@ import { SectionRail } from '@/components/docker-compose/layout/SectionRail';
 import { WorkspaceIntro } from '@/components/docker-compose/layout/WorkspaceIntro';
 import { WorkspaceShell } from '@/components/docker-compose/layout/WorkspaceShell';
 import { SiteFooter } from '@/components/Footer/SiteFooter';
+import { PromoteCard } from '@/components/promote/PromoteCard';
+import promoteCardStyles from '@/components/promote/PromoteCard.module.css';
 import {
   findFirstErrorSection,
   getWorkspaceSections,
@@ -35,7 +37,7 @@ function scrollToTarget(target: HTMLElement) {
 }
 
 export function DockerComposeGenerator() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const config = useSelector(selectConfig);
   const [activeNavTargetId, setActiveNavTargetId] = useState<WorkspaceSectionId | WorkspaceSectionChildId | undefined>();
 
@@ -184,6 +186,8 @@ export function DockerComposeGenerator() {
           </div>
         </div>
       </header>
+
+      <PromoteCard locale={i18n.resolvedLanguage} className={promoteCardStyles.promoteCard} />
 
       <main className="w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <WorkspaceShell
