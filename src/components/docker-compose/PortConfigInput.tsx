@@ -54,7 +54,7 @@ export function PortConfigInput({
       {helpText && <p className="text-xs text-muted-foreground">{helpText}</p>}
       {privilegedPortWarning && (
         <p className="text-xs text-amber-600 dark:text-amber-400">
-          {t('configForm.privilegedPortWarning')}
+          {t('docker-compose:configForm.privilegedPortWarning')}
         </p>
       )}
       {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}

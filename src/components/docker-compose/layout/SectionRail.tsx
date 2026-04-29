@@ -30,11 +30,11 @@ export function SectionRail({
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
       <CardHeader className="border-b border-border/60">
-        <CardTitle>{t('workspace.navigationTitle')}</CardTitle>
-        <CardDescription>{t('workspace.navigationDescription')}</CardDescription>
+        <CardTitle>{t('common:workspace.navigationTitle')}</CardTitle>
+        <CardDescription>{t('common:workspace.navigationDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <nav aria-label={t('workspace.navigationTitle')} className="space-y-2">
+        <nav aria-label={t('common:workspace.navigationTitle')} className="space-y-2">
           {sections.map((section, index) => {
             const isActive = section.id === activeSectionId;
 
@@ -75,7 +75,7 @@ export function SectionRail({
         {sections.find((section) => section.id === 'executors')?.children.length ? (
           <div className="rounded-2xl border border-border/60 bg-background/80 p-3">
             <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              {t('workspace.executorItemsTitle')}
+              {t('common:workspace.executorItemsTitle')}
             </p>
             <div className="space-y-2">
               {sections
@@ -120,26 +120,26 @@ export function SectionRail({
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-medium">{t('workspace.previewShortcutTitle')}</p>
-              <p className="text-xs text-muted-foreground">{t('workspace.previewShortcutDescription')}</p>
+              <p className="text-sm font-medium">{t('common:workspace.previewShortcutTitle')}</p>
+              <p className="text-xs text-muted-foreground">{t('common:workspace.previewShortcutDescription')}</p>
             </div>
             <Eye className="size-4 text-muted-foreground" />
           </div>
           <Button type="button" variant="outline" className="w-full justify-between" onClick={onOpenPreview}>
-            <span>{t('workspace.openPreview')}</span>
+            <span>{t('common:workspace.openPreview')}</span>
             <ArrowRight className="size-4" />
           </Button>
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
-          <p className="mb-3 text-sm font-medium">{t('workspace.statusLegendTitle')}</p>
+          <p className="mb-3 text-sm font-medium">{t('common:workspace.statusLegendTitle')}</p>
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             <SectionStatusBadge status="active" />
             <SectionStatusBadge status="complete" />
             <SectionStatusBadge status="pending" />
             <span className="inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/5 px-2 py-1 text-destructive">
               <TriangleAlert className="size-3.5" />
-              {t('workspace.status.error')}
+              {t('common:workspace.status.error')}
             </span>
           </div>
         </div>

@@ -35,12 +35,12 @@ export function IpConfigInput({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button type="button" aria-label={t('configForm.lanIpTooltipLabel')}>
+              <button type="button" aria-label={t('docker-compose:configForm.lanIpTooltipLabel')}>
                 <CircleHelp className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t('configForm.lanIpTooltipText')}</p>
+              <p>{t('docker-compose:configForm.lanIpTooltipText')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -53,10 +53,10 @@ export function IpConfigInput({
         onChange={(e) => onChange(e.target.value)}
       />
       {helpText && <p className="text-xs text-muted-foreground">{helpText}</p>}
-      <p className="text-xs text-muted-foreground">{t('configForm.lanIpExamples')}</p>
+      <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.lanIpExamples')}</p>
       {showLocalhostWarning && (
         <p className="text-xs text-amber-600 dark:text-amber-400">
-          {t('configForm.localhostLanWarning')}
+          {t('docker-compose:configForm.localhostLanWarning')}
         </p>
       )}
       {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}

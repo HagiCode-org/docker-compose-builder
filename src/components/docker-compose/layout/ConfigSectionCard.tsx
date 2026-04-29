@@ -54,7 +54,7 @@ export function ConfigSectionCard({
           <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
             <div className="flex items-center gap-2 text-sm font-medium text-destructive">
               <AlertTriangle className="size-4" />
-              <span>{t('workspace.inlineErrorsTitle', { count: section.errorCount })}</span>
+              <span>{t('common:workspace.inlineErrorsTitle', { count: section.errorCount })}</span>
             </div>
             <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
               {section.errorFields.map((error) => (

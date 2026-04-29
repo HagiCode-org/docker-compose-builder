@@ -43,21 +43,21 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
     try {
       await copyToClipboard(yaml);
       setCopied(true);
-      toast.success(t('configPreview.yamlCopiedSuccess'));
+      toast.success(t('docker-compose:configPreview.yamlCopiedSuccess'));
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
-      toast.error(t('configPreview.yamlCopiedError'));
+      toast.error(t('docker-compose:configPreview.yamlCopiedError'));
     }
   };
 
   const handleDownload = () => {
     if (exportDisabled) {
-      toast.error(t('configPreview.invalidConfigCannotExport'));
+      toast.error(t('docker-compose:configPreview.invalidConfigCannotExport'));
       return;
     }
     downloadComposeYaml(yaml);
-    toast.success(t('configPreview.downloadSuccess'));
+    toast.success(t('docker-compose:configPreview.downloadSuccess'));
   };
 
   return (
@@ -71,15 +71,15 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
               <FileCode className="size-4 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{t('configPreview.generatedConfiguration')}</h3>
-              <p className="text-sm text-muted-foreground">{t('configPreview.previewDescription')}</p>
+              <h3 className="text-lg font-semibold">{t('docker-compose:configPreview.generatedConfiguration')}</h3>
+              <p className="text-sm text-muted-foreground">{t('docker-compose:configPreview.previewDescription')}</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <Badge variant={exportDisabled ? 'destructive' : 'secondary'}>
-              {exportDisabled ? t('workspace.exportBlocked') : t('workspace.exportReady')}
+              {exportDisabled ? t('common:workspace.exportBlocked') : t('common:workspace.exportReady')}
             </Badge>
-            <span>{yaml.split('\n').length} {t('configPreview.lines')}</span>
+            <span>{yaml.split('\n').length} {t('docker-compose:configPreview.lines')}</span>
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
             className="justify-center gap-2"
           >
             {copied ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
-            <span>{copied ? t('configPreview.copied') : t('configPreview.copy')}</span>
+            <span>{copied ? t('docker-compose:configPreview.copied') : t('docker-compose:configPreview.copy')}</span>
           </Button>
           <Button
             size="sm"
@@ -101,7 +101,7 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
             className="justify-center gap-2"
           >
             <Download className="size-4" />
-            <span>{t('configPreview.download')}</span>
+            <span>{t('docker-compose:configPreview.download')}</span>
           </Button>
         </div>
       </div>
@@ -109,9 +109,9 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
       {exportDisabled ? (
         <Alert variant="destructive" className="rounded-2xl border-destructive/30 bg-destructive/5">
           <TriangleAlert className="size-4" />
-          <AlertTitle>{t('configPreview.exportBlockedTitle')}</AlertTitle>
+          <AlertTitle>{t('docker-compose:configPreview.exportBlockedTitle')}</AlertTitle>
           <AlertDescription>
-            <p>{t('configPreview.exportBlockedDescription')}</p>
+            <p>{t('docker-compose:configPreview.exportBlockedDescription')}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {errorSections.map((section) => (
                 <Button
@@ -133,8 +133,8 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
       ) : (
         <Alert className="rounded-2xl border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-950 dark:bg-emerald-950/25 dark:text-emerald-100">
           <Check className="size-4" />
-          <AlertTitle>{t('configPreview.exportReadyTitle')}</AlertTitle>
-          <AlertDescription>{t('configPreview.exportReadyDescription')}</AlertDescription>
+          <AlertTitle>{t('docker-compose:configPreview.exportReadyTitle')}</AlertTitle>
+          <AlertDescription>{t('docker-compose:configPreview.exportReadyDescription')}</AlertDescription>
         </Alert>
       )}
 
@@ -148,7 +148,7 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
             </div>
             <span className="ml-2 text-xs font-mono text-muted-foreground">docker-compose.yml</span>
           </div>
-          <span className="text-xs text-muted-foreground">{t('configPreview.livePreview')}</span>
+          <span className="text-xs text-muted-foreground">{t('docker-compose:configPreview.livePreview')}</span>
         </div>
         <div className="custom-scrollbar max-h-[65vh] overflow-auto p-4 xl:max-h-[72vh]">
           <SyntaxHighlighter language="yaml" className="text-sm" darkMode={darkMode}>
@@ -158,9 +158,9 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
       </div>
 
       <div className="space-y-1 px-1 text-xs text-muted-foreground">
-        <p>{t('configPreview.generatedAt')} {new Date().toLocaleString()}</p>
-        <p>{t('configPreview.basedOnSettings')}</p>
-        {exportDisabled ? <p>{t('configPreview.invalidConfigCannotExport')}</p> : null}
+        <p>{t('docker-compose:configPreview.generatedAt')} {new Date().toLocaleString()}</p>
+        <p>{t('docker-compose:configPreview.basedOnSettings')}</p>
+        {exportDisabled ? <p>{t('docker-compose:configPreview.invalidConfigCannotExport')}</p> : null}
       </div>
     </div>
   );

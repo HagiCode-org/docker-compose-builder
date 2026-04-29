@@ -19,8 +19,8 @@ interface HttpsConfigPanelProps {
 }
 
 export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }: HttpsConfigPanelProps) {
-  const { t } = useTranslation();
-  const caddyfile = useMemo(() => buildCaddyfile(config), [config]);
+  const { t, i18n } = useTranslation();
+  const caddyfile = useMemo(() => buildCaddyfile(config, i18n.resolvedLanguage), [config, i18n.resolvedLanguage]);
   const accessUrl = `https://${config.lanIp}:${config.httpsPort || '443'}`;
   const StatusIcon = config.enableHttps ? ShieldCheck : ShieldOff;
 
@@ -30,12 +30,12 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm font-medium">
             <StatusIcon className="size-4 text-primary" />
-            <span>{t('workspace.httpsPanelTitle')}</span>
+            <span>{t('common:workspace.httpsPanelTitle')}</span>
           </div>
-          <p className="text-sm text-muted-foreground">{t('configForm.enableHttpsHelp')}</p>
+          <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.enableHttpsHelp')}</p>
         </div>
         <Badge variant={config.enableHttps ? 'default' : 'secondary'}>
-          {config.enableHttps ? t('configForm.httpsEnabled') : t('configForm.httpsDisabled')}
+          {config.enableHttps ? t('docker-compose:configForm.httpsEnabled') : t('docker-compose:configForm.httpsDisabled')}
         </Badge>
       </div>
 
@@ -46,7 +46,7 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
           onCheckedChange={(checked) => updateConfig('enableHttps', checked as boolean)}
         />
         <Label htmlFor="enableHttps" className="cursor-pointer">
-          {t('configForm.enableHttps')}
+          {t('docker-compose:configForm.enableHttps')}
         </Label>
       </div>
       {config.enableHttps && (
@@ -54,25 +54,25 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <PortConfigInput
               id="httpsPort"
-              label={t('configForm.httpsPort')}
+              label={t('docker-compose:configForm.httpsPort')}
               value={config.httpsPort}
               onChange={(value) => updateConfig('httpsPort', value)}
-              helpText={t('configForm.httpsPortHelp')}
+              helpText={t('docker-compose:configForm.httpsPortHelp')}
               error={validationErrors.httpsPort}
             />
             <IpConfigInput
               id="lanIp"
-              label={t('configForm.lanIp')}
+              label={t('docker-compose:configForm.lanIp')}
               value={config.lanIp}
               onChange={(value) => updateConfig('lanIp', value)}
               placeholder="192.168.1.100"
-              helpText={t('configForm.lanIpHelp')}
+              helpText={t('docker-compose:configForm.lanIpHelp')}
               error={validationErrors.lanIp}
             />
           </div>
 
           <div className="flex items-center justify-between gap-2 rounded-xl border bg-background/70 px-3 py-2">
-            <span className="text-sm">{t('configForm.accessUrl')}</span>
+            <span className="text-sm">{t('docker-compose:configForm.accessUrl')}</span>
             <code className="text-xs">{accessUrl}</code>
           </div>
 
@@ -83,7 +83,7 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
               rel="noopener noreferrer"
               className="text-xs text-primary underline"
             >
-              {t('configForm.certificateTrustGuide')}
+              {t('docker-compose:configForm.certificateTrustGuide')}
             </a>
             <a
               href="/docs/https-certificate-guide.md#faq"
@@ -91,16 +91,16 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
               rel="noopener noreferrer"
               className="text-xs text-primary underline"
             >
-              {t('configForm.troubleshooting')}
+              {t('docker-compose:configForm.troubleshooting')}
             </a>
           </div>
 
           <CertificateGuide
-            title={t('configForm.certificateGuideTitle')}
-            description={t('configForm.certificateGuideDescription')}
-            detailsLabel={t('configForm.certificateGuideDetails')}
+            title={t('docker-compose:configForm.certificateGuideTitle')}
+            description={t('docker-compose:configForm.certificateGuideDescription')}
+            detailsLabel={t('docker-compose:configForm.certificateGuideDetails')}
             docsHref="/docs/https-certificate-guide.md"
-            docsLabel={t('configForm.certificateTrustGuide')}
+            docsLabel={t('docker-compose:configForm.certificateTrustGuide')}
           />
 
           <CaddyfilePreview content={caddyfile} generatedAt={new Date()} serviceCount={1} />
@@ -113,7 +113,7 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
               updateConfig('lanIp', '192.168.1.100');
             }}
           >
-            {t('configForm.resetHttps')}
+            {t('docker-compose:configForm.resetHttps')}
           </Button>
         </div>
       )}

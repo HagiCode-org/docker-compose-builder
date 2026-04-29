@@ -24,23 +24,23 @@ export function WorkspaceIntro({
       <div className="flex flex-wrap gap-3">
         <MetricPill
           icon={<Layers3 className="size-4" />}
-          label={t('workspace.metrics.modules')}
+          label={t('common:workspace.metrics.modules')}
           value={`${totalSections}`}
         />
         <MetricPill
           icon={<ListChecks className="size-4" />}
-          label={t('workspace.metrics.completed')}
+          label={t('common:workspace.metrics.completed')}
           value={`${completedSections}/${totalSections}`}
         />
         <MetricPill
           icon={<TriangleAlert className="size-4" />}
-          label={t('workspace.metrics.errors')}
+          label={t('common:workspace.metrics.errors')}
           value={`${errorCount}`}
         />
         <MetricPill
           icon={<ListChecks className="size-4" />}
-          label={t('workspace.metrics.export')}
-          value={exportReady ? t('workspace.exportReady') : t('workspace.exportBlocked')}
+          label={t('common:workspace.metrics.export')}
+          value={exportReady ? t('common:workspace.exportReady') : t('common:workspace.exportBlocked')}
         />
       </div>
 

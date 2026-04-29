@@ -12,6 +12,7 @@ import {
   REGISTRIES,
 } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
+import { localizeProviderPreset } from '@/lib/docker-compose/providerConfigLoader';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -52,6 +53,14 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
   const currentProvider = useSelector((state: RootState) =>
     selectProviderById(state, config.anthropicApiProvider)
   );
+  const localizedProviders = useMemo(
+    () => providers.map((provider) => localizeProviderPreset(provider, i18n.resolvedLanguage)),
+    [i18n.resolvedLanguage, providers],
+  );
+  const localizedCurrentProvider = useMemo(
+    () => currentProvider ? localizeProviderPreset(currentProvider, i18n.resolvedLanguage) : undefined,
+    [currentProvider, i18n.resolvedLanguage],
+  );
 
   useEffect(() => {
     if (!providersLoading && providers.length > 0 && (!config.anthropicApiProvider || config.anthropicApiProvider === 'zai')) {
@@ -62,7 +71,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
     }
   }, [providersLoading, providers, config.anthropicApiProvider, updateConfig]);
 
-  const validationErrors = useMemo(() => validateConfig(config), [config]);
+  const validationErrors = useMemo(
+    () => validateConfig(config, i18n.resolvedLanguage ?? i18n.language),
+    [config, i18n.language, i18n.resolvedLanguage],
+  );
   const validationMap = useMemo(() => {
     const entries = validationErrors.map((error) => [error.field, error.message] as const);
     return Object.fromEntries(entries);
@@ -114,7 +126,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Settings2 className="size-4" />
-              <span>{t('configForm.profileHelp')}</span>
+              <span>{t('docker-compose:configForm.profileHelp')}</span>
             </div>
             <RadioGroup
               value={config.profile}
@@ -128,10 +140,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 <RadioGroupItem value="quick-start" id="quick-start" className="mt-1" />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 font-medium">
-                    <span>{t('configForm.quickStart')}</span>
-                    <Badge variant="secondary">{t('common.default')}</Badge>
+                    <span>{t('docker-compose:configForm.quickStart')}</span>
+                    <Badge variant="secondary">{t('common:common.default')}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">{t('configForm.quickStartDescription')}</p>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.quickStartDescription')}</p>
                 </div>
               </Label>
               <Label
@@ -140,8 +152,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               >
                 <RadioGroupItem value="full-custom" id="full-custom" className="mt-1" />
                 <div className="space-y-1">
-                  <div className="font-medium">{t('configForm.fullCustom')}</div>
-                  <p className="text-sm text-muted-foreground">{t('configForm.fullCustomDescription')}</p>
+                  <div className="font-medium">{t('docker-compose:configForm.fullCustom')}</div>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.fullCustomDescription')}</p>
                 </div>
               </Label>
             </RadioGroup>
@@ -154,7 +166,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="httpPort">
-                {t('configForm.httpPort')} <span className="text-destructive">*</span>
+                {t('docker-compose:configForm.httpPort')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="httpPort"
@@ -168,7 +180,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
             {config.profile === 'full-custom' ? (
               <div className="space-y-2">
-                <Label htmlFor="containerName">{t('configForm.containerName')}</Label>
+                <Label htmlFor="containerName">{t('docker-compose:configForm.containerName')}</Label>
                 <Input
                   id="containerName"
                   value={config.containerName}
@@ -181,7 +193,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
             {config.profile === 'full-custom' ? (
               <div className="space-y-2">
-                <Label htmlFor="imageTag">{t('configForm.imageTag')}</Label>
+                <Label htmlFor="imageTag">{t('docker-compose:configForm.imageTag')}</Label>
                 <Input
                   id="imageTag"
                   value={config.imageTag}
@@ -194,17 +206,17 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
             {config.profile === 'full-custom' ? (
               <div className="space-y-2">
-                <Label htmlFor="hostOS">{t('configForm.hostOS')}</Label>
+                <Label htmlFor="hostOS">{t('docker-compose:configForm.hostOS')}</Label>
                 <Select
                   value={config.hostOS}
                   onValueChange={(value: 'windows' | 'linux') => updateConfig('hostOS', value)}
                 >
                   <SelectTrigger id="hostOS">
-                    <SelectValue placeholder={t('configForm.selectHostOS')} />
+                    <SelectValue placeholder={t('docker-compose:configForm.selectHostOS')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="windows">{t('configForm.windows')}</SelectItem>
-                    <SelectItem value="linux">{t('configForm.linux')}</SelectItem>
+                    <SelectItem value="windows">{t('docker-compose:configForm.windows')}</SelectItem>
+                    <SelectItem value="linux">{t('docker-compose:configForm.linux')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -213,10 +225,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             <div className="space-y-2 md:col-span-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Label htmlFor="imageRegistry">
-                  {t('configForm.imageRegistry')} <span className="text-destructive">*</span>
+                  {t('docker-compose:configForm.imageRegistry')} <span className="text-destructive">*</span>
                 </Label>
                 <div className="text-sm text-muted-foreground">
-                  {t('configForm.supportHint', {
+                  {t('docker-compose:configForm.supportHint', {
                     groupNumber: NAVIGATION_LINKS.qqGroup.groupNumber,
                   })}
                 </div>
@@ -226,45 +238,45 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 onValueChange={(value: 'docker-hub' | 'azure-acr' | 'aliyun-acr') => updateConfig('imageRegistry', value)}
               >
                 <SelectTrigger id="imageRegistry">
-                  <SelectValue placeholder={t('configForm.selectImageRegistry')} />
+                  <SelectValue placeholder={t('docker-compose:configForm.selectImageRegistry')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="aliyun-acr">
                     <div className="flex items-center gap-2">
-                      <span>{t('configForm.aliyunAcr')}</span>
-                      <Badge variant="secondary">{t('common.recommended')}</Badge>
+                      <span>{t('docker-compose:configForm.aliyunAcr')}</span>
+                      <Badge variant="secondary">{t('common:common.recommended')}</Badge>
                     </div>
                   </SelectItem>
-                  <SelectItem value="docker-hub">{t('configForm.dockerHub')}</SelectItem>
-                  <SelectItem value="azure-acr">{t('configForm.azureContainerRegistry')}</SelectItem>
+                  <SelectItem value="docker-hub">{t('docker-compose:configForm.dockerHub')}</SelectItem>
+                  <SelectItem value="azure-acr">{t('docker-compose:configForm.azureContainerRegistry')}</SelectItem>
                 </SelectContent>
               </Select>
 
               {config.imageRegistry === 'docker-hub' ? (
                 <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                  <p className="font-medium">{t('configForm.dockerOfficialRegistry')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.dockerHubNetworkAdvice')}</p>
+                  <p className="font-medium">{t('docker-compose:configForm.dockerOfficialRegistry')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.dockerHubNetworkAdvice')}</p>
                 </div>
               ) : null}
 
               {config.imageRegistry === 'azure-acr' ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-800 dark:bg-slate-900/70">
-                  <p className="font-medium">{t('configForm.alternativeRegistry')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.azureAcrDescription')}</p>
-                  <p className="text-muted-foreground">{t('configForm.azureAcrNetworkAdvice')}</p>
+                  <p className="font-medium">{t('docker-compose:configForm.alternativeRegistry')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.azureAcrDescription')}</p>
+                  <p className="text-muted-foreground">{t('docker-compose:configForm.azureAcrNetworkAdvice')}</p>
                   <p className="mt-2 text-xs font-mono">
-                    {t('configForm.imageLabel')}: {REGISTRIES['azure-acr'].imagePrefix}:{config.imageTag}
+                    {t('docker-compose:configForm.imageLabel')}: {REGISTRIES['azure-acr'].imagePrefix}:{config.imageTag}
                   </p>
                 </div>
               ) : null}
 
               {config.imageRegistry === 'aliyun-acr' ? (
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-950 dark:bg-emerald-950/25">
-                  <p className="font-medium">{t('configForm.aliyunAcrRecommended')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.aliyunAcrDescription')}</p>
-                  <p className="text-muted-foreground">{t('configForm.aliyunAcrNetworkAdvice')}</p>
+                  <p className="font-medium">{t('docker-compose:configForm.aliyunAcrRecommended')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.aliyunAcrDescription')}</p>
+                  <p className="text-muted-foreground">{t('docker-compose:configForm.aliyunAcrNetworkAdvice')}</p>
                   <p className="mt-2 text-xs font-mono">
-                    {t('configForm.imageLabel')}: {REGISTRIES['aliyun-acr'].imagePrefix}/hagicode:{config.imageTag}
+                    {t('docker-compose:configForm.imageLabel')}: {REGISTRIES['aliyun-acr'].imagePrefix}/hagicode:{config.imageTag}
                   </p>
                 </div>
               ) : null}
@@ -278,10 +290,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
               <Label className="text-base font-semibold">
-                {t('configForm.enabledExecutors')} <span className="text-destructive">*</span>
+                {t('docker-compose:configForm.enabledExecutors')} <span className="text-destructive">*</span>
               </Label>
-              <p className="mt-2 text-sm text-muted-foreground">{t('configForm.parallelEnablementHint')}</p>
-              <p className="text-sm text-muted-foreground">{t('configForm.explicitExecutorHint')}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{t('docker-compose:configForm.parallelEnablementHint')}</p>
+              <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.explicitExecutorHint')}</p>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <ExecutorToggle
                   id="executor-claude"
@@ -309,16 +321,16 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             </div>
 
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
-              <p className="font-medium">{t('configForm.communitySupportTitle')}</p>
-              <p className="mt-1 text-muted-foreground">{t('configForm.communitySupportDescription')}</p>
-              <p className="mt-3 text-muted-foreground">{t('configForm.communityContributeBuilder')}</p>
-              <p className="text-muted-foreground">{t('configForm.communityContributeRelease')}</p>
+              <p className="font-medium">{t('docker-compose:configForm.communitySupportTitle')}</p>
+              <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.communitySupportDescription')}</p>
+              <p className="mt-3 text-muted-foreground">{t('docker-compose:configForm.communityContributeBuilder')}</p>
+              <p className="text-muted-foreground">{t('docker-compose:configForm.communityContributeRelease')}</p>
             </div>
 
             <div id="executor-eula" tabIndex={-1} className={subSectionClass}>
               <div>
-                <h4 className="text-base font-semibold">{t('configForm.eulaConfiguration')}</h4>
-                <p className="text-sm text-muted-foreground">{t('configForm.eulaDescription')}</p>
+                <h4 className="text-base font-semibold">{t('docker-compose:configForm.eulaConfiguration')}</h4>
+                <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.eulaDescription')}</p>
               </div>
 
               <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
@@ -330,9 +342,9 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   />
                   <div className="space-y-2">
                     <Label htmlFor="acceptEula" className="cursor-pointer text-sm font-medium">
-                      {t('configForm.acceptEula')}
+                      {t('docker-compose:configForm.acceptEula')}
                     </Label>
-                    <p className="text-sm text-muted-foreground">{t('configForm.acceptEulaHint')}</p>
+                    <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.acceptEulaHint')}</p>
                     <div className="flex flex-wrap items-center gap-3">
                       <a
                         href={eulaDocsUrl}
@@ -341,9 +353,9 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-opacity hover:opacity-80"
                       >
                         <ExternalLink className="size-4" />
-                        <span>{t('configForm.readEula')}</span>
+                        <span>{t('docker-compose:configForm.readEula')}</span>
                       </a>
-                      <span className="text-xs text-muted-foreground">{t('configForm.acceptEulaSharedStateHint')}</span>
+                      <span className="text-xs text-muted-foreground">{t('docker-compose:configForm.acceptEulaSharedStateHint')}</span>
                     </div>
                   </div>
                 </div>
@@ -353,28 +365,28 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             {claudeEnabled ? (
               <div id="executor-claude" tabIndex={-1} className={subSectionClass}>
                 <div>
-                  <h4 className="text-base font-semibold">{t('configForm.claudeConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.unifiedUseOfToken')}</p>
+                  <h4 className="text-base font-semibold">{t('docker-compose:configForm.claudeConfiguration')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.unifiedUseOfToken')}</p>
                 </div>
 
                 {providersLoading ? (
                   <div className="flex items-center gap-2 rounded-xl bg-background/80 p-3 text-sm text-muted-foreground">
                     <Loader2 className="size-4 animate-spin" />
-                    <span>{t('workspace.providersLoading')}</span>
+                    <span>{t('common:workspace.providersLoading')}</span>
                   </div>
                 ) : null}
 
                 {providersError ? (
                   <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
                     <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                    <span>{t('workspace.providersError', { message: providersError })}</span>
+                    <span>{t('common:workspace.providersError', { message: providersError })}</span>
                   </div>
                 ) : null}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="apiProvider">
-                      {t('configForm.apiProvider')} <span className="text-destructive">*</span>
+                      {t('docker-compose:configForm.apiProvider')} <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={config.anthropicApiProvider}
@@ -394,14 +406,14 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       disabled={providersLoading || providers.length === 0}
                     >
                       <SelectTrigger id="apiProvider">
-                        <SelectValue placeholder={t('configForm.selectApiProvider')} />
+                        <SelectValue placeholder={t('docker-compose:configForm.selectApiProvider')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {providers.map((provider) => (
+                        {localizedProviders.map((provider) => (
                           <SelectItem key={provider.providerId} value={provider.providerId}>
                             <div className="flex items-center gap-2">
                               <span>{provider.name}</span>
-                              {provider.recommended ? <Badge variant="secondary">{t('common.recommended')}</Badge> : null}
+                              {provider.recommended ? <Badge variant="secondary">{t('common:common.recommended')}</Badge> : null}
                             </div>
                           </SelectItem>
                         ))}
@@ -416,7 +428,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
                       >
                         <Sparkles className="size-4" />
-                        <span>{t('configForm.getApiToken')}</span>
+                        <span>{t('docker-compose:configForm.getApiToken')}</span>
                       </a>
                     ) : null}
                   </div>
@@ -425,7 +437,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     {config.anthropicApiProvider === 'custom' ? (
                       <>
                         <Label htmlFor="anthropicUrl">
-                          {t('configForm.apiEndpointUrl')} <span className="text-destructive">*</span>
+                          {t('docker-compose:configForm.apiEndpointUrl')} <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           id="anthropicUrl"
@@ -441,7 +453,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="anthropicAuthToken">
-                    {t('configForm.apiToken')} <span className="text-destructive">*</span>
+                    {t('docker-compose:configForm.apiToken')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="anthropicAuthToken"
@@ -450,24 +462,27 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     onChange={(event) => updateConfig('anthropicAuthToken', event.target.value)}
                     placeholder={
                       currentProvider?.providerId === 'anthropic'
-                        ? t('configForm.enterAnthropicApiToken')
-                        : t('configForm.enterApiToken')
+                        ? t('docker-compose:configForm.enterAnthropicApiToken')
+                        : t('docker-compose:configForm.enterApiToken')
                     }
                   />
                   {renderFieldError('anthropicAuthToken')}
 
-                  {currentProvider && config.anthropicApiProvider !== 'custom' ? (
+                  {currentProvider && localizedCurrentProvider && config.anthropicApiProvider !== 'custom' ? (
                     <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
                       {currentProvider.providerId === 'anthropic' ? (
-                        <p>{t('configForm.usingOfficialApi')}</p>
+                        <p>{t('docker-compose:configForm.usingOfficialApi')}</p>
                       ) : (
                         <>
-                          <p>{t('configForm.apiEndpointAutoSet')}: {currentProvider.apiUrl.codingPlanForAnthropic}</p>
-                          {currentProvider.description ? (
-                            <p className="mt-1 text-xs text-muted-foreground">{currentProvider.description}</p>
+                          <p>{t('docker-compose:configForm.apiEndpointAutoSet')}: {currentProvider.apiUrl.codingPlanForAnthropic}</p>
+                          {localizedCurrentProvider.description ? (
+                            <p className="mt-1 text-xs text-muted-foreground">{localizedCurrentProvider.description}</p>
                           ) : null}
-                          {currentProvider.notes ? (
-                            <p className="mt-1 text-xs text-muted-foreground">{currentProvider.notes}</p>
+                          {localizedCurrentProvider.notes ? (
+                            <p className="mt-1 text-xs text-muted-foreground">{localizedCurrentProvider.notes}</p>
+                          ) : null}
+                          {localizedCurrentProvider.networkAdvice ? (
+                            <p className="mt-1 text-xs text-muted-foreground">{localizedCurrentProvider.networkAdvice}</p>
                           ) : null}
                         </>
                       )}
@@ -476,7 +491,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
                   {config.anthropicApiProvider === 'custom' ? (
                     <div className="rounded-2xl border border-border/60 bg-background/80 p-4 text-sm">
-                      <p>{t('configForm.usingCustomEndpoint')}</p>
+                      <p>{t('docker-compose:configForm.usingCustomEndpoint')}</p>
                     </div>
                   ) : null}
                 </div>
@@ -484,12 +499,12 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 {config.profile === 'full-custom' ? (
                   <div className="space-y-4 rounded-2xl border border-border/60 bg-background/80 p-4">
                     <div>
-                      <h5 className="text-sm font-semibold">{t('configForm.claudeCodeExtendedConfig')}</h5>
-                      <p className="text-sm text-muted-foreground">{t('configForm.claudeCodeExtendedConfigDescription')}</p>
+                      <h5 className="text-sm font-semibold">{t('docker-compose:configForm.claudeCodeExtendedConfig')}</h5>
+                      <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.claudeCodeExtendedConfigDescription')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      <FieldBlock label={t('configForm.anthropicSonnetModel')} htmlFor="anthropicSonnetModel">
+                      <FieldBlock label={t('docker-compose:configForm.anthropicSonnetModel')} htmlFor="anthropicSonnetModel">
                         <Input
                           id="anthropicSonnetModel"
                           type="text"
@@ -497,10 +512,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           onChange={(event) => updateConfig('anthropicSonnetModel', event.target.value || undefined)}
                           placeholder="claude-sonnet-4-20250514"
                         />
-                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicSonnetModelHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.anthropicSonnetModelHint')}</p>
                       </FieldBlock>
 
-                      <FieldBlock label={t('configForm.anthropicOpusModel')} htmlFor="anthropicOpusModel">
+                      <FieldBlock label={t('docker-compose:configForm.anthropicOpusModel')} htmlFor="anthropicOpusModel">
                         <Input
                           id="anthropicOpusModel"
                           type="text"
@@ -508,10 +523,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           onChange={(event) => updateConfig('anthropicOpusModel', event.target.value || undefined)}
                           placeholder="claude-opus-4-20250514"
                         />
-                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicOpusModelHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.anthropicOpusModelHint')}</p>
                       </FieldBlock>
 
-                      <FieldBlock label={t('configForm.anthropicHaikuModel')} htmlFor="anthropicHaikuModel">
+                      <FieldBlock label={t('docker-compose:configForm.anthropicHaikuModel')} htmlFor="anthropicHaikuModel">
                         <Input
                           id="anthropicHaikuModel"
                           type="text"
@@ -519,7 +534,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           onChange={(event) => updateConfig('anthropicHaikuModel', event.target.value || undefined)}
                           placeholder="claude-haiku-4-20250514"
                         />
-                        <p className="text-xs text-muted-foreground">{t('configForm.anthropicHaikuModelHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.anthropicHaikuModelHint')}</p>
                       </FieldBlock>
                     </div>
 
@@ -531,9 +546,9 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       />
                       <div>
                         <Label htmlFor="claudeCodeExperimentalAgentTeams" className="cursor-pointer">
-                          {t('configForm.claudeCodeExperimentalAgentTeams')}
+                          {t('docker-compose:configForm.claudeCodeExperimentalAgentTeams')}
                         </Label>
-                        <p className="text-xs text-muted-foreground">{t('configForm.claudeCodeExperimentalAgentTeamsHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.claudeCodeExperimentalAgentTeamsHint')}</p>
                       </div>
                     </div>
                   </div>
@@ -544,8 +559,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             {codexEnabled ? (
               <div id="executor-codex" tabIndex={-1} className={subSectionClass}>
                 <div>
-                  <h4 className="text-base font-semibold">{t('configForm.codexConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.codexDescription')}</p>
+                  <h4 className="text-base font-semibold">{t('docker-compose:configForm.codexConfiguration')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.codexDescription')}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -562,7 +577,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="codexBaseUrl">CODEX_BASE_URL ({t('configForm.optional')})</Label>
+                    <Label htmlFor="codexBaseUrl">CODEX_BASE_URL ({t('docker-compose:configForm.optional')})</Label>
                     <Input
                       id="codexBaseUrl"
                       type="text"
@@ -573,8 +588,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   </div>
 
                   <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                    <p className="font-medium">{t('configForm.compatibilityAliasHint')}</p>
-                    <p className="mt-1 text-muted-foreground">{t('configForm.codexCompatibilityDescription')}</p>
+                    <p className="font-medium">{t('docker-compose:configForm.compatibilityAliasHint')}</p>
+                    <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.codexCompatibilityDescription')}</p>
                     <p className="mt-2 text-xs font-mono">
                       OPENAI_API_KEY = CODEX_API_KEY
                       <br />
@@ -588,12 +603,12 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             {openCodeEnabled ? (
               <div id="executor-opencode" tabIndex={-1} className={subSectionClass}>
                 <div>
-                  <h4 className="text-base font-semibold">{t('configForm.openCodeConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.openCodeDescription')}</p>
+                  <h4 className="text-base font-semibold">{t('docker-compose:configForm.openCodeConfiguration')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.openCodeDescription')}</p>
                 </div>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="openCodeModel">{t('configForm.openCodeModel')}</Label>
+                    <Label htmlFor="openCodeModel">{t('docker-compose:configForm.openCodeModel')}</Label>
                     <Input
                       id="openCodeModel"
                       type="text"
@@ -601,13 +616,13 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       onChange={(event) => updateConfig('openCodeModel', event.target.value || undefined)}
                       placeholder="anthropic/claude-sonnet-4"
                     />
-                    <p className="text-sm text-muted-foreground">{t('configForm.openCodeModelHint')}</p>
+                    <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.openCodeModelHint')}</p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="space-y-1">
-                      <Label>{t('configForm.openCodeConfigSource')}</Label>
-                      <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigSourceHint')}</p>
+                      <Label>{t('docker-compose:configForm.openCodeConfigSource')}</Label>
+                      <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.openCodeConfigSourceHint')}</p>
                     </div>
                     <RadioGroup
                       value={config.openCodeConfigMode}
@@ -621,10 +636,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         <RadioGroupItem value="default-managed" id="openCodeConfigMode-default-managed" className="mt-1" />
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 font-medium">
-                            <span>{t('configForm.openCodeConfigModeDefault')}</span>
-                            <Badge variant="secondary">{t('common.recommended')}</Badge>
+                            <span>{t('docker-compose:configForm.openCodeConfigModeDefault')}</span>
+                            <Badge variant="secondary">{t('common:common.recommended')}</Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigModeDefaultHint')}</p>
+                          <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.openCodeConfigModeDefaultHint')}</p>
                         </div>
                       </Label>
                       <Label
@@ -633,8 +648,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       >
                         <RadioGroupItem value="host-file" id="openCodeConfigMode-host-file" className="mt-1" />
                         <div className="space-y-1">
-                          <div className="font-medium">{t('configForm.openCodeConfigModeHostFile')}</div>
-                          <p className="text-sm text-muted-foreground">{t('configForm.openCodeConfigModeHostFileHint')}</p>
+                          <div className="font-medium">{t('docker-compose:configForm.openCodeConfigModeHostFile')}</div>
+                          <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.openCodeConfigModeHostFileHint')}</p>
                         </div>
                       </Label>
                     </RadioGroup>
@@ -644,7 +659,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="openCodeConfigHostPath">
-                          {t('configForm.openCodeConfigHostPath')} <span className="text-destructive">*</span>
+                          {t('docker-compose:configForm.openCodeConfigHostPath')} <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           id="openCodeConfigHostPath"
@@ -657,7 +672,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         />
                         {renderFieldError('openCodeConfigHostPath')}
                         <p className="text-sm text-muted-foreground">
-                          {t('configForm.openCodeConfigHostPathHint', {
+                          {t('docker-compose:configForm.openCodeConfigHostPathHint', {
                             example: config.hostOS === 'windows'
                               ? 'C:\\opencode\\opencode.json'
                               : '/srv/opencode/opencode.json'
@@ -667,8 +682,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
                       <div className="space-y-2">
                         <Label htmlFor="openCodeAuthHostPath" className="flex items-center gap-2">
-                          <span>{t('configForm.openCodeAuthHostPath')}</span>
-                          <Badge variant="outline">{t('configForm.optional')}</Badge>
+                          <span>{t('docker-compose:configForm.openCodeAuthHostPath')}</span>
+                          <Badge variant="outline">{t('docker-compose:configForm.optional')}</Badge>
                         </Label>
                         <Input
                           id="openCodeAuthHostPath"
@@ -681,7 +696,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         />
                         {renderFieldError('openCodeAuthHostPath')}
                         <p className="text-sm text-muted-foreground">
-                          {t('configForm.openCodeAuthHostPathHint', {
+                          {t('docker-compose:configForm.openCodeAuthHostPathHint', {
                             example: config.hostOS === 'windows'
                               ? 'C:\\opencode\\auth.json'
                               : '/srv/opencode/auth.json'
@@ -691,8 +706,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
                       <div className="space-y-2">
                         <Label htmlFor="openCodeModelsHostPath" className="flex items-center gap-2">
-                          <span>{t('configForm.openCodeModelsHostPath')}</span>
-                          <Badge variant="outline">{t('configForm.optional')}</Badge>
+                          <span>{t('docker-compose:configForm.openCodeModelsHostPath')}</span>
+                          <Badge variant="outline">{t('docker-compose:configForm.optional')}</Badge>
                         </Label>
                         <Input
                           id="openCodeModelsHostPath"
@@ -705,7 +720,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         />
                         {renderFieldError('openCodeModelsHostPath')}
                         <p className="text-sm text-muted-foreground">
-                          {t('configForm.openCodeModelsHostPathHint', {
+                          {t('docker-compose:configForm.openCodeModelsHostPathHint', {
                             example: config.hostOS === 'windows'
                               ? 'C:\\opencode\\models.json'
                               : '/srv/opencode/models.json'
@@ -714,23 +729,23 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       </div>
 
                       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
-                        <p className="font-medium">{t('configForm.openCodeConfigBrowserLimitTitle')}</p>
-                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigBrowserLimitHint')}</p>
-                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigManualPriorityHint')}</p>
-                        <p className="mt-1 text-muted-foreground">{t('configForm.openCodeAdditionalHostFilesHint')}</p>
+                        <p className="font-medium">{t('docker-compose:configForm.openCodeConfigBrowserLimitTitle')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeConfigBrowserLimitHint')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeConfigManualPriorityHint')}</p>
+                        <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeAdditionalHostFilesHint')}</p>
                       </div>
                     </div>
                   ) : (
                     <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                      <p className="font-medium">{t('configForm.openCodeManagedVolumeTitle')}</p>
-                      <p className="mt-1 text-muted-foreground">{t('configForm.openCodeManagedVolumeHint')}</p>
+                      <p className="font-medium">{t('docker-compose:configForm.openCodeManagedVolumeTitle')}</p>
+                      <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeManagedVolumeHint')}</p>
                     </div>
                   )}
 
                   <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
-                    <p className="font-medium">{t('configForm.openCodeConfigAuthWarningTitle')}</p>
-                    <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigAuthWarningHint')}</p>
-                    <p className="mt-1 text-muted-foreground">{t('configForm.openCodeConfigAuthMigrationHint')}</p>
+                    <p className="font-medium">{t('docker-compose:configForm.openCodeConfigAuthWarningTitle')}</p>
+                    <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeConfigAuthWarningHint')}</p>
+                    <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.openCodeConfigAuthMigrationHint')}</p>
                   </div>
                 </div>
               </div>
@@ -739,8 +754,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             {config.profile === 'full-custom' ? (
               <div id="executor-code-server" tabIndex={-1} className={subSectionClass}>
                 <div>
-                  <h4 className="text-base font-semibold">{t('configForm.codeServerConfiguration')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('configForm.codeServerDescription')}</p>
+                  <h4 className="text-base font-semibold">{t('docker-compose:configForm.codeServerConfiguration')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.codeServerDescription')}</p>
                 </div>
 
                 <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
@@ -752,29 +767,29 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     />
                     <div className="space-y-1">
                       <Label htmlFor="enableCodeServer" className="cursor-pointer text-sm font-medium">
-                        {t('configForm.codeServerEnable')}
+                        {t('docker-compose:configForm.codeServerEnable')}
                       </Label>
-                      <p className="text-sm text-muted-foreground">{t('configForm.codeServerEnableHint')}</p>
+                      <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.codeServerEnableHint')}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                  <p className="font-medium">{t('configForm.codeServerPrivateTitle')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPrivateHint')}</p>
+                  <p className="font-medium">{t('docker-compose:configForm.codeServerPrivateTitle')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.codeServerPrivateHint')}</p>
                 </div>
 
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-950 dark:bg-emerald-950/25">
-                  <p className="font-medium">{t('configForm.codeServerPersistenceTitle')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPersistenceHint')}</p>
-                  <p className="mt-2 text-xs font-mono">{t('configForm.codeServerPersistencePathValue')}</p>
-                  <p className="mt-2 text-xs font-mono">{t('configForm.codeServerSaveStatePathValue')}</p>
+                  <p className="font-medium">{t('docker-compose:configForm.codeServerPersistenceTitle')}</p>
+                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.codeServerPersistenceHint')}</p>
+                  <p className="mt-2 text-xs font-mono">{t('docker-compose:configForm.codeServerPersistencePathValue')}</p>
+                  <p className="mt-2 text-xs font-mono">{t('docker-compose:configForm.codeServerSaveStatePathValue')}</p>
                 </div>
 
                 {config.enableCodeServer ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <FieldBlock label={t('configForm.codeServerHost')} htmlFor="codeServerHost">
+                      <FieldBlock label={t('docker-compose:configForm.codeServerHost')} htmlFor="codeServerHost">
                         <Input
                           id="codeServerHost"
                           type="text"
@@ -783,10 +798,10 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           placeholder="127.0.0.1"
                         />
                         {renderFieldError('codeServerHost')}
-                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerHostHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.codeServerHostHint')}</p>
                       </FieldBlock>
 
-                      <FieldBlock label={t('configForm.codeServerPort')} htmlFor="codeServerPort">
+                      <FieldBlock label={t('docker-compose:configForm.codeServerPort')} htmlFor="codeServerPort">
                         <Input
                           id="codeServerPort"
                           type="number"
@@ -795,30 +810,30 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           placeholder="36529"
                         />
                         {renderFieldError('codeServerPort')}
-                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerPortHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.codeServerPortHint')}</p>
                       </FieldBlock>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <FieldBlock label={t('configForm.codeServerAuthMode')} htmlFor="codeServerAuthMode">
+                      <FieldBlock label={t('docker-compose:configForm.codeServerAuthMode')} htmlFor="codeServerAuthMode">
                         <Select
                           value={config.codeServerAuthMode}
                           onValueChange={(value: DockerComposeConfig['codeServerAuthMode']) => updateConfig('codeServerAuthMode', value)}
                         >
                           <SelectTrigger id="codeServerAuthMode">
-                            <SelectValue placeholder={t('configForm.codeServerAuthMode')} />
+                            <SelectValue placeholder={t('docker-compose:configForm.codeServerAuthMode')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="none">{t('configForm.codeServerAuthModeNone')}</SelectItem>
-                            <SelectItem value="password">{t('configForm.codeServerAuthModePassword')}</SelectItem>
+                            <SelectItem value="none">{t('docker-compose:configForm.codeServerAuthModeNone')}</SelectItem>
+                            <SelectItem value="password">{t('docker-compose:configForm.codeServerAuthModePassword')}</SelectItem>
                           </SelectContent>
                         </Select>
                         {renderFieldError('codeServerAuthMode')}
-                        <p className="text-xs text-muted-foreground">{t('configForm.codeServerAuthModeHint')}</p>
+                        <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.codeServerAuthModeHint')}</p>
                       </FieldBlock>
 
                       {config.codeServerAuthMode === 'password' ? (
-                        <FieldBlock label={t('configForm.codeServerPassword')} htmlFor="codeServerPassword">
+                        <FieldBlock label={t('docker-compose:configForm.codeServerPassword')} htmlFor="codeServerPassword">
                           <Input
                             id="codeServerPassword"
                             type="password"
@@ -827,12 +842,12 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                             placeholder="change-me"
                           />
                           {renderFieldError('codeServerPassword')}
-                          <p className="text-xs text-muted-foreground">{t('configForm.codeServerPasswordHint')}</p>
+                          <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.codeServerPasswordHint')}</p>
                         </FieldBlock>
                       ) : (
                         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
-                          <p className="font-medium">{t('configForm.codeServerAuthModeNone')}</p>
-                          <p className="mt-1">{t('configForm.codeServerPasswordSkippedHint')}</p>
+                          <p className="font-medium">{t('docker-compose:configForm.codeServerAuthModeNone')}</p>
+                          <p className="mt-1">{t('docker-compose:configForm.codeServerPasswordSkippedHint')}</p>
                         </div>
                       )}
                     </div>
@@ -846,15 +861,15 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                         />
                         <div className="space-y-1">
                           <Label htmlFor="codeServerPublishToHost" className="cursor-pointer text-sm font-medium">
-                            {t('configForm.codeServerPublishToHost')}
+                            {t('docker-compose:configForm.codeServerPublishToHost')}
                           </Label>
-                          <p className="text-sm text-muted-foreground">{t('configForm.codeServerPublishToHostHint')}</p>
+                          <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.codeServerPublishToHostHint')}</p>
                         </div>
                       </div>
 
                       {config.codeServerPublishToHost ? (
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          <FieldBlock label={t('configForm.codeServerPublishedPort')} htmlFor="codeServerPublishedPort">
+                          <FieldBlock label={t('docker-compose:configForm.codeServerPublishedPort')} htmlFor="codeServerPublishedPort">
                             <Input
                               id="codeServerPublishedPort"
                               type="number"
@@ -863,13 +878,13 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                               placeholder="36529"
                             />
                             {renderFieldError('codeServerPublishedPort')}
-                            <p className="text-xs text-muted-foreground">{t('configForm.codeServerPublishedPortHint')}</p>
+                            <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.codeServerPublishedPortHint')}</p>
                           </FieldBlock>
 
                           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                            <p className="font-medium">{t('configForm.codeServerPublishBindTitle')}</p>
-                            <p className="mt-1 text-muted-foreground">{t('configForm.codeServerPublishBindHint')}</p>
-                            <p className="mt-2 text-xs font-mono">{t('configForm.codeServerPublishBindValue')}</p>
+                            <p className="font-medium">{t('docker-compose:configForm.codeServerPublishBindTitle')}</p>
+                            <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.codeServerPublishBindHint')}</p>
+                            <p className="mt-2 text-xs font-mono">{t('docker-compose:configForm.codeServerPublishBindValue')}</p>
                           </div>
                         </div>
                       ) : null}
@@ -877,8 +892,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-dashed border-border/70 bg-muted/15 p-4 text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground">{t('configForm.codeServerDisabledTitle')}</p>
-                    <p className="mt-1">{t('configForm.codeServerDisabledHint')}</p>
+                    <p className="font-medium text-foreground">{t('docker-compose:configForm.codeServerDisabledTitle')}</p>
+                    <p className="mt-1">{t('docker-compose:configForm.codeServerDisabledHint')}</p>
                   </div>
                 )}
               </div>
@@ -894,7 +909,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
           action={
             getSection('https')!.errorCount > 0 ? (
               <Button type="button" variant="outline" size="sm" onClick={() => onSelectSection('https')}>
-                {t('workspace.resolveSection')}
+                {t('common:workspace.resolveSection')}
               </Button>
             ) : null
           }
@@ -912,13 +927,13 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
           <div className="space-y-6">
             <div className={subSectionClass}>
               <div>
-                <h4 className="text-base font-semibold">{t('configForm.volumeMounts')}</h4>
-                <p className="text-sm text-muted-foreground">{t('configForm.workdirDescription')}</p>
+                <h4 className="text-base font-semibold">{t('docker-compose:configForm.volumeMounts')}</h4>
+                <p className="text-sm text-muted-foreground">{t('docker-compose:configForm.workdirDescription')}</p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="workdirPath">
-                  {t('configForm.workdirPath')} <span className="text-destructive">*</span>
+                  {t('docker-compose:configForm.workdirPath')} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="workdirPath"
@@ -927,15 +942,15 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                   placeholder={config.hostOS === 'windows' ? 'C:\\repos' : '/home/user/repos'}
                 />
                 {renderFieldError('workdirPath')}
-                <p className="text-xs text-muted-foreground">{t('configForm.workdirRecommendation')}</p>
+                <p className="text-xs text-muted-foreground">{t('docker-compose:configForm.workdirRecommendation')}</p>
               </div>
 
               <div className="rounded-2xl border border-border/60 bg-background/80 p-4">
                 <div className="flex items-center gap-3">
                   <FolderOpenDot className="size-4 text-primary" />
-                  <span className="text-sm font-medium">{t('workspace.repositoryHint')}</span>
+                  <span className="text-sm font-medium">{t('common:workspace.repositoryHint')}</span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{t('workspace.repositoryHintDescription')}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{t('common:workspace.repositoryHintDescription')}</p>
               </div>
 
               {config.hostOS === 'linux' && config.profile === 'full-custom' ? (
@@ -947,35 +962,35 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                       onCheckedChange={(checked) => updateConfig('workdirCreatedByRoot', checked as boolean)}
                     />
                     <Label htmlFor="workdirCreatedByRoot" className="cursor-pointer">
-                      {t('configForm.workdirCreatedByRoot')}
+                      {t('docker-compose:configForm.workdirCreatedByRoot')}
                     </Label>
                   </div>
 
                   {config.workdirCreatedByRoot ? (
                     <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm dark:border-red-950 dark:bg-red-950/25">
-                      <p className="font-medium text-red-800 dark:text-red-200">{t('configForm.permissionIssueWarning')}</p>
-                      <p className="mt-2 text-red-700 dark:text-red-300">{t('configForm.permissionIssueDescription')}</p>
+                      <p className="font-medium text-red-800 dark:text-red-200">{t('docker-compose:configForm.permissionIssueWarning')}</p>
+                      <p className="mt-2 text-red-700 dark:text-red-300">{t('docker-compose:configForm.permissionIssueDescription')}</p>
                       <ul className="mt-2 list-disc space-y-1 pl-5 text-red-700 dark:text-red-300">
                         <li>
-                          {t('configForm.changeDirPermissions')}{' '}
+                          {t('docker-compose:configForm.changeDirPermissions')}{' '}
                           <code className="rounded bg-red-100 px-1 dark:bg-red-900">chmod 777 /path/to/repos</code>
                         </li>
-                        <li>{t('configForm.createNonRootUser')}</li>
+                        <li>{t('docker-compose:configForm.createNonRootUser')}</li>
                       </ul>
                     </div>
                   ) : (
                     <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
-                      <p className="font-medium">{t('configForm.configureUserPermission')}</p>
-                      <p className="mt-2 text-muted-foreground">{t('configForm.configureUserPermissionDescription')}</p>
+                      <p className="font-medium">{t('docker-compose:configForm.configureUserPermission')}</p>
+                      <p className="mt-2 text-muted-foreground">{t('docker-compose:configForm.configureUserPermissionDescription')}</p>
                       <p className="mt-2 text-muted-foreground">
-                        {t('configForm.getCurrentUserId')}{' '}
+                        {t('docker-compose:configForm.getCurrentUserId')}{' '}
                         <code className="rounded bg-blue-100 px-1 dark:bg-blue-900">id username</code>
                         <br />
-                        {t('configForm.outputExample')}{' '}
+                        {t('docker-compose:configForm.outputExample')}{' '}
                         <code className="rounded bg-blue-100 px-1 dark:bg-blue-900">uid=1000(user) gid=1000(user)</code>
                       </p>
                       <div className="mt-4 grid grid-cols-2 gap-4">
-                        <FieldBlock label={`${t('configForm.puid')} *`} htmlFor="puid">
+                        <FieldBlock label={`${t('docker-compose:configForm.puid')} *`} htmlFor="puid">
                           <Input
                             id="puid"
                             value={config.puid}
@@ -984,7 +999,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                           />
                           {renderFieldError('puid')}
                         </FieldBlock>
-                        <FieldBlock label={`${t('configForm.pgid')} *`} htmlFor="pgid">
+                        <FieldBlock label={`${t('docker-compose:configForm.pgid')} *`} htmlFor="pgid">
                           <Input
                             id="pgid"
                             value={config.pgid}
@@ -999,8 +1014,8 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
 
                   {config.workdirCreatedByRoot ? (
                     <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-950 dark:bg-amber-950/25">
-                      <p className="font-medium text-amber-800 dark:text-amber-200">{t('configForm.permissionNotRequired')}</p>
-                      <p className="mt-2 text-amber-700 dark:text-amber-300">{t('configForm.permissionNotRequiredDescription')}</p>
+                      <p className="font-medium text-amber-800 dark:text-amber-200">{t('docker-compose:configForm.permissionNotRequired')}</p>
+                      <p className="mt-2 text-amber-700 dark:text-amber-300">{t('docker-compose:configForm.permissionNotRequiredDescription')}</p>
                     </div>
                   ) : null}
                 </div>
@@ -1010,28 +1025,28 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
             {config.profile === 'full-custom' ? (
               <div className={subSectionClass}>
                 <div>
-                  <h4 className="text-base font-semibold">{t('configForm.licenseConfig')}</h4>
-                  <p className="text-sm text-muted-foreground">{t('workspace.licenseDescription')}</p>
+                  <h4 className="text-base font-semibold">{t('docker-compose:configForm.licenseConfig')}</h4>
+                  <p className="text-sm text-muted-foreground">{t('common:workspace.licenseDescription')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FieldBlock label={t('configForm.licenseKeyType')} htmlFor="licenseKeyType">
+                  <FieldBlock label={t('docker-compose:configForm.licenseKeyType')} htmlFor="licenseKeyType">
                     <Select
                       value={config.licenseKeyType}
                       onValueChange={(value: 'public' | 'custom') => updateConfig('licenseKeyType', value)}
                     >
                       <SelectTrigger id="licenseKeyType">
-                        <SelectValue placeholder={t('configForm.selectLicenseType')} />
+                        <SelectValue placeholder={t('docker-compose:configForm.selectLicenseType')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="public">{t('configForm.publicTestKey')}</SelectItem>
-                        <SelectItem value="custom">{t('configForm.customKey')}</SelectItem>
+                        <SelectItem value="public">{t('docker-compose:configForm.publicTestKey')}</SelectItem>
+                        <SelectItem value="custom">{t('docker-compose:configForm.customKey')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FieldBlock>
 
                   {config.licenseKeyType === 'custom' ? (
-                    <FieldBlock label={t('configForm.customLicenseKey')} htmlFor="licenseKey">
+                    <FieldBlock label={t('docker-compose:configForm.customLicenseKey')} htmlFor="licenseKey">
                       <Input
                         id="licenseKey"
                         value={config.licenseKey}

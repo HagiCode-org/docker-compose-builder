@@ -36,7 +36,7 @@ export function CaddyfilePreview({ content, generatedAt, serviceCount }: Caddyfi
     <div className="rounded-lg border bg-background/60">
       <div className="px-3 py-2 border-b flex items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-medium">{t('configForm.caddyPreviewTitle')}</p>
+          <p className="text-sm font-medium">{t('docker-compose:configForm.caddyPreviewTitle')}</p>
           <p className="text-xs text-muted-foreground">
             {lineCount} lines · {serviceCount} service · {generatedAt.toLocaleString()}
           </p>
@@ -46,10 +46,10 @@ export function CaddyfilePreview({ content, generatedAt, serviceCount }: Caddyfi
             {copyStatus === 'success' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             <span className="ml-1">
               {copyStatus === 'success'
-                ? t('configForm.caddyPreviewCopied')
+                ? t('docker-compose:configForm.caddyPreviewCopied')
                 : copyStatus === 'error'
-                  ? t('configForm.caddyPreviewRetryCopy')
-                  : t('configForm.caddyPreviewCopy')}
+                  ? t('docker-compose:configForm.caddyPreviewRetryCopy')
+                  : t('docker-compose:configForm.caddyPreviewCopy')}
             </span>
           </Button>
           <Collapsible open={expanded} onOpenChange={setExpanded}>
@@ -64,7 +64,7 @@ export function CaddyfilePreview({ content, generatedAt, serviceCount }: Caddyfi
       </div>
       {copyStatus === 'error' && (
         <p className="px-3 py-1 text-xs text-red-600 dark:text-red-400">
-          {t('configForm.caddyPreviewCopyError')}
+          {t('docker-compose:configForm.caddyPreviewCopyError')}
         </p>
       )}
       {expanded && (
@@ -78,7 +78,7 @@ export function CaddyfilePreview({ content, generatedAt, serviceCount }: Caddyfi
             {content}
           </SyntaxHighlighter>
           <p className="text-xs text-muted-foreground mt-2">
-            {t('configForm.caddyPreviewTlsHint')}
+            {t('docker-compose:configForm.caddyPreviewTlsHint')}
           </p>
         </div>
       )}

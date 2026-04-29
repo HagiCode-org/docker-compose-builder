@@ -50,9 +50,9 @@ export function CertificateGuide({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="text-xs text-muted-foreground space-y-1 mt-1">
-            <p>{t('configForm.certificateStep1')}</p>
-            <p>{t('configForm.certificateStep2')}</p>
-            <p>{t('configForm.certificateStep3')}</p>
+            <p>{t('docker-compose:configForm.certificateStep1')}</p>
+            <p>{t('docker-compose:configForm.certificateStep2')}</p>
+            <p>{t('docker-compose:configForm.certificateStep3')}</p>
             <a className="text-primary underline" href={docsHref} target="_blank" rel="noopener noreferrer">
               {docsLabel}
             </a>
