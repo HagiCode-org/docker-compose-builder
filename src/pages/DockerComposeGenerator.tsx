@@ -41,7 +41,10 @@ export function DockerComposeGenerator() {
   const config = useSelector(selectConfig);
   const [activeNavTargetId, setActiveNavTargetId] = useState<WorkspaceSectionId | WorkspaceSectionChildId | undefined>();
 
-  const validationErrors = useMemo(() => validateConfig(config), [config]);
+  const validationErrors = useMemo(
+    () => validateConfig(config, i18n.resolvedLanguage ?? i18n.language),
+    [config, i18n.language, i18n.resolvedLanguage],
+  );
   const baseSections = useMemo(
     () => getWorkspaceSections(config, validationErrors),
     [config, validationErrors]
@@ -178,8 +181,8 @@ export function DockerComposeGenerator() {
                 <Dock className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-lg font-bold tracking-tight">{t('header.title')}</h1>
-                <p className="hidden text-sm text-muted-foreground sm:block">{t('workspace.headerSubtitle')}</p>
+                <h1 className="text-lg font-bold tracking-tight">{t('common:header.title')}</h1>
+                <p className="hidden text-sm text-muted-foreground sm:block">{t('common:workspace.headerSubtitle')}</p>
               </div>
             </div>
             <NavigationLinks />
@@ -201,7 +204,7 @@ export function DockerComposeGenerator() {
                 firstErrorSection ? (
                   <Button type="button" variant="outline" onClick={() => handleSelectSection(firstErrorSection.id)}>
                     <TriangleAlert className="size-4" />
-                    <span>{t('workspace.jumpToFirstError')}</span>
+                    <span>{t('common:workspace.jumpToFirstError')}</span>
                   </Button>
                 ) : undefined
               }

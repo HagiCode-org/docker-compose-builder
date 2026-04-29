@@ -156,6 +156,21 @@ describe('validateConfig', () => {
     expect(errors.some((error) => error.field === 'httpPort')).toBe(true);
     expect(errors.some((error) => error.field === 'workdirPath')).toBe(true);
   });
+
+  it('returns localized validation copy for the active language', () => {
+    const enErrors = validateConfig(createMockConfig({
+      httpPort: 'invalid',
+      workdirPath: '',
+    }), 'en-US');
+    const zhErrors = validateConfig(createMockConfig({
+      httpPort: 'invalid',
+      workdirPath: '',
+    }), 'zh-CN');
+
+    expect(enErrors.find((error) => error.field === 'httpPort')?.message).toBe('HTTP port must be a valid number');
+    expect(zhErrors.find((error) => error.field === 'httpPort')?.message).toBe('HTTP 端口必须是有效数字');
+    expect(zhErrors.find((error) => error.field === 'workdirPath')?.message).toBe('工作目录路径不能为空');
+  });
 });
 
 describe('isValidConfig', () => {

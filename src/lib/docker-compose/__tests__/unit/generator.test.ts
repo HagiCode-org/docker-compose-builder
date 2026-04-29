@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { getBuilderMessage } from '@/i18n/resources';
+
 import {
   buildAppService,
   buildCaddyService,
@@ -53,10 +55,28 @@ describe('buildAppService', () => {
       codexApiKey: 'test-codex-key',
     })).join('\n');
 
-    expect(appService).toContain('# Claude Runtime Configuration');
+    expect(appService).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.runtime.claude.title')}`);
     expect(appService).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
-    expect(appService).toContain('# Codex Runtime Configuration');
+    expect(appService).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.runtime.codex.title')}`);
     expect(appService).toContain('CODEX_API_KEY: "test-codex-key"');
+  });
+
+  it('localizes runtime guidance comments for the requested language', () => {
+    const zhService = buildAppService(createMockConfig({
+      enabledExecutors: ['claude', 'codex'],
+      anthropicAuthToken: 'test-token',
+      codexApiKey: 'test-codex-key',
+    }), undefined, 'zh-CN').join('\n');
+    const enService = buildAppService(createMockConfig({
+      enabledExecutors: ['claude', 'codex'],
+      anthropicAuthToken: 'test-token',
+      codexApiKey: 'test-codex-key',
+    }), undefined, 'en-US').join('\n');
+
+    expect(zhService).toContain('# Claude 运行时配置');
+    expect(zhService).toContain('# Codex 运行时配置');
+    expect(enService).toContain('# Claude Runtime Configuration');
+    expect(enService).toContain('# Codex Runtime Configuration');
   });
 
   it('renders the managed OpenCode runtime contract explicitly', () => {
@@ -186,7 +206,7 @@ describe('generateYAML', () => {
       openCodeModel: 'openai/gpt-5',
     }), undefined, 'zh-CN', FIXED_DATE);
 
-    expect(yaml).toContain('# Hagicode Docker Compose Configuration');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.title')}`);
     expect(yaml).toContain('services:');
     expect(yaml).toContain('CODEX_API_KEY: "test-codex-key"');
     expect(yaml).toContain('AI__Providers__Providers__OpenCodeCli__Enabled: "true"');

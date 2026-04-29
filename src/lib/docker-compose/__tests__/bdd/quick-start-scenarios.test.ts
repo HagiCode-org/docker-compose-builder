@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+
+import { getBuilderMessage } from '@/i18n/resources';
 import { generateYAML } from '../../generator';
 import {
   createQuickStartConfig,
@@ -78,7 +80,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
-      expect(result).toContain('# Zhipu AI (ZAI)');
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.zai.heading')}`);
       expect(result).toContain('ANTHROPIC_URL: "https://open.bigmodel.cn/api/anthropic"');
       expect(result).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
     });
@@ -93,7 +95,7 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
-      expect(result).toContain('# Anthropic Official API');
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.anthropic.heading')}`);
       expect(result).toContain('ANTHROPIC_AUTH_TOKEN: "test-token"');
       expect(result).not.toContain('ANTHROPIC_URL:');
     });
@@ -110,9 +112,9 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
-      expect(result).toContain('# Custom Anthropic-compatible API');
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.custom.heading')}`);
       expect(result).toContain('ANTHROPIC_URL: "https://custom-api.example.com"');
-      expect(result).toContain('# API Provider: Custom Endpoint');
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.custom.providerLabel')}`);
     });
   });
 
@@ -125,8 +127,8 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const result = generateYAML(config, undefined, 'zh-CN', FIXED_DATE);
 
       // Then
-      expect(result).toContain('# 支持信息');
-      expect(result).toContain('# 如果您遇到任何问题或需要技术支持:');
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.support.title')}`);
+      expect(result).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.support.description')}`);
     });
 
     it('Given English language setting, When generating YAML, Then English support information should be included', () => {
@@ -137,8 +139,8 @@ describe('Docker Compose Generation: Quick Start Profile', () => {
       const result = generateYAML(config, undefined, 'en-US', FIXED_DATE);
 
       // Then
-      expect(result).toContain('# Support Information');
-      expect(result).toContain('# If you encounter any issues or need technical support:');
+      expect(result).toContain(`# ${getBuilderMessage('en-US', 'docker-compose:generator.support.title')}`);
+      expect(result).toContain(`# ${getBuilderMessage('en-US', 'docker-compose:generator.support.description')}`);
     });
   });
 });

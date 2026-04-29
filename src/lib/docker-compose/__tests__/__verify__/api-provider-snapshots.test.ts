@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+
+import { getBuilderMessage } from '@/i18n/resources';
 import { generateYAML } from '../../generator';
 import {
   createZaiProviderConfig,
@@ -26,7 +28,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_AUTH_TOKEN')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe(false);
     expect(getServiceEnvVar(yaml, 'hagicode', 'ANTHROPIC_AUTH_TOKEN')).toBe('sk-ant-test-key');
-    expect(yaml).toContain('# Anthropic Official API');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.anthropic.heading')}`);
     expect(yaml).toMatchSnapshot('api-provider-anthropic-zh-CN');
   });
 
@@ -42,7 +44,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_AUTH_TOKEN')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe(true);
     expect(getServiceEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe('https://open.bigmodel.cn/api/anthropic');
-    expect(yaml).toContain('# Zhipu AI (ZAI) - uses Anthropic-compatible API');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.zai.heading')}`);
     expect(yaml).toMatchSnapshot('api-provider-zai-zh-CN');
   });
 
@@ -59,7 +61,7 @@ describe('API Provider Profiles - Complete File Verification with YAML Parsing',
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_AUTH_TOKEN')).toBe(true);
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe(true);
     expect(getServiceEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe('https://custom-ai-proxy.example.com/v1');
-    expect(yaml).toContain('# Custom Anthropic-compatible API');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.custom.heading')}`);
     expect(yaml).toMatchSnapshot('api-provider-custom-zh-CN');
   });
 

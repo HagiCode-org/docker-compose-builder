@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import enUS from '@/i18n/locales/en-US.json';
-import zhCN from '@/i18n/locales/zh-CN.json';
+import enUS from '@/i18n/generated-locales/en-US/docker-compose.json';
+import zhCN from '@/i18n/generated-locales/zh-CN/docker-compose.json';
 import {
   OPENCODE_AUTH_TARGET_FILE,
   OPENCODE_CONFIG_TARGET_FILE,

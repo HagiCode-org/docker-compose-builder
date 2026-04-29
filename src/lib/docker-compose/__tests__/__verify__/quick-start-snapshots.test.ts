@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+
+import { getBuilderMessage } from '@/i18n/resources';
 import { generateYAML } from '../../generator';
 import {
   createQuickStartConfig,
@@ -88,7 +90,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(hasNetwork(yaml, 'pcode-network')).toBe(true);
 
     // 验证注释内容（英文）
-    expect(yaml).toContain('# Support Information');
+    expect(yaml).toContain(`# ${getBuilderMessage('en-US', 'docker-compose:generator.support.title')}`);
 
     expect(yaml).toMatchSnapshot('quick-start-default-en-US');
   });
@@ -126,7 +128,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(getServiceEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe('https://open.bigmodel.cn/api/anthropic');
 
     // 验证注释
-    expect(yaml).toContain('# Zhipu AI (ZAI)');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.zai.heading')}`);
 
     expect(yaml).toMatchSnapshot('quick-start-zai-zh-CN');
   });
@@ -147,7 +149,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(hasEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe(false);
 
     // 验证注释
-    expect(yaml).toContain('# Anthropic Official API');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.anthropic.heading')}`);
 
     expect(yaml).toMatchSnapshot('quick-start-anthropic-zh-CN');
   });
@@ -171,7 +173,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
     expect(getServiceEnvVar(yaml, 'hagicode', 'ANTHROPIC_URL')).toBe('https://custom-api.example.com');
 
     // 验证注释
-    expect(yaml).toContain('# Custom Anthropic-compatible API');
+    expect(yaml).toContain(`# ${getBuilderMessage('zh-CN', 'docker-compose:generator.providers.custom.heading')}`);
 
     expect(yaml).toMatchSnapshot('quick-start-custom-zh-CN');
   });

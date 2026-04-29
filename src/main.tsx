@@ -7,6 +7,7 @@ import { initializeClarity } from './services/clarityService';
 import { initializeDefaultSEO } from './lib/seo/utils';
 import { injectAllSchemas } from './lib/seo/schema-generator';
 import { initializeProviderConfig, getProviderConfigLoader } from './lib/docker-compose/providerConfigLoader';
+import i18n from './i18n';
 import {
   setProvidersLoading,
   setProviders,
@@ -15,13 +16,15 @@ import {
 
 import "./index.css"
 import App from "./App.tsx"
-import './i18n/config'; // Import i18n configuration
 
 // Initialize Microsoft Clarity
 initializeClarity();
 
 // Initialize SEO
-initializeDefaultSEO();
+initializeDefaultSEO(i18n.resolvedLanguage ?? i18n.language);
+i18n.on('languageChanged', (nextLanguage) => {
+  initializeDefaultSEO(nextLanguage);
+});
 injectAllSchemas();
 
 // Initialize provider configuration
