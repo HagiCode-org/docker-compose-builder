@@ -1,0 +1,131 @@
+common:
+  loading: 読み込み中...
+  error: エラー
+  success: 成功
+  required: 必須
+  recommended: 推奨
+  default: デフォルト
+header:
+  title: Hagicode Docker Compose ビルダー
+  subtitle: Hagicode の Docker Compose 構成を生成する
+  language: 言語
+  languageLabel: 言語：
+  navigation:
+    officialSite: Hagicode 公式サイト
+    officialDocs: 導入ドキュメント
+    discord: Discord コミュニティ
+    githubRepo: GitHub リポジトリ
+    qqGroup: "QQ グループ: {{groupNumber}}"
+    joinQQGroup: QQ グループに参加する
+    copyGroupNumber: コピーグループ番号
+    copied: コピーしました！
+    theme: テーマ
+    language: 言語
+    menuToggle: ナビゲーションメニューを切り替えます
+    menu: メインナビゲーション
+languageSwitcher:
+  selectLanguage: 言語の選択
+backToTop:
+  backToTop: トップに戻る
+  ariaLabel: ページの先頭に戻る
+workspace:
+  headerSubtitle: 表示されるセクション、ステータス追跡、永続的なプレビュー レールを使用してセットアップをガイドします。
+  introTitle: より明確なワークスペースで docker-compose.yml を構築する
+  introDescription: グループ化された展開セクションを操作し、検証ステータスを表示したままにして、場所を見失うことなく YAML プレビューを開きます。
+  navigationTitle: セクションのナビゲーション
+  navigationDescription: 表示されているモジュール間をジャンプし、隠れたブランチがパスに入らないようにします。
+  previewShortcutTitle: プレビューアクセス
+  previewShortcutDescription: プレビュー レールまたはドロワーを使用して、編集中に出力を確認します。
+  openPreview: プレビューを開く
+  statusLegendTitle: ステータスの凡例
+  jumpToFirstError: 最初の号にジャンプ
+  resolveSection: レビューセクション
+  mobilePreviewTrigger: YAML プレビューを開く
+  mobilePreviewTitle: YAML プレビュー
+  mobilePreviewDescription: 現在のセクションを離れることなく、生成された docker-compose.yml を検査します。
+  repositoryHint: リポジトリ マッピングはこのセクションに残ります
+  repositoryHintDescription: Linux デプロイメントが調整された状態を維持できるように、ワークスペースのマウントを権限設定に近い状態に保ちます。
+  licenseDescription: 共有公開キーを選択するか、この展開用のカスタム ライセンスを提供します。
+  inlineErrorsTitle: このセクションでは {{count}} 問題に注意が必要です
+  httpsPanelTitle: HTTPS ランタイムの詳細
+  providersLoading: プロバイダー設定を読み込み中...
+  providersError: "プロバイダー構成のロードに失敗しました: {{message}}"
+  exportReady: 輸出準備完了
+  exportBlocked: 輸出がブロックされました
+  metrics:
+    modules: 表示可能なモジュール
+    modulesDetail: ワークスペース内の現在のセクション
+    completed: 完了
+    completedDetail: エクスポートする準備ができているモジュール
+    errors: 検証の問題
+    errorsPresent: エクスポートする前にこれらを修正してください
+    errorsClear: ブロッキングの問題は検出されませんでした
+    export: 輸出状況
+    exportReadyDetail: コピーとダウンロードが可能です
+    exportBlockedDetail: プレビューはライブですが、エクスポートは無効のままです
+  status:
+    active: アクティブ
+    complete: 準備ができて
+    error: 修正が必要です
+    pending: 保留中
+  sections:
+    profile:
+      title: 展開モード
+      shortTitle: モード
+      description: より詳細なオプションを編集する前に、クイック スタートまたはフル カスタムを選択してください。
+    base:
+      title: 基本展開
+      shortTitle: ベース
+      description: ポート、イメージ ソース、ベースライン ランタイムの詳細を構成します。
+    executors:
+      title: エグゼキューターの機能
+      shortTitle: 遺言執行者
+      description: ランタイム ブランチを有効にし、各アクティブ ブランチに必要な認証情報を入力します。
+    https:
+      title: HTTPS アクセス
+      shortTitle: __トークン_0__
+      description: HTTPS が有効な場合にのみ、Caddy を通じてデプロイメントを公開します。
+    database:
+      title: データベース戦略
+      shortTitle: データベース
+      description: エクスポートされたデプロイメントで使用される修正された SQLite ランタイムを確認してください。
+    advanced:
+      title: 高度なセットアップ
+      shortTitle: 高度な
+      description: ワークスペースのマウント、権限、その他の展開レベルのライセンス設定を処理します。
+  executorItemsTitle: 有効なエグゼキュータ ブランチ
+  executorItems:
+    claude:
+      title: Claude 認証情報
+      description: Anthropic 互換のプロバイダー、エンドポイント、トークン、および Claude Code チューニング設定。
+    codex:
+      title: Codex ランタイム
+      description: CODEX_API_KEY およびオプションの CODEX_BASE_URL。
+    opencode:
+      title: Codex ランタイム
+      description: 管理対象モデルの選択と構成永続モード。
+    codeServer:
+      title: コードサーバーのデフォルト
+      description: コンテナー ホスト/port、認証モード、および code-server のオプションのホスト公開。
+    eula:
+      title: コンテナ EULA
+      description: 共有 ACCEPT_EULA オプトインとドキュメント契約リンク。
+footer:
+  eyebrow: DOCKER COMPOSE BUILDER
+  title: パブリックフッター
+  description: 共有サイトの宛先はバンドルされたスナップショットから取得されますが、Builder は独自の GitHub、Discord、QQ、および Steam サポート アクションを保持します。
+  relatedSites: 関連サイト
+  communitySupport: コミュニティとサポート
+  qqGroup: QQ グループ {{groupNumber}}
+promoBanner:
+  title: 🚀 Aliyun Qwen コーディング プランが公開されました
+  description: Aliyun Qwen コーディング プランが日常の開発に利用できるようになりました。 Hagicode と組み合わせると、エンドツーエンドのワークフローがよりスムーズになります。
+  cta: 今すぐ購読する →
+  ariaLabel: Aliyun Qwen コーディング プラン ページにアクセスしてください
+promoteCard:
+  badgeFallback: 昇格
+  dismiss: 昇進を却下する
+  sectionLabel: プロモーション
+  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
+themeToggle:
+  toggle: テーマの切り替え

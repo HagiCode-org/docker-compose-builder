@@ -1,0 +1,131 @@
+common:
+  loading: "&#10;載入中...&#10;"
+  error: "&#10;錯誤&#10;"
+  success: "&#10;成功&#10;"
+  required: "&#10;必填&#10;"
+  recommended: "&#10;推薦&#10;"
+  default: "&#10;預設&#10;"
+header:
+  title: "&#10; Hagicode Docker Compose Builder&#10;"
+  subtitle: "&#10;為Hagicode 產生Docker Compose 配置&#10;"
+  language: "&#10;語言&#10;"
+  languageLabel: "&#10;語言：&#10;"
+  navigation:
+    officialSite: "&#10; Hagicode 官網"
+    officialDocs: "&#10;部署文件&#10;"
+    discord: "&#10; Discord 社區&#10;"
+    githubRepo: "&#10; GitHub 倉庫&#10;"
+    qqGroup: "&#10; QQ 群：{{groupNumber}}&#10;"
+    joinQQGroup: "&#10;加入QQ 群&#10;"
+    copyGroupNumber: "&#10;複製群組&#10;"
+    copied: "&#10;已複製！&#10;"
+    theme: "&#10;主題&#10;"
+    language: "&#10;語言&#10;"
+    menuToggle: "&#10;切換導航選單&#10;"
+    menu: "&#10;主導航"
+languageSwitcher:
+  selectLanguage: "&#10;選擇語言/ Select Language&#10;"
+backToTop:
+  backToTop: "&#10;回到頂部&#10;"
+  ariaLabel: "&#10;捲動回頁面頂部&#10;"
+workspace:
+  headerSubtitle: "&#10;以可見分割區、狀態摘要和常駐預覽列引導完整配置流程。&#10;"
+  introTitle: "&#10;用更清晰的工作區產生docker-compose.yml&#10;"
+  introDescription: "&#10;依模組完成部署配置，始終看見校驗狀態，且無需離開目前上下文即可查看YAML 預覽。&#10;"
+  navigationTitle: "&#10;模組導航"
+  navigationDescription: "&#10;只顯示目前可見的配置模組，隱藏分支不會繼續出現在導覽中。&#10;"
+  previewShortcutTitle: "&#10;預覽入口&#10;"
+  previewShortcutDescription: "&#10;編輯時可隨時開啟預覽欄或行動裝置抽屜檢查輸出結果。&#10;"
+  openPreview: "&#10;打開預覽&#10;"
+  statusLegendTitle: "&#10;狀態說明&#10;"
+  jumpToFirstError: "&#10;跳到首個問題&#10;"
+  resolveSection: "&#10;查看此模組&#10;"
+  mobilePreviewTrigger: "&#10;開啟YAML 預覽&#10;"
+  mobilePreviewTitle: "&#10; YAML 預覽"
+  mobilePreviewDescription: "&#10;無需離開目前模組即可查看產生的docker-compose.yml。&#10;"
+  repositoryHint: "&#10;倉庫掛載與權限配置保持在同一區塊&#10;"
+  repositoryHintDescription: "&#10;這樣可以讓Linux 權限與工作目錄設定保持一致，減少來回捲動。&#10;"
+  licenseDescription: "&#10;可以繼續使用共享測試許可證，也可以切換為自訂許可證。&#10;"
+  inlineErrorsTitle: "&#10;本單元有{{count}} 個問題需要處理&#10;"
+  httpsPanelTitle: "&#10; HTTPS 運行時細節&#10;"
+  providersLoading: "&#10;正在載入provider 配置..."
+  providersError: "&#10;載入provider 配置失敗：{{message}}&#10;"
+  exportReady: "&#10;可匯出&#10;"
+  exportBlocked: "&#10;暫不可導出&#10;"
+  metrics:
+    modules: "&#10;可見模組&#10;"
+    modulesDetail: "&#10;目前工作區中的配置分區數量&#10;"
+    completed: "&#10;已完成&#10;"
+    completedDetail: "&#10;已滿足導出條件的模組&#10;"
+    errors: "&#10;校驗問題&#10;"
+    errorsPresent: "&#10;匯出前需要先修復這些問題&#10;"
+    errorsClear: "&#10;目前沒有阻塞導出的錯誤&#10;"
+    export: "&#10;匯出狀態"
+    exportReadyDetail: "&#10;複製和下載操作均可使用&#10;"
+    exportBlockedDetail: "&#10;預覽仍會更新，但匯出按鈕保持停用&#10;"
+  status:
+    active: "&#10;目前&#10;"
+    complete: "&#10;已就緒&#10;"
+    error: "&#10;需修復&#10;"
+    pending: "&#10;待完善&#10;"
+  sections:
+    profile:
+      title: "&#10;部署模式&#10;"
+      shortTitle: "&#10;模式&#10;"
+      description: "&#10;先選擇快速開始或完全自訂，再繼續編輯更深入的配置。&#10;"
+    base:
+      title: "&#10;基礎部署&#10;"
+      shortTitle: "&#10;基礎"
+      description: "&#10;集中配置連接埠、鏡像來源和基礎運作參數。&#10;"
+    executors:
+      title: "&#10;執行器能力&#10;"
+      shortTitle: "&#10;執行器&#10;"
+      description: "&#10;啟用需要的執行器分支，並填寫每個分支所需的認證資訊。&#10;"
+    https:
+      title: "&#10; HTTPS 訪問&#10;"
+      shortTitle: "&#10; HTTPS&#10;"
+      description: "&#10;僅在啟用HTTPS 時展示Caddy 代理與憑證相關配置。&#10;"
+    database:
+      title: "&#10;資料庫策略&#10;"
+      shortTitle: "&#10;資料庫"
+      description: "&#10;查看匯出部署固定使用的SQLite 執行時期配置。&#10;"
+    advanced:
+      title: "&#10;進階配置&#10;"
+      shortTitle: "&#10;進階&#10;"
+      description: "&#10;處理工作區掛載、權限與許可證等部署級設定。&#10;"
+  executorItemsTitle: "&#10;已啟用的執行器分支&#10;"
+  executorItems:
+    claude:
+      title: "&#10; Claude 憑證&#10;"
+      description: "&#10; Anthropic 相容provider、端點、token 與Claude Code 擴充選項。&#10;"
+    codex:
+      title: "&#10; Codex 運作時"
+      description: "&#10;配置CODEX_API_KEY 與可選的CODEX_BASE_URL。&#10;"
+    opencode:
+      title: "&#10; OpenCode 運作時&#10;"
+      description: "&#10;託管模型選擇與配置持久化模式。&#10;"
+    codeServer:
+      title: "&#10; Code Server 預設值&#10;"
+      description: "&#10;配置code-server 的容器host/port、認證模式，以及選購的宿主機連接埠發布。&#10;"
+    eula:
+      title: "&#10;容器EULA"
+      description: "&#10;共享的ACCEPT_EULA 同意開關，以及對應的docs 協定入口。&#10;"
+footer:
+  eyebrow: "&#10; DOCKER COMPOSE BUILDER&#10;"
+  title: "&#10;公開頁腳&#10;"
+  description: "&#10;共享站點入口來自已簽入snapshot；Builder 本身的GitHub、Discord、QQ 與Steam 支援入口仍保留在本倉。&#10;"
+  relatedSites: "&#10;生態站點&#10;"
+  communitySupport: "&#10;社區與支持"
+  qqGroup: "&#10; QQ 群{{groupNumber}}&#10;"
+promoBanner:
+  title: "&#10; 🚀 阿里雲千問Coding Plan 上線&#10;"
+  description: "&#10;阿里雲千問Coding Plan 已上線，滿足開發日常需求。推薦搭配Hagicode，一站式涵蓋日常開發流程。&#10;"
+  cta: "&#10;立即訂閱→&#10;"
+  ariaLabel: "&#10;造訪阿里雲千問Coding Plan 頁面&#10;"
+promoteCard:
+  badgeFallback: "&#10;推薦&#10;"
+  dismiss: "&#10;關閉推廣訊息&#10;"
+  sectionLabel: "&#10;推廣訊息"
+  surfaceAriaLabel: "&#10; {{ctaLabel}}: {{title}}&#10;"
+themeToggle:
+  toggle: "&#10;切換主題"

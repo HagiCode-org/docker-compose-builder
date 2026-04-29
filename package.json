@@ -7,17 +7,27 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "npm run sync:footer-sites && tsc -b && vite build",
+    "dev": "npm run prepare:i18n && vite",
+    "build": "npm run prepare:i18n && npm run sync:footer-sites && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "sync:footer-sites": "node ./scripts/fetch-sites-snapshot.mjs",
-    "test": "vitest",
+    "test": "npm run prepare:i18n && vitest",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
-    "test:verify": "vitest --reporter=verbose src/lib/docker-compose/__tests__/__verify__"
+    "test:verify": "vitest --reporter=verbose src/lib/docker-compose/__tests__/__verify__",
+    "i18n:audit": "hagi18n audit --config hagi18n.yaml",
+    "i18n:report": "hagi18n report --config hagi18n.yaml",
+    "i18n:doctor": "hagi18n doctor --config hagi18n.yaml",
+    "i18n:sync": "hagi18n sync --config hagi18n.yaml --from en-US",
+    "i18n:sync:write": "hagi18n sync --config hagi18n.yaml --from en-US --write",
+    "i18n:prune": "hagi18n prune --config hagi18n.yaml --from en-US",
+    "i18n:prune:write": "hagi18n prune --config hagi18n.yaml --from en-US --write",
+    "i18n:generate": "node ./scripts/generate-i18n-resources.mjs",
+    "prepare:i18n": "npm run i18n:generate",
+    "i18n:check": "npm run i18n:audit && npm run i18n:doctor && npm run prepare:i18n && node ./scripts/generate-i18n-resources.mjs --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
@@ -63,6 +73,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@hagicode/hagi18n": "^0.1.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

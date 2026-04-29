@@ -1,0 +1,131 @@
+common:
+  loading: Loading...
+  error: Error
+  success: Success
+  required: Required
+  recommended: Recommended
+  default: Default
+header:
+  title: Hagicode Docker Compose Builder
+  subtitle: Generate Docker Compose configurations for Hagicode
+  language: Language
+  languageLabel: "Language: "
+  navigation:
+    officialSite: Hagicode Official Site
+    officialDocs: Deployment Docs
+    discord: Discord Community
+    githubRepo: GitHub Repository
+    qqGroup: "QQ Group: {{groupNumber}}"
+    joinQQGroup: Join QQ Group
+    copyGroupNumber: Copy group number
+    copied: Copied!
+    theme: Theme
+    language: Language
+    menuToggle: Toggle navigation menu
+    menu: Main navigation
+languageSwitcher:
+  selectLanguage: Select Language
+backToTop:
+  backToTop: Back to Top
+  ariaLabel: Scroll back to top of page
+workspace:
+  headerSubtitle: Guide the setup with visible sections, status tracking, and a persistent preview rail.
+  introTitle: Build docker-compose.yml with a clearer workspace
+  introDescription: Work through grouped deployment sections, keep validation status visible, and open the YAML preview without losing your place.
+  navigationTitle: Section navigation
+  navigationDescription: Jump between visible modules and keep hidden branches out of the path.
+  previewShortcutTitle: Preview access
+  previewShortcutDescription: Use the preview rail or drawer to verify output while editing.
+  openPreview: Open preview
+  statusLegendTitle: Status legend
+  jumpToFirstError: Jump to first issue
+  resolveSection: Review section
+  mobilePreviewTrigger: Open YAML preview
+  mobilePreviewTitle: YAML preview
+  mobilePreviewDescription: Inspect the generated docker-compose.yml without leaving the current section.
+  repositoryHint: Repository mapping stays in this section
+  repositoryHintDescription: Keep the workspace mount close to permission settings so Linux deployments stay aligned.
+  licenseDescription: Choose the shared public key or provide a custom license for this deployment.
+  inlineErrorsTitle: "{{count}} issue needs attention in this section"
+  httpsPanelTitle: HTTPS runtime details
+  providersLoading: Loading provider configurations...
+  providersError: "Failed to load provider configurations: {{message}}"
+  exportReady: Export ready
+  exportBlocked: Export blocked
+  metrics:
+    modules: Visible modules
+    modulesDetail: Current sections in the workspace
+    completed: Completed
+    completedDetail: Modules that are ready to export
+    errors: Validation issues
+    errorsPresent: Fix these before exporting
+    errorsClear: No blocking issues detected
+    export: Export status
+    exportReadyDetail: Copy and download are available
+    exportBlockedDetail: Preview is live, export stays disabled
+  status:
+    active: Active
+    complete: Ready
+    error: Needs fixes
+    pending: Pending
+  sections:
+    profile:
+      title: Deployment mode
+      shortTitle: Mode
+      description: Choose quick start or full custom before editing deeper options.
+    base:
+      title: Base deployment
+      shortTitle: Base
+      description: Configure ports, image source, and baseline runtime details.
+    executors:
+      title: Executor capabilities
+      shortTitle: Executors
+      description: Enable runtime branches and fill the credentials each active branch needs.
+    https:
+      title: HTTPS access
+      shortTitle: HTTPS
+      description: Expose the deployment through Caddy only when HTTPS is enabled.
+    database:
+      title: Database strategy
+      shortTitle: Database
+      description: Review the fixed SQLite runtime used by exported deployments.
+    advanced:
+      title: Advanced setup
+      shortTitle: Advanced
+      description: Handle workspace mounts, permissions, and other deployment-level license settings.
+  executorItemsTitle: Enabled executor branches
+  executorItems:
+    claude:
+      title: Claude credentials
+      description: Anthropic-compatible provider, endpoint, token, and Claude Code tuning settings.
+    codex:
+      title: Codex runtime
+      description: CODEX_API_KEY and optional CODEX_BASE_URL.
+    opencode:
+      title: OpenCode runtime
+      description: Managed model selection plus config persistence mode.
+    codeServer:
+      title: Code Server defaults
+      description: Container host/port, auth mode, and optional host publishing for code-server.
+    eula:
+      title: Container EULA
+      description: Shared ACCEPT_EULA opt-in plus the docs agreement link.
+footer:
+  eyebrow: DOCKER COMPOSE BUILDER
+  title: Public footer
+  description: Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, QQ, and Steam support actions.
+  relatedSites: Related sites
+  communitySupport: Community and support
+  qqGroup: QQ Group {{groupNumber}}
+promoBanner:
+  title: 🚀 Aliyun Qwen Coding Plan is live
+  description: Aliyun Qwen Coding Plan is now available for day-to-day development. Pair it with Hagicode for a smoother end-to-end workflow.
+  cta: Subscribe now →
+  ariaLabel: Visit the Aliyun Qwen Coding Plan page
+promoteCard:
+  badgeFallback: Promoted
+  dismiss: Dismiss promotion
+  sectionLabel: Promotion
+  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
+themeToggle:
+  toggle: Toggle theme

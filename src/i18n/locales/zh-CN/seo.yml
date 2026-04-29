@@ -1,0 +1,17 @@
+default:
+  title: Hagicode Docker Compose Builder
+  description: 一个强大的可视化工具，用于创建和管理 Docker Compose 配置。通过直观界面构建、自定义并导出 docker-compose.yml 文件。
+  keywords:
+    - docker
+    - docker compose
+    - docker-compose
+    - yaml generator
+    - docker builder
+    - container orchestration
+    - devops tools
+    - docker ui
+    - compose builder
+pages:
+  home:
+    title: Hagicode Docker Compose Builder - 可视化 Docker Compose 生成器
+    description: 以可视化方式创建和管理 Docker Compose 配置。通过直观界面构建 docker-compose.yml 文件。

@@ -1,0 +1,31 @@
+providers:
+  anthropic:
+    name: "&#10; Anthropic 官方&#10;"
+    description: "&#10;官方Anthropic API&#10;"
+    notes: "&#10;使用官方Claude 模型，使用者可自訂選擇模型版本。&#10;"
+    networkAdvice: "&#10;適合可直接存取Anthropic 官方服務的環境。&#10;"
+  zai:
+    name: "&#10;智譜AI (ZAI)&#10;"
+    description: "&#10;智譜AI 提供的Claude API 相容服務"
+    notes: "&#10;需從智譜AI 平台取得API Key。&#10;"
+    networkAdvice: "&#10;適合希望使用國內Claude 相容接入的用戶。&#10;"
+  aliyun:
+    name: "&#10;阿里雲DashScope&#10;"
+    description: "&#10;阿里雲靈積平台提供的Claude API 相容服務&#10;"
+    notes: "&#10;使用統一的glm-4.7 模型適用於所有層級。&#10;"
+    networkAdvice: "&#10;適合中國大陸用戶，通常具備更穩定的本地網路連通性。"
+  minimax:
+    name: "&#10; MiniMax&#10;"
+    description: "&#10; MiniMax 提供的Claude API 相容服務&#10;"
+    notes: "&#10;使用統一的MiniMax-M2.5 模型適用於所有層級。&#10;"
+    networkAdvice: "&#10;適合希望接入MiniMax Claude 相容服務的使用者。&#10;"
+  volcengine:
+    name: "&#10;火山引擎Coding Plan&#10;"
+    description: "&#10;火山引擎提供的Claude API 相容服務"
+    notes: "&#10;使用統一的glm-4.7 模型適用於所有層級。&#10;"
+    networkAdvice: "&#10;適合優先使用火山引擎網路入口的部署環境。&#10;"
+  custom:
+    name: "&#10;自訂API 端點&#10;"
+    description: "&#10;使用者提供的自訂Claude / Anthropic 相容API 端點&#10;"
+    notes: "&#10;需手動提供API 端點URL 與對應憑證。"
+    networkAdvice: "&#10;適合已有自託管網關或第三方Anthropic 相容代理的環境。"

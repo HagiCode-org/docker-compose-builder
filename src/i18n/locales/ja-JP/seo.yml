@@ -1,0 +1,17 @@
+default:
+  title: Hagicode Docker Compose ビルダー
+  description: Docker Compose 構成を作成および管理するための強力なビジュアル ツール。 直感的なインターフェイスを使用して、docker-compose.yml ファイルを構築、カスタマイズ、エクスポートします。
+  keywords:
+    - 港湾労働者
+    - ドッカー構成
+    - ドッカー構成
+    - yaml ジェネレーター
+    - ドッカービルダー
+    - コンテナオーケストレーション
+    - 開発ツール
+    - ドッカーUI
+    - 構成ビルダー
+pages:
+  home:
+    title: Hagicode Docker Compose ビルダー - ビジュアル Docker Compose ジェネレーター
+    description: Docker Compose 構成を視覚的に作成および管理します。 直感的なインターフェイスを使用して docker-compose.yml ファイルを構築します。

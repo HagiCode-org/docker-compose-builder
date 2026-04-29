@@ -1,0 +1,131 @@
+common:
+  loading: 加载中...
+  error: 错误
+  success: 成功
+  required: 必填
+  recommended: 推荐
+  default: 默认
+header:
+  title: Hagicode Docker Compose Builder
+  subtitle: 为 Hagicode 生成 Docker Compose 配置
+  language: 语言
+  languageLabel: 语言：
+  navigation:
+    officialSite: Hagicode 官网
+    officialDocs: 部署文档
+    discord: Discord 社区
+    githubRepo: GitHub 仓库
+    qqGroup: QQ 群：{{groupNumber}}
+    joinQQGroup: 加入 QQ 群
+    copyGroupNumber: 复制群号
+    copied: 已复制！
+    theme: 主题
+    language: 语言
+    menuToggle: 切换导航菜单
+    menu: 主导航
+languageSwitcher:
+  selectLanguage: 选择语言 / Select Language
+backToTop:
+  backToTop: 返回顶部
+  ariaLabel: 滚动回页面顶部
+workspace:
+  headerSubtitle: 用可见分区、状态摘要和常驻预览栏引导完整配置流程。
+  introTitle: 用更清晰的工作区生成 docker-compose.yml
+  introDescription: 按模块完成部署配置，始终看见校验状态，并且无需离开当前上下文就能查看 YAML 预览。
+  navigationTitle: 模块导航
+  navigationDescription: 只显示当前可见的配置模块，隐藏分支不会继续出现在导航中。
+  previewShortcutTitle: 预览入口
+  previewShortcutDescription: 编辑时可随时打开预览栏或移动端抽屉检查输出结果。
+  openPreview: 打开预览
+  statusLegendTitle: 状态说明
+  jumpToFirstError: 跳转到首个问题
+  resolveSection: 查看此模块
+  mobilePreviewTrigger: 打开 YAML 预览
+  mobilePreviewTitle: YAML 预览
+  mobilePreviewDescription: 无需离开当前模块即可查看生成的 docker-compose.yml。
+  repositoryHint: 仓库挂载与权限配置保持在同一区块
+  repositoryHintDescription: 这样可以让 Linux 权限与工作目录设置保持一致，减少来回滚动。
+  licenseDescription: 可以继续使用共享测试许可证，也可以切换为自定义许可证。
+  inlineErrorsTitle: 本模块有 {{count}} 个问题需要处理
+  httpsPanelTitle: HTTPS 运行时细节
+  providersLoading: 正在加载 provider 配置...
+  providersError: 加载 provider 配置失败：{{message}}
+  exportReady: 可导出
+  exportBlocked: 暂不可导出
+  metrics:
+    modules: 可见模块
+    modulesDetail: 当前工作区中的配置分区数量
+    completed: 已完成
+    completedDetail: 已经满足导出条件的模块
+    errors: 校验问题
+    errorsPresent: 导出前需要先修复这些问题
+    errorsClear: 当前没有阻塞导出的错误
+    export: 导出状态
+    exportReadyDetail: 复制和下载操作均可使用
+    exportBlockedDetail: 预览仍会更新，但导出按钮保持禁用
+  status:
+    active: 当前
+    complete: 已就绪
+    error: 需修复
+    pending: 待完善
+  sections:
+    profile:
+      title: 部署模式
+      shortTitle: 模式
+      description: 先选择快速开始或完全自定义，再继续编辑更深入的配置。
+    base:
+      title: 基础部署
+      shortTitle: 基础
+      description: 集中配置端口、镜像源和基础运行参数。
+    executors:
+      title: 执行器能力
+      shortTitle: 执行器
+      description: 启用需要的执行器分支，并填写每个分支所需的认证信息。
+    https:
+      title: HTTPS 访问
+      shortTitle: HTTPS
+      description: 仅在启用 HTTPS 时展示 Caddy 代理与证书相关配置。
+    database:
+      title: 数据库策略
+      shortTitle: 数据库
+      description: 查看导出部署固定使用的 SQLite 运行时配置。
+    advanced:
+      title: 高级配置
+      shortTitle: 高级
+      description: 处理工作区挂载、权限与许可证等部署级设置。
+  executorItemsTitle: 已启用的执行器分支
+  executorItems:
+    claude:
+      title: Claude 凭据
+      description: Anthropic 兼容 provider、端点、token 与 Claude Code 扩展选项。
+    codex:
+      title: Codex 运行时
+      description: 配置 CODEX_API_KEY 与可选的 CODEX_BASE_URL。
+    opencode:
+      title: OpenCode 运行时
+      description: 托管模型选择与配置持久化模式。
+    codeServer:
+      title: Code Server 默认值
+      description: 配置 code-server 的容器 host/port、认证模式，以及可选的宿主机端口发布。
+    eula:
+      title: 容器 EULA
+      description: 共享的 ACCEPT_EULA 同意开关，以及对应的 docs 协议入口。
+footer:
+  eyebrow: DOCKER COMPOSE BUILDER
+  title: 公开页脚
+  description: 共享站点入口来自已签入 snapshot；Builder 自身的 GitHub、Discord、QQ 与 Steam 支持入口仍保留在本仓。
+  relatedSites: 生态站点
+  communitySupport: 社区与支持
+  qqGroup: QQ 群 {{groupNumber}}
+promoBanner:
+  title: 🚀 阿里云千问 Coding Plan 上线
+  description: 阿里云千问 Coding Plan 已上线，满足开发日常需求。推荐搭配 Hagicode，一站式覆盖日常开发流程。
+  cta: 立即订阅 →
+  ariaLabel: 访问阿里云千问 Coding Plan 页面
+promoteCard:
+  badgeFallback: 推荐
+  dismiss: 关闭推广信息
+  sectionLabel: 推广信息
+  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
+themeToggle:
+  toggle: 切换主题

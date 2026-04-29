@@ -1,0 +1,327 @@
+configForm:
+  title: Docker Compose 配置生成器
+  subtitle: 配置您的 Hagicode Docker Compose 设置
+  profile: 配置模式
+  profileLabel: 配置模式
+  quickStart: 本地快速体验 (推荐新用户)
+  quickStartDescription: 使用 SQLite 快速开始，无需额外的数据库设置
+  fullCustom: 完整自定义
+  fullCustomDescription: 完全控制所有配置选项
+  profileHelp: 选择您的配置体验。您可以随时切换模式。
+  basicConfig: 基础配置
+  httpPort: HTTP 端口
+  containerName: 容器名称
+  imageTag: 镜像标签
+  selectImageTag: 选择镜像标签
+  hostOS: 主机操作系统
+  selectHostOS: 选择主机操作系统
+  windows: Windows
+  linux: Linux
+  imageRegistry: 镜像来源
+  supportHint: 遇到困难？欢迎加入 QQ 群 {{groupNumber}} 或 Discord 社区获取帮助。
+  selectImageRegistry: 选择镜像来源
+  dockerHub: Docker Hub
+  dockerOfficialRegistry: Docker 官方注册表
+  azureContainerRegistry: Azure 容器注册表
+  aliyunAcr: 阿里云 ACR
+  aliyunAcrRecommended: 阿里云容器镜像服务
+  alternativeRegistry: 替代注册表
+  dockerHubDescription: Docker 官方镜像注册表，推荐使用
+  dockerHubNetworkAdvice: 适合有 Docker Hub 镜像加速支持的用户
+  azureAcrDescription: 替代镜像注册表，与 Docker Hub 同步
+  azureAcrNetworkAdvice: 适合无法本地访问 Docker Hub 的用户
+  aliyunAcrDescription: 阿里云容器镜像服务，国内用户推荐
+  aliyunAcrNetworkAdvice: 适合中国大陆用户，提供稳定的镜像加速服务
+  imageLabel: 镜像
+  httpsSettings: HTTPS 安全配置
+  httpsEnabled: HTTPS 已启用
+  httpsDisabled: HTTPS 已禁用
+  enableHttps: 启用 HTTPS 代理
+  enableHttpsHelp: 通过 Caddy 反向代理暴露服务，并使用自签名证书。
+  httpsPort: HTTPS 端口
+  httpsPortHelp: 有效范围：1-65535，推荐使用 443。
+  lanIp: 局域网 IP 地址
+  lanIpHelp: 请输入可在局域网访问的 IPv4/IPv6 地址。
+  lanIpExamples: 示例：192.168.1.100、10.0.0.12、fe80::1
+  lanIpTooltipLabel: 局域网 IP 使用说明
+  lanIpTooltipText: 请填写可被局域网其他设备访问到的宿主机地址。
+  accessUrl: 访问地址
+  certificateTrustGuide: 证书信任指南
+  troubleshooting: 故障排查
+  certificateGuideTitle: 证书生成说明
+  certificateGuideDescription: Caddy 使用 tls internal 自动生成自签名证书。
+  certificateGuideDetails: 查看详情
+  certificateStep1: 1. Caddy 通过 tls internal 自动生成自签名证书。
+  certificateStep2: 2. 证书会持久化在 Docker 卷 caddy_data 中。
+  certificateStep3: 3. 首次访问时请在浏览器中手动信任证书。
+  privilegedPortWarning: 1024 以下端口可能需要管理员权限。
+  localhostLanWarning: localhost 不适合局域网 HTTPS 共享访问。
+  caddyPreviewTitle: Caddyfile 预览
+  caddyPreviewCopy: 复制
+  caddyPreviewCopied: 已复制
+  caddyPreviewRetryCopy: 重试复制
+  caddyPreviewCopyError: 复制失败，请重试。
+  caddyPreviewTlsHint: 已包含 `tls internal` 以启用自签名证书管理。
+  resetHttps: 重置 HTTPS 默认值
+  databaseConfig: 数据库配置
+  databaseType: 数据库类型
+  databaseTypeFixed: 仅支持 SQLite
+  sqliteDatabase: SQLite 数据库
+  sqliteDescription: 轻量级嵌入式数据库，无需额外容器，适合快速体验和当前受支持的部署路径。
+  sqliteDataLocation: 数据存储位置
+  sqliteOnlySupport: 当前构建器只导出内嵌 SQLite 部署路径，这里不再提供旧数据库模式、凭据或数据库卷配置。
+  licenseConfig: Hagicode 许可证配置
+  licenseKeyType: 许可证密钥类型
+  selectLicenseType: 选择许可证类型
+  publicTestKey: 公共测试密钥（推荐）
+  customKey: 自定义密钥
+  customLicenseKey: 自定义许可证密钥
+  aiProviderConfig: AI 提供商配置
+  enabledExecutors: 并行启用
+  parallelEnablementHint: Claude、Codex 与 OpenCode 支持并行启用，彼此不互斥。
+  explicitExecutorHint: 生成的 compose 文件只导出已启用的执行器分支，运行时选择现在必须显式指定。
+  communitySupportTitle: 其他 CLI 工具也已支持
+  communitySupportDescription: HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前还不完整。
+  communityContributeBuilder: 容器配置相关 PR 请提交到 https://github.com/HagiCode-org/docker-compose-builder。
+  communityContributeRelease: 发布与运行时契约相关 PR 请提交到 https://github.com/HagiCode-org/releases。
+  claudeConfiguration: Claude 配置
+  codexConfiguration: Codex 配置
+  codexDescription: 使用 CODEX_* 环境变量配置 Codex 运行时
+  openCodeConfiguration: OpenCode 配置
+  openCodeDescription: OpenCode 使用统一镜像内置的托管运行时契约，不再依赖默认提供商路由。
+  openCodeModel: OpenCode 模型
+  openCodeModelHint: 可选的托管运行时模型。镜像内仍然提供 opencode 命令，但路由改为显式配置。
+  openCodeTargetPathLabel: 目标配置文件
+  openCodeTargetPathHint: OpenCode 始终读写同一个容器内 opencode.json 路径。
+  openCodeConfigSource: 配置来源
+  openCodeConfigSourceHint: 选择让 Docker Compose 使用托管卷保留 OpenCode 配置，或显式绑定宿主机上的 OpenCode 文件。
+  openCodeConfigModeDefault: 默认持久化
+  openCodeConfigModeDefaultHint: 推荐。使用 `opencode-config-data`、`opencode-auth-data`、`opencode-models-data` 三个命名卷，在容器重启后保留 OpenCode 配置、认证和缓存目录。
+  openCodeConfigModeHostFile: 宿主机文件路径
+  openCodeConfigModeHostFileHint: 绑定宿主机上的 `opencode.json`，并可按需追加 `auth.json`、`models.json` 文件挂载。
+  openCodeConfigHostPath: 宿主机文件路径
+  openCodeConfigHostPathHint: 请输入 Docker 宿主机上 `opencode.json` 的绝对路径，例如：{{example}}
+  openCodeAuthHostPath: 宿主机 auth 路径
+  openCodeAuthHostPathHint: 可选。若要让容器直接复用登录状态，请填写宿主机 `auth.json` 的绝对路径，例如：{{example}}
+  openCodeModelsHostPath: 宿主机 models 路径
+  openCodeModelsHostPathHint: 可选。若要复用宿主机模型缓存，请填写 `models.json` 的绝对路径，例如：{{example}}
+  openCodeConfigBrowserLimitTitle: 需要手动填写路径
+  openCodeConfigBrowserLimitHint: 浏览器无法替你返回可直接用于 Docker bind mount 的宿主机路径，因此这里必须手动填写。
+  openCodeConfigManualPriorityHint: 导出的 compose 文件会始终以你在这里输入的路径作为最终挂载来源。
+  openCodeAdditionalHostFilesHint: 如果你填写了 `auth.json` 或 `models.json` 路径，Builder 会一并导出对应的宿主机文件挂载；留空则不挂载。
+  openCodeManagedVolumeTitle: 已启用默认持久化
+  openCodeManagedVolumeHint: 无需额外输入。构建器会自动挂载 `opencode-config-data`、`opencode-auth-data`、`opencode-models-data`，分别保留配置、认证和模型缓存目录。
+  openCodeRuntimePathTitle: hagicode 目录映射
+  openCodeRuntimePathHint: 容器内的 OpenCode 相关文件都会落在 `/home/hagicode/` 前缀下。
+  openCodeRuntimePathConfigLabel: 配置文件
+  openCodeRuntimePathAuthLabel: 认证文件
+  openCodeRuntimePathModelsLabel: 模型缓存
+  openCodeConfigAuthWarningTitle: 配置文件不等于认证文件
+  openCodeConfigAuthWarningHint: "`opencode.json`、`auth.json` 和 `models.json` 是三份独立文件。即使使用宿主机文件模式，也需要分别提供对应路径。"
+  openCodeConfigAuthMigrationHint: 如果你想复用宿主机登录状态，请显式填写 `auth.json` 宿主机路径或自行准备到 `/home/hagicode/.local/share/opencode/auth.json`。Builder 不会自动复制它。
+  standardTemplate: 标准模板
+  standardTemplateDescription: 默认 Hagicode 应用模板
+  optional: 可选
+  compatibilityAliasHint: 兼容别名提示
+  codexCompatibilityDescription: 您也可以使用 OPENAI_* 环境变量作为兼容别名
+  claudeApiConfig: Claude API 配置
+  unifiedUseOfToken: 统一使用 ANTHROPIC_AUTH_TOKEN 环境变量
+  apiProvider: API 提供商
+  selectApiProvider: 选择 API 提供商
+  zhipuAI: 智谱 AI（ZAI）
+  aliyunDashScope: 阿里云百炼（DashScope）
+  anthropicOfficialApi: Anthropic 官方 API
+  customApiEndpoint: 自定义 API 端点
+  apiEndpointUrl: API 端点 URL
+  apiToken: API 令牌
+  getApiToken: 获取 API 令牌 →
+  enterApiToken: 输入您的 API 令牌
+  enterAnthropicApiToken: 输入您的 Anthropic API 令牌（sk-ant-...）
+  apiEndpointAutoSet: API 端点将自动设置为
+  aliyunModelsSupported: 支持的模型
+  usingOfficialApi: 使用 Anthropic 官方 API，无需设置 ANTHROPIC_URL
+  usingCustomEndpoint: 使用自定义 Anthropic 兼容 API 端点
+  claudeCodeExtendedConfig: Claude Code 扩展配置
+  claudeCodeExtendedConfigDescription: 配置 Claude Code 模型版本和实验性功能（可选）
+  anthropicSonnetModel: Sonnet / GLM 模型版本
+  anthropicSonnetModelHint: ZAI 默认：glm-4.7 | Anthropic 示例：claude-sonnet-4-20250514
+  anthropicOpusModel: Opus / GLM 模型版本
+  anthropicOpusModelHint: ZAI 默认：glm-5 | Anthropic 示例：claude-opus-4-20250514
+  anthropicHaikuModel: Haiku / GLM-Air 模型版本
+  anthropicHaikuModelHint: ZAI 默认：glm-4.5-air | Anthropic 示例：claude-haiku-4-20250514
+  claudeCodeExperimentalAgentTeams: 启用 Agent Teams 功能
+  claudeCodeExperimentalAgentTeamsHint: 启用实验性的 Agent Teams 协作功能
+  volumeMounts: 卷挂载
+  workdirDescription: 工作目录指向包含您代码仓库的文件夹。我们将扫描该文件夹内的多个仓库，并将其映射到容器内的 /app/workdir 路径。
+  workdirRecommendation: 💡 建议：指向包含多个仓库的父文件夹（例如 /home/user/repos 或 C:\Users\YourName\source\repos）。应用程序将扫描所有子文件夹以检测仓库。
+  workdirPath: 工作目录路径
+  workdirCreatedByRoot: 工作目录由 root 用户创建
+  permissionIssueWarning: 权限问题警告
+  permissionIssueDescription: 工作目录由 root 用户创建，这将阻止容器写入文件。请选择以下解决方案之一：
+  changeDirPermissions: 更改目录权限：
+  createNonRootUser: 创建非 root 用户并使用该用户创建目录
+  configureUserPermission: 配置用户权限映射
+  configureUserPermissionDescription: 为了解决容器内外的文件权限问题，您需要配置 PUID 和 PGID。使用创建工作目录的用户的用户 ID 和组 ID。
+  getCurrentUserId: 获取当前用户 ID：
+  outputExample: 输出示例：
+  puid: PUID（用户 ID）
+  pgid: PGID（组 ID）
+  permissionNotRequired: 无需权限配置
+  permissionNotRequiredDescription: 当工作目录由 root 用户创建时，不需要权限映射。
+  codeServerConfiguration: Code Server 配置
+  codeServerDescription: 只在完整自定义模式下导出托管浏览器 IDE 的部署默认值。
+  codeServerEnable: 将 code-server 设为默认浏览器 IDE
+  codeServerEnableHint: 关闭后会保留你填写的值，但导出的默认实现会切回 code serve-web。
+  codeServerPrivateTitle: 默认保持私有
+  codeServerPrivateHint: 只有在下方显式开启宿主机发布后，Builder 才会额外导出专用端口映射。
+  codeServerPersistenceTitle: 持久化继续复用现有数据卷
+  codeServerPersistenceHint: Builder 现在会把系统级资源持久化到 /app/data，把 save-scoped 的 HagiCode 运行时状态持久化到 /app/saves/save0/...；Code Server 仍保留在系统级根目录。
+  codeServerPersistencePathValue: 系统级：hagicode_data:/app/data  ->  /app/data/code-server
+  codeServerSaveStatePathValue: 存档级：hagicode_saves:/app/saves  ->  /app/saves/save0/...
+  codeServerHost: 监听 Host
+  codeServerHostHint: 默认使用 127.0.0.1 保持容器内私有访问。若要开启宿主机发布，请先切换为 0.0.0.0 或 ::。
+  codeServerPort: 容器端口
+  codeServerPortHint: 有效范围：1-65535。36529 与 HagiCode 当前的 code-server 默认端口一致。
+  codeServerAuthMode: 认证模式
+  codeServerAuthModeNone: none
+  codeServerAuthModePassword: password
+  codeServerAuthModeHint: 当你希望 Builder 一并导出 code-server 的启动密码时，请选择 password。
+  codeServerPassword: CODE_SERVER_PASSWORD
+  codeServerPasswordHint: 该值会交给容器启动引导桥接到 code-server，不会在注释里明文解释。
+  codeServerPasswordSkippedHint: 当认证模式为 none 时，不会导出密码类环境变量。
+  codeServerPublishToHost: 发布到宿主机
+  codeServerPublishToHostHint: 为 code-server 增加独立的宿主机到容器端口映射，同时把宿主机绑定地址固定为回环地址。
+  codeServerPublishedPort: 宿主机发布端口
+  codeServerPublishedPortHint: Builder 会为该端口生成一条仅回环可访问的独立映射。
+  codeServerPublishBindTitle: 宿主机绑定地址
+  codeServerPublishBindHint: Builder 首阶段固定绑定到 loopback；如果你需要更广泛的暴露范围，请在外层显式增加反向代理。
+  codeServerPublishBindValue: 127.0.0.1:<宿主机端口>:<容器端口>
+  codeServerDisabledTitle: 当前未启用 code-server 默认值
+  codeServerDisabledHint: 在重新启用之前，Builder 会导出 code serve-web 作为当前配置模式的默认实现。
+  eulaConfiguration: 容器 EULA
+  eulaDescription: 在 quick-start 与 full-custom 之间共享同一份运行时协议确认开关。
+  acceptEula: 在启动前接受容器 EULA
+  acceptEulaHint: 仅在启用时导出 ACCEPT_EULA=Y；发布镜像的 entrypoint 只有在检测到有效同意值后才会继续启动。
+  readEula: 在 docs 中查看 EULA
+  acceptEulaSharedStateHint: 该选择会在 quick-start 与 full-custom 之间共享。
+configPreview:
+  generatedConfiguration: 生成的配置
+  copy: 复制
+  copied: 已复制！
+  download: 下载
+  yamlCopiedSuccess: YAML 配置已复制到剪贴板！
+  yamlCopiedError: 复制到剪贴板失败
+  downloadSuccess: docker-compose.yml 下载成功！
+  invalidConfigCannotExport: 请先修复配置错误后再复制或下载。
+  generatedAt: 生成时间：
+  basedOnSettings: 此配置基于您上面的设置。
+  previewDescription: 实时 YAML 输出会和当前可见模块保持同步。
+  lines: 行
+  livePreview: 实时预览
+  exportBlockedTitle: 高亮模块修复前，导出操作不可用。
+  exportBlockedDescription: 使用下面的快捷入口返回仍有校验问题的配置模块。
+  exportReadyTitle: 当前配置已经可以导出。
+  exportReadyDescription: 确认预览无误后，可以直接复制或下载生成的文件。
+generator:
+  title: Hagicode Docker Compose 配置
+  generatedBy: 由 Docker Compose 生成器自动生成
+  generatedAtLabel: 生成时间
+  support:
+    title: 支持信息
+    description: 如果您遇到任何问题或需要技术支持：
+    qqGroup: 加入我们的 QQ 群
+    qqNumber: "610394020"
+    discord: 加入我们的 Discord 社区
+    discordLink: https://discord.gg/qY662sJK
+    assistance: 我们提供实时协助和解决方案
+    share: 分享您的经验并与其他用户交流
+  caddyfile:
+    title: Hagicode HTTPS 自动生成 Caddyfile
+    copyHint: 将此内容复制到 docker-compose.yml 同级目录下的 ./Caddyfile
+  runtime:
+    codex:
+      title: Codex 运行时配置
+      usesEnv: 使用 CODEX_* 环境变量
+      alias: OPENAI_* 变量可作为兼容别名
+      baseUrlOptional: CODEX_BASE_URL：可选，未设置时使用默认值
+    opencode:
+      title: OpenCode 运行时配置
+      managedContract: 使用统一镜像内置的托管 OpenCode 运行时契约
+    claude:
+      title: Claude 运行时配置
+      usesToken: 所有提供商统一使用 ANTHROPIC_AUTH_TOKEN
+      urlHint: ZAI、阿里云和自定义提供商会额外设置 ANTHROPIC_URL
+  providers:
+    anthropic:
+      heading: Anthropic 官方 API
+      noUrlHint: 无需 ANTHROPIC_URL，默认使用 Anthropic 官方端点
+    zai:
+      heading: 智谱 AI (ZAI) - 使用 Anthropic 兼容 API
+      providerLabel: API 提供商：智谱 AI (ZAI)
+    aliyun:
+      heading: 阿里云 DashScope - 使用 Anthropic 兼容 API
+      providerLabel: API 提供商：阿里云 DashScope
+      modelMapping: 模型映射（统一配置）
+      unifiedModelHaiku: Haiku  -> glm-4.7  （所有层级统一模型）
+      unifiedModelSonnet: Sonnet -> glm-4.7  （所有层级统一模型）
+      unifiedModelOpus: Opus   -> glm-4.7  （所有层级统一模型）
+    volcengine:
+      heading: 火山引擎 Coding Plan - 使用 Anthropic 兼容 API
+      providerLabel: API 提供商：火山引擎 Coding Plan
+      modelMapping: 模型映射（统一配置）
+      unifiedModelHaiku: Haiku  -> glm-4.7  （所有层级统一模型）
+      unifiedModelSonnet: Sonnet -> glm-4.7  （所有层级统一模型）
+      unifiedModelOpus: Opus   -> glm-4.7  （所有层级统一模型）
+    custom:
+      heading: 自定义 Anthropic 兼容 API
+      providerLabel: API 提供商：自定义端点
+    generic:
+      compatibleLabel: 使用 Anthropic 兼容 API
+      providerLabel: API 提供商：{{displayName}}
+  codeServer:
+    title: Code Server 部署默认值
+    privateHint: 默认不公开宿主机端口；只有开启宿主机发布后才会导出独立映射
+    persistenceHint: 系统级资源继续保存在 hagicode_data:/app/data；save-scoped 运行时状态会持久化到 hagicode_saves:/app/saves/save0/...
+    disabledHint: 当前未将 code-server 设为默认实现，运行时会回退到 code serve-web
+    publishHint: 宿主机发布固定绑定到 127.0.0.1；如需更广泛访问，请在外层反向代理中显式放开
+    systemVolumeHint: 系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server
+    saveVolumeHint: 存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...
+validation:
+  fields:
+    openCodeConfigHostPath: OpenCode 配置宿主机文件路径
+    openCodeAuthHostPath: OpenCode 认证宿主机文件路径
+    openCodeModelsHostPath: OpenCode 模型宿主机文件路径
+  messages:
+    enabledExecutorsRequired: 至少需要启用一个执行器
+    httpPortInvalid: HTTP 端口必须是有效数字
+    httpPortRange: HTTP 端口必须在 1 到 65535 之间
+    httpsPortInvalid: HTTPS 端口必须是有效数字
+    httpsPortRange: HTTPS 端口必须在 1 到 65535 之间
+    lanIpInvalid: 局域网 IP 必须是有效的 IPv4/IPv6 地址
+    httpsPortConflict: HTTPS 端口不能与 HTTP 端口相同
+    containerNameRequired: 容器名称不能为空
+    imageTagRequired: 镜像标签不能为空
+    customLicenseKeyRequired: 自定义许可证密钥不能为空
+    anthropicAuthTokenRequired: 启用 Claude 执行器时必须提供 API 令牌
+    anthropicUrlRequired: 使用自定义 Claude 提供商时必须提供 API 端点 URL
+    codexApiKeyRequired: 启用 Codex 执行器时必须提供 CODEX_API_KEY
+    hostFileRequired: 启用宿主机文件模式时，必须填写{{label}}
+    hostFileMustBeJsonFile: "{{label}}必须指向 .json 文件，而不是目录"
+    hostFileMustEndWithJson: "{{label}}必须以 .json 结尾"
+    hostFileMustBeAbsoluteWindows: '{{label}}必须是绝对 Windows 路径，例如 C:\opencode\{{exampleFilename}}'
+    hostFileMustBeAbsoluteLinux: "{{label}}必须是绝对 Linux 路径，例如 /srv/opencode/{{exampleFilename}}"
+    codeServerHostInvalid: Code Server 监听 Host 必须是有效的 IPv4/IPv6 地址
+    codeServerHostNoPort: Code Server 监听 Host 不能包含端口
+    codeServerPortInvalid: Code Server 容器端口必须是有效数字
+    codeServerPortRange: Code Server 容器端口必须在 1 到 65535 之间
+    codeServerPortConflict: Code Server 容器端口不能复用 HagiCode 应用端口 45000
+    codeServerAuthModeInvalid: Code Server 认证模式只能是 none 或 password
+    codeServerPasswordRequired: 认证模式为 password 时必须提供 Code Server 密码
+    codeServerPublishedPortInvalid: Code Server 宿主机发布端口必须是有效数字
+    codeServerPublishedPortRange: Code Server 宿主机发布端口必须在 1 到 65535 之间
+    codeServerPublishedPortHttpConflict: Code Server 宿主机发布端口不能与 HagiCode HTTP 端口冲突
+    codeServerPublishedPortHttpsConflict: Code Server 宿主机发布端口不能与 HTTPS 代理端口冲突
+    codeServerHostPublishConflict: "启用宿主机发布时，Code Server 监听 Host 必须是 0.0.0.0 或 ::"
+    workdirPathRequired: 工作目录路径不能为空
+    puidInvalid: PUID 必须是有效数字
+    pgidInvalid: PGID 必须是有效数字

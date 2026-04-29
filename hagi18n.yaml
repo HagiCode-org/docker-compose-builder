@@ -1,0 +1,50 @@
+localesRoot: src/i18n/locales
+repoRoot: .
+baseLocale: en-US
+targetLocales:
+  - zh-CN
+  - zh-Hant
+  - ja-JP
+  - ko-KR
+  - de-DE
+  - fr-FR
+  - es-ES
+  - pt-BR
+  - ru-RU
+doctor:
+  excludedDirectories:
+    - .git
+    - coverage
+    - dist
+    - node_modules
+  excludedPathPrefixes:
+    - src/i18n/generated-locales/
+  textFileExtensions:
+    - .cjs
+    - .js
+    - .jsx
+    - .json
+    - .md
+    - .mjs
+    - .ts
+    - .tsx
+    - .yaml
+    - .yml
+  allowlist:
+    legacy-language-change-call: []
+    legacy-locale-path: []
+    legacy-ui-language-literal: []
+    legacy-ui-language-union: []
+  scanRules:
+    - id: legacy-builder-locale-json
+      message: Builder runtime locale loading must use generated namespace JSON instead of the legacy monolithic locale JSON files.
+      pattern: "src/i18n/locales/(?:en-US|zh-CN)\\.json\\b"
+    - id: raw-builder-yaml-import
+      message: Builder runtime locale loading must use generated JSON resources instead of importing YAML files directly.
+      pattern: '(?:from\s+[''"''][^''""]+\.ya?ml[''"'']|import\s*\(\s*[''"''][^''""]+\.ya?ml[''"'']\s*\)|require\(\s*[''"''][^''""]+\.ya?ml[''"'']\s*\))'
+
+# Runtime namespaces are maintained as one YAML file per namespace:
+# - common.yml
+# - docker-compose.yml
+# - providers.yml
+# - seo.yml
