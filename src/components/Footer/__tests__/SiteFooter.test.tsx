@@ -1,10 +1,13 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
+import { getBuilderMessage } from '@/i18n/resources';
+
 import { SiteFooter } from '../SiteFooter';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
+    t: (key: string, values?: Record<string, string | number>) => getBuilderMessage('en-US', key, values),
     i18n: { resolvedLanguage: 'en-US' },
   }),
 }));

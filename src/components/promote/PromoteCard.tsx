@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { getBuilderMessage } from '@/i18n/resources';
 import { loadFirstActivePromotion, type ActivePromotion } from '@/lib/promote-loader';
 
 type PromoteCardProps = {
@@ -15,11 +16,11 @@ const DISMISSED_PROMOTIONS_STORAGE_KEY = 'hagicode:promote-card:dismissed-signat
 
 function platformLabel(platform: string | null, locale: string | undefined) {
   if (platform) return platform;
-  return locale?.toLowerCase().startsWith('zh') ? '推荐' : 'Promoted';
+  return getBuilderMessage(locale, 'common:promoteCard.badgeFallback');
 }
 
 function closeLabel(locale: string | undefined) {
-  return locale?.toLowerCase().startsWith('zh') ? '关闭推广信息' : 'Dismiss promotion';
+  return getBuilderMessage(locale, 'common:promoteCard.dismiss');
 }
 
 function readDismissedSignature(): string | null {
@@ -96,7 +97,7 @@ export function PromoteCard({
   };
 
   return (
-    <section className={className} data-promote-card aria-label={locale.toLowerCase().startsWith('zh') ? '推广信息' : 'Promotion'}>
+    <section className={className} data-promote-card aria-label={getBuilderMessage(locale, 'common:promoteCard.sectionLabel')}>
       <div className="promote-card__inner">
         <button type="button" className="promote-card__close" onClick={dismissPromotion} aria-label={closeLabel(locale)}>
           <span aria-hidden="true">×</span>
@@ -106,7 +107,10 @@ export function PromoteCard({
           className="promote-card__surface"
           data-has-image={promotion.image ? 'true' : 'false'}
           onClick={openPromotion}
-          aria-label={`${promotion.ctaLabel}: ${promotion.title}`}
+          aria-label={getBuilderMessage(locale, 'common:promoteCard.surfaceAriaLabel', {
+            ctaLabel: promotion.ctaLabel,
+            title: promotion.title,
+          })}
         >
           <span className="promote-card__body">
             <span className="promote-card__badge">{platformLabel(promotion.platform, locale)}</span>

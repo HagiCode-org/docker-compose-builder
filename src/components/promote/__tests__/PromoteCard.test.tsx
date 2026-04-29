@@ -2,6 +2,8 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
+import { getBuilderMessage } from '@/i18n/resources';
+
 import { PromoteCard } from '../PromoteCard';
 
 const activePromotion = {
@@ -35,8 +37,11 @@ describe('PromoteCard', () => {
     expect(markup).toContain('promote-card__image');
     expect(markup).toContain('src="https://index.hagicode.com/images/promotions/main-game.webp"');
     expect(markup).toContain('alt="HagiCode artwork"');
-    expect(markup).toContain('aria-label="关闭推广信息"');
-    expect(markup).toContain('aria-label="加入愿望单: 立即添加到愿望单"');
+    expect(markup).toContain(`aria-label="${getBuilderMessage('zh-CN', 'common:promoteCard.dismiss')}"`);
+    expect(markup).toContain(`aria-label="${getBuilderMessage('zh-CN', 'common:promoteCard.surfaceAriaLabel', {
+      ctaLabel: activePromotion.ctaLabel,
+      title: activePromotion.title,
+    })}"`);
   });
 
   it('renders nothing when no active promotion exists', () => {

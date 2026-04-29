@@ -25,10 +25,10 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
   const handleCopyQQNumber = async () => {
     try {
       await navigator.clipboard.writeText(NAVIGATION_LINKS.qqGroup.groupNumber!);
-      toast.success(t('header.navigation.copied'));
+      toast.success(t('common:header.navigation.copied'));
     } catch (error) {
       console.error('Failed to copy:', error);
-      toast.error(t('common.error'));
+      toast.error(t('common:common.error'));
     }
   };
 
@@ -90,7 +90,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
           size="sm"
           onClick={handleCopyQQNumber}
           className="text-sm h-8 px-3 hover:bg-accent/50 transition-all duration-200"
-          aria-label={t('header.navigation.copyGroupNumber')}
+          aria-label={t('common:header.navigation.copyGroupNumber')}
         >
           <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
           <span>{t(NAVIGATION_LINKS.qqGroup.labelKey, { groupNumber: NAVIGATION_LINKS.qqGroup.groupNumber })}</span>
@@ -109,7 +109,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
           variant="ghost"
           size="sm"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle navigation menu"
+          aria-label={t('common:header.navigation.menuToggle')}
           aria-expanded={isMenuOpen}
           className="h-8 px-2"
         >
@@ -121,7 +121,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
           <div
             className="absolute right-4 top-14 bg-card/95 backdrop-blur-xl border-2 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 min-w-[200px]"
             role="navigation"
-            aria-label="Main navigation"
+            aria-label={t('common:header.navigation.menu')}
           >
             {externalLinks.map((link) => (
               <a
@@ -155,11 +155,11 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
             {/* Theme and Language */}
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">主题</span>
+                <span className="text-sm text-muted-foreground">{t('common:header.navigation.theme')}</span>
                 <ThemeToggle />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">语言</span>
+                <span className="text-sm text-muted-foreground">{t('common:header.navigation.language')}</span>
                 <LanguageSwitcher />
               </div>
             </div>

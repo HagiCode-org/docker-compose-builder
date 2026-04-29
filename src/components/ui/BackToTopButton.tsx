@@ -106,7 +106,7 @@ export const BackToTopButton: React.FC<BackToTopButtonProps> = ({
     <Button
       size="icon"
       onClick={scrollToTop}
-      aria-label={t('backToTop.ariaLabel')}
+      aria-label={t('common:backToTop.ariaLabel')}
       className={cn(
         // Position classes - absolute position relative to scrollable container
         'absolute bottom-8 z-10',
@@ -125,7 +125,7 @@ export const BackToTopButton: React.FC<BackToTopButtonProps> = ({
         // Custom classes
         className
       )}
-      title={t('backToTop.backToTop')}
+      title={t('common:backToTop.backToTop')}
     >
       <ArrowUp className="h-4 w-4" />
     </Button>

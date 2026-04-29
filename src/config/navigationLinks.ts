@@ -4,31 +4,31 @@ import type { LucideIcon } from 'lucide-react';
 export const NAVIGATION_LINKS = {
   officialSite: {
     url: 'https://hagicode.com',
-    labelKey: 'header.navigation.officialSite',
+    labelKey: 'common:header.navigation.officialSite',
     icon: Globe,
     external: true,
   },
   officialDocs: {
     url: 'https://docs.hagicode.com/installation/docker-compose/',
-    labelKey: 'header.navigation.officialDocs',
+    labelKey: 'common:header.navigation.officialDocs',
     icon: BookOpen,
     external: true,
   },
   githubRepo: {
     url: 'https://github.com/HagiCode-org/site',
-    labelKey: 'header.navigation.githubRepo',
+    labelKey: 'common:header.navigation.githubRepo',
     icon: Github,
     external: true,
   },
   discord: {
     url: 'https://discord.gg/qY662sJK',
-    labelKey: 'header.navigation.discord',
+    labelKey: 'common:header.navigation.discord',
     icon: MessageSquare,
     external: true,
   },
   qqGroup: {
     url: null,
-    labelKey: 'header.navigation.qqGroup',
+    labelKey: 'common:header.navigation.qqGroup',
     icon: null,
     groupNumber: '610394020',
     action: 'copy',
