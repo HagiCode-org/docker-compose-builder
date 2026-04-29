@@ -1,5 +1,5 @@
 import type { SEOConfig, PageSEOConfig } from '../../config/seo';
-import { defaultSEOConfig, siteConfig } from '../../config/seo';
+import { buildDefaultSEOConfig, getPageSEOMetadata, siteConfig } from '../../config/seo';
 
 export function setMetaTag(name: string, content: string) {
   let element = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
@@ -49,8 +49,11 @@ export function setCanonicalUrl(url: string) {
   setLinkTag('canonical', url);
 }
 
-export function updateSEO(config: Partial<SEOConfig> & PageSEOConfig) {
-  const fullConfig = { ...defaultSEOConfig, ...config };
+export function updateSEO(
+  config: Partial<SEOConfig> & PageSEOConfig,
+  baseConfig: SEOConfig = buildDefaultSEOConfig(),
+) {
+  const fullConfig = { ...baseConfig, ...config };
 
   // Basic meta tags
   if (config.title || fullConfig.title) {
@@ -111,14 +114,16 @@ export function updateSEO(config: Partial<SEOConfig> & PageSEOConfig) {
   }
 }
 
-export function updatePageSEO(pathname: string, pageConfig?: PageSEOConfig) {
+export function updatePageSEO(pathname: string, language?: string | null, pageConfig?: PageSEOConfig) {
   const url = `${siteConfig.siteUrl}${pathname.slice(1)}`;
+  const pageMetadata = getPageSEOMetadata(language)[pathname] ?? {};
   updateSEO({
+    ...pageMetadata,
     url,
     ...pageConfig
-  });
+  }, buildDefaultSEOConfig(language));
 }
 
-export function initializeDefaultSEO() {
-  updateSEO({});
+export function initializeDefaultSEO(language?: string | null) {
+  updateSEO({}, buildDefaultSEOConfig(language));
 }

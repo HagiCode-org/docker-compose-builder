@@ -1,3 +1,10 @@
+import {
+  DEFAULT_BUILDER_LANGUAGE,
+  SUPPORTED_BUILDER_LANGUAGE_CODES,
+  resolveBuilderLanguageCode,
+} from '@/i18n/config';
+import { getBuilderMessage, getBuilderResourceValue } from '@/i18n/resources';
+
 export interface SEOConfig {
   title: string;
   description: string;
@@ -19,26 +26,23 @@ export interface PageSEOConfig {
   canonical?: string;
 }
 
-export const defaultSEOConfig: SEOConfig = {
-  title: 'Hagicode Docker Compose Builder',
-  description: 'A powerful visual tool for creating and managing Docker Compose configurations. Build, customize, and export your docker-compose.yml files with an intuitive interface.',
-  keywords: [
-    'docker',
-    'docker compose',
-    'docker-compose',
-    'yaml generator',
-    'docker builder',
-    'container orchestration',
-    'devops tools',
-    'docker ui',
-    'compose builder'
-  ],
-  image: '/og-image.png',
-  url: 'https://builder.hagicode.com',
-  type: 'web-application',
-  locale: 'en',
-  alternateLocales: ['zh-CN']
-};
+export function buildDefaultSEOConfig(language: string | null | undefined = DEFAULT_BUILDER_LANGUAGE): SEOConfig {
+  const locale = resolveBuilderLanguageCode(language);
+  const keywords = getBuilderResourceValue(locale, 'seo:default.keywords');
+
+  return {
+    title: getBuilderMessage(locale, 'seo:default.title'),
+    description: getBuilderMessage(locale, 'seo:default.description'),
+    keywords: Array.isArray(keywords) ? keywords.filter((keyword): keyword is string => typeof keyword === 'string') : [],
+    image: '/og-image.png',
+    url: 'https://builder.hagicode.com',
+    type: 'web-application',
+    locale,
+    alternateLocales: SUPPORTED_BUILDER_LANGUAGE_CODES.filter((candidate) => candidate !== locale),
+  };
+}
+
+export const defaultSEOConfig: SEOConfig = buildDefaultSEOConfig();
 
 export const siteConfig = {
   name: 'Hagicode Docker Compose Builder',
@@ -54,9 +58,14 @@ export const siteConfig = {
   }
 };
 
-export const pageSEOMetadata: Record<string, PageSEOConfig> = {
-  '/': {
-    title: 'Hagicode Docker Compose Builder - Visual Docker Compose Generator',
-    description: 'Create and manage Docker Compose configurations visually. Build docker-compose.yml files with an intuitive drag-and-drop interface.'
-  }
-};
+export function getPageSEOMetadata(
+  language: string | null | undefined = DEFAULT_BUILDER_LANGUAGE,
+): Record<string, PageSEOConfig> {
+  const locale = resolveBuilderLanguageCode(language);
+  return {
+    '/': {
+      title: getBuilderMessage(locale, 'seo:pages.home.title'),
+      description: getBuilderMessage(locale, 'seo:pages.home.description'),
+    },
+  };
+}
