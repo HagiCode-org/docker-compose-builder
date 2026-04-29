@@ -8,6 +8,8 @@
  * 3. If that fails, use legacy hardcoded constants
  */
 
+import { getBuilderMessage } from '@/i18n/resources';
+
 /**
  * Provider Preset Configuration Interface
  * Matches the JSON structure from the docs repository
@@ -47,6 +49,8 @@ export interface ProviderPreset {
   documentationUrl?: string;
   /** Additional notes about the provider */
   notes?: string;
+  /** Network advice shown alongside provider copy when available */
+  networkAdvice?: string;
 }
 
 /**
@@ -176,6 +180,35 @@ const CUSTOM_PROVIDER: ProviderPreset = {
   supportedModels: [],
   notes: '用户需要手动提供 API 端点 URL'
 };
+
+function getLocalizedProviderField(
+  language: string | null | undefined,
+  providerId: string,
+  field: 'name' | 'description' | 'notes' | 'networkAdvice',
+  fallback: string | undefined,
+): string | undefined {
+  const localizedValue = getBuilderMessage(
+    language,
+    `providers:providers.${providerId}.${field}`,
+    undefined,
+    fallback ?? '',
+  ).trim();
+
+  return localizedValue || fallback;
+}
+
+export function localizeProviderPreset(
+  provider: ProviderPreset,
+  language: string | null | undefined,
+): ProviderPreset {
+  return {
+    ...provider,
+    name: getLocalizedProviderField(language, provider.providerId, 'name', provider.name) ?? provider.name,
+    description: getLocalizedProviderField(language, provider.providerId, 'description', provider.description) ?? provider.description,
+    notes: getLocalizedProviderField(language, provider.providerId, 'notes', provider.notes),
+    networkAdvice: getLocalizedProviderField(language, provider.providerId, 'networkAdvice', provider.networkAdvice),
+  };
+}
 
 /**
  * Provider Configuration Loader Class
@@ -327,7 +360,8 @@ export class ProviderConfigLoader {
       authTokenEnv: data.authTokenEnv as string | undefined,
       referralUrl: data.referralUrl as string | undefined,
       documentationUrl: data.documentationUrl as string | undefined,
-      notes: data.notes as string | undefined
+      notes: data.notes as string | undefined,
+      networkAdvice: data.networkAdvice as string | undefined,
     };
   }
 

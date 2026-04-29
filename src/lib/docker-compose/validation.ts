@@ -1,5 +1,7 @@
 import type { DockerComposeConfig } from './types';
 import { hasPortConflict, parseHostWithOptionalPort } from '../../validators/ipValidator';
+import { DEFAULT_BUILDER_LANGUAGE } from '@/i18n/config';
+import { getBuilderMessage } from '@/i18n/resources';
 
 const WINDOWS_FILE_PATH_PATTERN = /^[A-Za-z]:[\\/].+$/;
 const CODE_SERVER_PUBLIC_LISTEN_HOSTS = new Set(['0.0.0.0', '::']);
@@ -15,33 +17,51 @@ function parseRequiredPort(value: string): number | null {
 function getOpenCodeHostPathError(
   pathValue: string,
   config: DockerComposeConfig,
-  label: string,
+  fieldKey: 'openCodeConfigHostPath' | 'openCodeAuthHostPath' | 'openCodeModelsHostPath',
   required: boolean,
-  exampleFilename: string
+  exampleFilename: string,
+  language: string | null | undefined,
 ): string | null {
   const path = pathValue.trim();
+  const label = getValidationMessage(language, `docker-compose:validation.fields.${fieldKey}`);
 
   if (path.length === 0) {
-    return required ? `${label} is required when host-file mode is enabled` : null;
+    return required
+      ? getValidationMessage(language, 'docker-compose:validation.messages.hostFileRequired', { label })
+      : null;
   }
 
   if (path.endsWith('/') || path.endsWith('\\')) {
-    return `${label} must point to a .json file, not a directory`;
+    return getValidationMessage(language, 'docker-compose:validation.messages.hostFileMustBeJsonFile', { label });
   }
 
   if (!path.toLowerCase().endsWith('.json')) {
-    return `${label} must end with .json`;
+    return getValidationMessage(language, 'docker-compose:validation.messages.hostFileMustEndWithJson', { label });
   }
 
   if (config.hostOS === 'windows') {
     return WINDOWS_FILE_PATH_PATTERN.test(path)
       ? null
-      : `${label} must be an absolute Windows path such as C:\\opencode\\${exampleFilename}`;
+      : getValidationMessage(language, 'docker-compose:validation.messages.hostFileMustBeAbsoluteWindows', {
+        label,
+        exampleFilename,
+      });
   }
 
   return path.startsWith('/')
     ? null
-    : `${label} must be an absolute Linux path such as /srv/opencode/${exampleFilename}`;
+    : getValidationMessage(language, 'docker-compose:validation.messages.hostFileMustBeAbsoluteLinux', {
+      label,
+      exampleFilename,
+    });
+}
+
+function getValidationMessage(
+  language: string | null | undefined,
+  key: string,
+  interpolation?: Record<string, string | number>,
+): string {
+  return getBuilderMessage(language ?? DEFAULT_BUILDER_LANGUAGE, key, interpolation);
 }
 
 /**
@@ -57,7 +77,10 @@ export interface ValidationError {
  * @param config The configuration to validate
  * @returns Array of validation errors (empty if valid)
  */
-export function validateConfig(config: DockerComposeConfig): ValidationError[] {
+export function validateConfig(
+  config: DockerComposeConfig,
+  language: string | null | undefined = DEFAULT_BUILDER_LANGUAGE,
+): ValidationError[] {
   const errors: ValidationError[] = [];
   const claudeEnabled = config.enabledExecutors.includes('claude');
   const codexEnabled = config.enabledExecutors.includes('codex');
@@ -65,60 +88,63 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
 
   // Validate executor capability only.
   if (!Array.isArray(config.enabledExecutors) || config.enabledExecutors.length === 0) {
-    errors.push({ field: 'enabledExecutors', message: 'At least one executor must be enabled' });
+    errors.push({
+      field: 'enabledExecutors',
+      message: getValidationMessage(language, 'docker-compose:validation.messages.enabledExecutorsRequired'),
+    });
   }
 
   // Validate HTTP port
   if (!config.httpPort || isNaN(parseInt(config.httpPort))) {
-    errors.push({ field: 'httpPort', message: 'HTTP port must be a valid number' });
+    errors.push({ field: 'httpPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpPortInvalid') });
   } else if (parseInt(config.httpPort) < 1 || parseInt(config.httpPort) > 65535) {
-    errors.push({ field: 'httpPort', message: 'HTTP port must be between 1 and 65535' });
+    errors.push({ field: 'httpPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpPortRange') });
   }
 
   // Validate HTTPS configuration
   if (config.enableHttps) {
     if (!config.httpsPort || Number.isNaN(parseInt(config.httpsPort))) {
-      errors.push({ field: 'httpsPort', message: 'HTTPS port must be a valid number' });
+      errors.push({ field: 'httpsPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpsPortInvalid') });
     } else if (parseInt(config.httpsPort) < 1 || parseInt(config.httpsPort) > 65535) {
-      errors.push({ field: 'httpsPort', message: 'HTTPS port must be between 1 and 65535' });
+      errors.push({ field: 'httpsPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpsPortRange') });
     }
 
     const parsedLanIp = parseHostWithOptionalPort(config.lanIp || '');
     if (!parsedLanIp) {
-      errors.push({ field: 'lanIp', message: 'LAN IP must be a valid IPv4/IPv6 address' });
+      errors.push({ field: 'lanIp', message: getValidationMessage(language, 'docker-compose:validation.messages.lanIpInvalid') });
     }
 
     if (hasPortConflict(config.httpPort, config.httpsPort)) {
-      errors.push({ field: 'httpsPort', message: 'HTTPS port cannot be the same as HTTP port' });
+      errors.push({ field: 'httpsPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpsPortConflict') });
     }
   }
 
   // Validate container name
   if (!config.containerName || config.containerName.trim() === '') {
-    errors.push({ field: 'containerName', message: 'Container name is required' });
+    errors.push({ field: 'containerName', message: getValidationMessage(language, 'docker-compose:validation.messages.containerNameRequired') });
   }
 
   // Validate image tag
   if (!config.imageTag || config.imageTag.trim() === '') {
-    errors.push({ field: 'imageTag', message: 'Image tag is required' });
+    errors.push({ field: 'imageTag', message: getValidationMessage(language, 'docker-compose:validation.messages.imageTagRequired') });
   }
 
   // Validate license key
   if (config.licenseKeyType === 'custom') {
     if (!config.licenseKey || config.licenseKey.trim() === '') {
-      errors.push({ field: 'licenseKey', message: 'Custom license key is required' });
+      errors.push({ field: 'licenseKey', message: getValidationMessage(language, 'docker-compose:validation.messages.customLicenseKeyRequired') });
     }
   }
 
   // Validate Claude configuration when Claude capability is enabled
   if (claudeEnabled) {
     if (!config.anthropicAuthToken || config.anthropicAuthToken.trim() === '') {
-      errors.push({ field: 'anthropicAuthToken', message: 'API token is required when Claude executor is enabled' });
+      errors.push({ field: 'anthropicAuthToken', message: getValidationMessage(language, 'docker-compose:validation.messages.anthropicAuthTokenRequired') });
     }
 
     if (config.anthropicApiProvider === 'custom') {
       if (!config.anthropicUrl || config.anthropicUrl.trim() === '') {
-        errors.push({ field: 'anthropicUrl', message: 'API endpoint URL is required for custom Claude provider' });
+        errors.push({ field: 'anthropicUrl', message: getValidationMessage(language, 'docker-compose:validation.messages.anthropicUrlRequired') });
       }
     }
   }
@@ -126,7 +152,7 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   // Validate Codex configuration when Codex capability is enabled
   if (codexEnabled) {
     if (!config.codexApiKey || config.codexApiKey.trim() === '') {
-      errors.push({ field: 'codexApiKey', message: 'CODEX_API_KEY is required when Codex executor is enabled' });
+      errors.push({ field: 'codexApiKey', message: getValidationMessage(language, 'docker-compose:validation.messages.codexApiKeyRequired') });
     }
   }
 
@@ -134,9 +160,10 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     const openCodeConfigHostPathError = getOpenCodeHostPathError(
       config.openCodeConfigHostPath,
       config,
-      'OpenCode config host file path',
+      'openCodeConfigHostPath',
       true,
-      'opencode.json'
+      'opencode.json',
+      language,
     );
     if (openCodeConfigHostPathError) {
       errors.push({
@@ -148,9 +175,10 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     const openCodeAuthHostPathError = getOpenCodeHostPathError(
       config.openCodeAuthHostPath,
       config,
-      'OpenCode auth host file path',
+      'openCodeAuthHostPath',
       false,
-      'auth.json'
+      'auth.json',
+      language,
     );
     if (openCodeAuthHostPathError) {
       errors.push({
@@ -162,9 +190,10 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
     const openCodeModelsHostPathError = getOpenCodeHostPathError(
       config.openCodeModelsHostPath,
       config,
-      'OpenCode models host file path',
+      'openCodeModelsHostPath',
       false,
-      'models.json'
+      'models.json',
+      language,
     );
     if (openCodeModelsHostPathError) {
       errors.push({
@@ -177,48 +206,48 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
   if (config.profile === 'full-custom' && config.enableCodeServer) {
     const parsedCodeServerHost = parseHostWithOptionalPort(config.codeServerHost || '');
     if (!parsedCodeServerHost) {
-      errors.push({ field: 'codeServerHost', message: 'Code Server listen host must be a valid IPv4/IPv6 address' });
+      errors.push({ field: 'codeServerHost', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerHostInvalid') });
     } else if (parsedCodeServerHost.port !== undefined) {
-      errors.push({ field: 'codeServerHost', message: 'Code Server listen host must not include a port' });
+      errors.push({ field: 'codeServerHost', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerHostNoPort') });
     }
 
     const codeServerPort = parseRequiredPort(config.codeServerPort);
     if (codeServerPort === null) {
-      errors.push({ field: 'codeServerPort', message: 'Code Server container port must be a valid number' });
+      errors.push({ field: 'codeServerPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPortInvalid') });
     } else if (codeServerPort < 1 || codeServerPort > 65535) {
-      errors.push({ field: 'codeServerPort', message: 'Code Server container port must be between 1 and 65535' });
+      errors.push({ field: 'codeServerPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPortRange') });
     } else if (codeServerPort === 45000) {
-      errors.push({ field: 'codeServerPort', message: 'Code Server container port cannot reuse the HagiCode app port 45000' });
+      errors.push({ field: 'codeServerPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPortConflict') });
     }
 
     if (config.codeServerAuthMode !== 'none' && config.codeServerAuthMode !== 'password') {
-      errors.push({ field: 'codeServerAuthMode', message: 'Code Server auth mode must be none or password' });
+      errors.push({ field: 'codeServerAuthMode', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerAuthModeInvalid') });
     }
 
     if (config.codeServerAuthMode === 'password' && (!config.codeServerPassword || config.codeServerPassword.trim() === '')) {
-      errors.push({ field: 'codeServerPassword', message: 'Code Server password is required when auth mode is password' });
+      errors.push({ field: 'codeServerPassword', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPasswordRequired') });
     }
 
     if (config.codeServerPublishToHost) {
       const publishedPort = parseRequiredPort(config.codeServerPublishedPort);
       if (publishedPort === null) {
-        errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port must be a valid number' });
+        errors.push({ field: 'codeServerPublishedPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPublishedPortInvalid') });
       } else if (publishedPort < 1 || publishedPort > 65535) {
-        errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port must be between 1 and 65535' });
+        errors.push({ field: 'codeServerPublishedPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPublishedPortRange') });
       } else {
         if (!config.enableHttps && hasPortConflict(config.httpPort, config.codeServerPublishedPort)) {
-          errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port cannot match the HagiCode HTTP port' });
+          errors.push({ field: 'codeServerPublishedPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPublishedPortHttpConflict') });
         }
 
         if (config.enableHttps && hasPortConflict(config.httpsPort, config.codeServerPublishedPort)) {
-          errors.push({ field: 'codeServerPublishedPort', message: 'Code Server published port cannot match the HTTPS proxy port' });
+          errors.push({ field: 'codeServerPublishedPort', message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerPublishedPortHttpsConflict') });
         }
       }
 
       if (parsedCodeServerHost && !CODE_SERVER_PUBLIC_LISTEN_HOSTS.has(parsedCodeServerHost.host.trim())) {
         errors.push({
           field: 'codeServerHost',
-          message: 'Code Server listen host must be 0.0.0.0 or :: when host publishing is enabled'
+          message: getValidationMessage(language, 'docker-compose:validation.messages.codeServerHostPublishConflict'),
         });
       }
     }
@@ -226,16 +255,16 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
 
   // Validate work directory
   if (!config.workdirPath || config.workdirPath.trim() === '') {
-    errors.push({ field: 'workdirPath', message: 'Work directory path is required' });
+    errors.push({ field: 'workdirPath', message: getValidationMessage(language, 'docker-compose:validation.messages.workdirPathRequired') });
   }
 
   // Validate PUID and PGID for Linux
   if (config.hostOS === 'linux' && !config.workdirCreatedByRoot) {
     if (!config.puid || config.puid.trim() === '' || isNaN(parseInt(config.puid))) {
-      errors.push({ field: 'puid', message: 'PUID must be a valid number' });
+      errors.push({ field: 'puid', message: getValidationMessage(language, 'docker-compose:validation.messages.puidInvalid') });
     }
     if (!config.pgid || config.pgid.trim() === '' || isNaN(parseInt(config.pgid))) {
-      errors.push({ field: 'pgid', message: 'PGID must be a valid number' });
+      errors.push({ field: 'pgid', message: getValidationMessage(language, 'docker-compose:validation.messages.pgidInvalid') });
     }
   }
 
@@ -247,6 +276,9 @@ export function validateConfig(config: DockerComposeConfig): ValidationError[] {
  * @param config The configuration to validate
  * @returns true if valid, false otherwise
  */
-export function isValidConfig(config: DockerComposeConfig): boolean {
-  return validateConfig(config).length === 0;
+export function isValidConfig(
+  config: DockerComposeConfig,
+  language: string | null | undefined = DEFAULT_BUILDER_LANGUAGE,
+): boolean {
+  return validateConfig(config, language).length === 0;
 }

@@ -1,5 +1,8 @@
 import type { DockerComposeConfig } from './types';
-import type { ProviderPreset } from './providerConfigLoader';
+import {
+  localizeProviderPreset,
+  type ProviderPreset,
+} from './providerConfigLoader';
 import {
   OPENCODE_AUTH_TARGET_FILE,
   OPENCODE_AUTH_TARGET_DIR,
@@ -12,6 +15,8 @@ import {
   OPENCODE_MODELS_TARGET_DIR,
   OPENCODE_MODELS_TARGET_FILE,
 } from './types';
+import { resolveBuilderLanguageCode } from '@/i18n/config';
+import { getBuilderMessage } from '@/i18n/resources';
 
 /**
  * Get provider API URL for Docker Compose generation
@@ -60,23 +65,42 @@ function getProviderApiUrl(
  * @param providerConfig Optional provider configuration
  * @returns The provider display name
  */
-function getProviderDisplayName(providerId: string, providerConfig?: ProviderPreset): string {
+function translateGenerator(language: string, key: string, interpolation?: Record<string, string | number>, fallback = key): string {
+  return getBuilderMessage(resolveBuilderLanguageCode(language), key, interpolation, fallback);
+}
+
+function getLocalizedProviderFallback(
+  language: string,
+  providerId: string,
+  field: 'name' | 'description',
+  fallback: string,
+): string {
+  return getBuilderMessage(language, `providers:providers.${providerId}.${field}`, undefined, fallback);
+}
+
+function getProviderDisplayName(
+  providerId: string,
+  providerConfig: ProviderPreset | undefined,
+  language: string,
+): string {
+  const localizedProvider = providerConfig ? localizeProviderPreset(providerConfig, language) : undefined;
+
   // Legacy fallback for backward compatibility with existing tests
   switch (providerId) {
     case 'anthropic':
-      return 'Anthropic Official';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'Anthropic Official');
     case 'zai':
-      return 'Zhipu AI (ZAI)';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'Zhipu AI (ZAI)');
     case 'aliyun':
-      return 'Aliyun DashScope';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'Aliyun DashScope');
     case 'custom':
-      return 'Custom Endpoint';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'Custom Endpoint');
     case 'minimax':
-      return 'MiniMax';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'MiniMax');
     case 'volcengine':
-      return '火山引擎 Coding Plan';
+      return getLocalizedProviderFallback(language, providerId, 'name', localizedProvider?.name ?? 'Volcengine Coding Plan');
     default:
-      return providerConfig?.name || providerId;
+      return localizedProvider?.name || providerId;
   }
 }
 
@@ -86,10 +110,20 @@ function getProviderDisplayName(providerId: string, providerConfig?: ProviderPre
  * @param providerConfig Optional provider configuration
  * @returns The provider description
  */
-function getProviderDescription(_providerId: string, providerConfig?: ProviderPreset): string | null {
-  if (providerConfig && providerConfig.description) {
-    return providerConfig.description;
+function getProviderDescription(
+  providerId: string,
+  providerConfig: ProviderPreset | undefined,
+  language: string,
+): string | null {
+  if (providerConfig) {
+    return localizeProviderPreset(providerConfig, language).description;
   }
+
+  const fallbackDescription = getBuilderMessage(language, `providers:providers.${providerId}.description`, undefined, '');
+  if (fallbackDescription) {
+    return fallbackDescription;
+  }
+
   return null;
 }
 
@@ -102,25 +136,15 @@ function hasTextValue(value: string | undefined): value is string {
 }
 
 function getCodeServerCommentCopy(language: string) {
-  return language === 'zh-CN'
-    ? {
-      title: 'Code Server 部署默认值',
-      privateHint: '默认不公开宿主机端口；只有开启宿主机发布后才会导出独立映射',
-      persistenceHint: '系统级资源继续保存在 hagicode_data:/app/data；save-scoped 运行时状态会持久化到 hagicode_saves:/app/saves/save0/...',
-      disabledHint: '当前未将 code-server 设为默认实现，运行时会回退到 code serve-web',
-      publishHint: '宿主机发布固定绑定到 127.0.0.1；如需更广泛访问，请在外层反向代理中显式放开',
-      systemVolumeHint: '系统级数据卷；Code Server 运行时状态会落在 /app/data/code-server',
-      saveVolumeHint: '存档级数据卷；主数据库与 Orleans 等状态会落在 /app/saves/save0/...'
-    }
-    : {
-      title: 'Code Server deployment defaults',
-      privateHint: 'Private by default: no host port is published unless you explicitly enable it',
-      persistenceHint: 'System-scoped assets stay under hagicode_data:/app/data while save-scoped runtime state persists under hagicode_saves:/app/saves/save0/...',
-      disabledHint: 'code-server is not the default implementation for this deployment; runtime falls back to code serve-web',
-      publishHint: 'Host publishing is loopback-only at 127.0.0.1; add a reverse proxy explicitly if you need broader exposure',
-      systemVolumeHint: 'System data volume; Code Server runtime state lives under /app/data/code-server',
-      saveVolumeHint: 'Save-state volume; the main database and Orleans state live under /app/saves/save0/...'
-    };
+  return {
+    title: translateGenerator(language, 'docker-compose:generator.codeServer.title'),
+    privateHint: translateGenerator(language, 'docker-compose:generator.codeServer.privateHint'),
+    persistenceHint: translateGenerator(language, 'docker-compose:generator.codeServer.persistenceHint'),
+    disabledHint: translateGenerator(language, 'docker-compose:generator.codeServer.disabledHint'),
+    publishHint: translateGenerator(language, 'docker-compose:generator.codeServer.publishHint'),
+    systemVolumeHint: translateGenerator(language, 'docker-compose:generator.codeServer.systemVolumeHint'),
+    saveVolumeHint: translateGenerator(language, 'docker-compose:generator.codeServer.saveVolumeHint'),
+  };
 }
 
 function buildCodeServerEnvVars(config: DockerComposeConfig, language: string): string[] {
@@ -270,36 +294,36 @@ function getUsedExecutorNamedVolumes(config: DockerComposeConfig): Set<string> {
  */
 function buildProviderEnvVars(
   config: DockerComposeConfig,
-  providerConfig?: ProviderPreset
+  providerConfig: ProviderPreset | undefined,
+  language: string,
 ): string[] {
   const lines: string[] = [];
 
   if (isExecutorEnabled(config, 'codex')) {
-    // Codex runtime configuration
     lines.push('      # ==================================================');
-    lines.push('      # Codex Runtime Configuration');
-    lines.push('      # Uses CODEX_* environment variables');
-    lines.push('      # OPENAI_* variables are accepted as compatibility aliases');
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.title')}`);
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.usesEnv')}`);
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.alias')}`);
     lines.push('      # ==================================================');
 
     if (config.codexApiKey) {
       lines.push(`      CODEX_API_KEY: "${config.codexApiKey}"`);
-      lines.push('      # Compatibility alias: OPENAI_API_KEY = CODEX_API_KEY');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.alias')}: OPENAI_API_KEY = CODEX_API_KEY`);
     }
 
     if (config.codexBaseUrl && config.codexBaseUrl.trim()) {
       lines.push(`      CODEX_BASE_URL: "${config.codexBaseUrl}"`);
-      lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.alias')}: OPENAI_BASE_URL = CODEX_BASE_URL`);
     } else {
-      lines.push('      # CODEX_BASE_URL: optional, uses default if not set');
-      lines.push('      # Compatibility alias: OPENAI_BASE_URL = CODEX_BASE_URL');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.baseUrlOptional')}`);
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.codex.alias')}: OPENAI_BASE_URL = CODEX_BASE_URL`);
     }
   }
 
   if (isExecutorEnabled(config, 'opencode')) {
     lines.push('      # ==================================================');
-    lines.push('      # OpenCode Runtime Configuration');
-    lines.push('      # Uses the managed OpenCode runtime contract baked into the unified image');
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.opencode.title')}`);
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.opencode.managedContract')}`);
     lines.push('      # ==================================================');
     lines.push('      AI__Providers__Providers__OpenCodeCli__Enabled: "true"');
     lines.push('      AI__Providers__Providers__OpenCodeCli__Type: "OpenCodeCli"');
@@ -312,7 +336,6 @@ function buildProviderEnvVars(
   }
 
   if (isExecutorEnabled(config, 'claude')) {
-    // Claude runtime configuration
     if (!config.anthropicAuthToken) {
       return lines;
     }
@@ -321,51 +344,49 @@ function buildProviderEnvVars(
     const apiUrl = getProviderApiUrl(providerId, providerConfig, config.anthropicUrl);
 
     lines.push('      # ==================================================');
-    lines.push('      # Claude Runtime Configuration');
-    lines.push('      # All providers use ANTHROPIC_AUTH_TOKEN');
-    lines.push('      # ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers');
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.claude.title')}`);
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.claude.usesToken')}`);
+    lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.runtime.claude.urlHint')}`);
     lines.push('      # ==================================================');
 
-    // Legacy behavior for backward compatibility with existing tests
     if (providerId === 'anthropic') {
-      lines.push('      # Anthropic Official API');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.anthropic.heading')}`);
       lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
-      lines.push('      # No ANTHROPIC_URL needed - uses default Anthropic endpoint');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.anthropic.noUrlHint')}`);
     } else if (providerId === 'zai') {
-      lines.push('      # Zhipu AI (ZAI) - uses Anthropic-compatible API');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.zai.heading')}`);
       lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
       lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-      lines.push('      # API Provider: Zhipu AI (ZAI)');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.zai.providerLabel')}`);
     } else if (providerId === 'aliyun') {
-      lines.push('      # Aliyun DashScope - uses Anthropic-compatible API');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.heading')}`);
       lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
       lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-      lines.push('      # API Provider: Aliyun DashScope');
-      lines.push('      # Model mapping (unified configuration):');
-      lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
-      lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
-      lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.providerLabel')}`);
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.modelMapping')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.unifiedModelHaiku')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.unifiedModelSonnet')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.aliyun.unifiedModelOpus')}`);
     } else if (providerId === 'volcengine') {
-      lines.push('      # 火山引擎 Coding Plan - uses Anthropic-compatible API');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.heading')}`);
       lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
       lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
-      lines.push('      # API Provider: 火山引擎 Coding Plan');
-      lines.push('      # Model mapping (unified configuration):');
-      lines.push('      #   Haiku  → glm-4.7  (Unified model for all tiers)');
-      lines.push('      #   Sonnet → glm-4.7  (Unified model for all tiers)');
-      lines.push('      #   Opus   → glm-4.7  (Unified model for all tiers)');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.providerLabel')}`);
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.modelMapping')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.unifiedModelHaiku')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.unifiedModelSonnet')}`);
+      lines.push(`      #   ${translateGenerator(language, 'docker-compose:generator.providers.volcengine.unifiedModelOpus')}`);
     } else if (providerId === 'custom') {
-      lines.push('      # Custom Anthropic-compatible API');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.custom.heading')}`);
       lines.push(`      ANTHROPIC_AUTH_TOKEN: "${config.anthropicAuthToken}"`);
       if (apiUrl) {
         lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
       }
-      lines.push('      # API Provider: Custom Endpoint');
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.custom.providerLabel')}`);
     } else {
-      // New providers from dynamic configuration
-      const displayName = getProviderDisplayName(providerId, providerConfig);
-      const description = getProviderDescription(providerId, providerConfig);
-      lines.push(`      # ${displayName} - uses Anthropic-compatible API`);
+      const displayName = getProviderDisplayName(providerId, providerConfig, language);
+      const description = getProviderDescription(providerId, providerConfig, language);
+      lines.push(`      # ${displayName} - ${translateGenerator(language, 'docker-compose:generator.providers.generic.compatibleLabel')}`);
       if (description) {
         lines.push(`      # ${description}`);
       }
@@ -373,7 +394,7 @@ function buildProviderEnvVars(
       if (apiUrl) {
         lines.push(`      ANTHROPIC_URL: "${apiUrl}"`);
       }
-      lines.push(`      # API Provider: ${displayName}`);
+      lines.push(`      # ${translateGenerator(language, 'docker-compose:generator.providers.generic.providerLabel', { displayName })}`);
     }
   }
 
@@ -393,41 +414,20 @@ export function buildHeader(
   now: Date
 ): string[] {
   const lines: string[] = [];
+  const normalizedLanguage = resolveBuilderLanguageCode(language);
 
-  // Support information based on language
-  const supportInfo = language === 'zh-CN' ? {
-    title: '支持信息',
-    description: '如果您遇到任何问题或需要技术支持:',
-    qqGroup: '加入我们的 QQ 群',
-    qqNumber: '610394020',
-    discord: '加入我们的 Discord 社区',
-    discordLink: 'https://discord.gg/qY662sJK',
-    assistance: '我们提供实时协助和解决方案',
-    share: '分享您的经验并与其他用户交流'
-  } : {
-    title: 'Support Information',
-    description: 'If you encounter any issues or need technical support:',
-    qqGroup: 'Join our QQ group',
-    qqNumber: '610394020',
-    discord: 'Join our Discord community',
-    discordLink: 'https://discord.gg/qY662sJK',
-    assistance: 'We provide real-time assistance and solutions',
-    share: 'Share your experiences and connect with other users'
-  };
-
-  // Header comment
-  lines.push('# Hagicode Docker Compose Configuration');
-  lines.push('# Auto-generated by Docker Compose Generator');
-  lines.push(`# Generated at: ${now.toLocaleString(language === 'zh-CN' ? 'zh-CN' : 'en-US', { timeZone: 'UTC' })}`);
+  lines.push(`# ${translateGenerator(language, 'docker-compose:generator.title')}`);
+  lines.push(`# ${translateGenerator(language, 'docker-compose:generator.generatedBy')}`);
+  lines.push(`# ${translateGenerator(language, 'docker-compose:generator.generatedAtLabel')}: ${now.toLocaleString(normalizedLanguage, { timeZone: 'UTC' })}`);
   lines.push('');
   lines.push('# ==================================================');
-  lines.push(`# ${supportInfo.title}`);
+  lines.push(`# ${translateGenerator(language, 'docker-compose:generator.support.title')}`);
   lines.push('# ==================================================');
-  lines.push(`# ${supportInfo.description}`);
-  lines.push(`# - ${supportInfo.qqGroup}: ${supportInfo.qqNumber}`);
-  lines.push(`# - ${supportInfo.discord}: ${supportInfo.discordLink}`);
-  lines.push(`# - ${supportInfo.assistance}`);
-  lines.push(`# - ${supportInfo.share}`);
+  lines.push(`# ${translateGenerator(language, 'docker-compose:generator.support.description')}`);
+  lines.push(`# - ${translateGenerator(language, 'docker-compose:generator.support.qqGroup')}: ${translateGenerator(language, 'docker-compose:generator.support.qqNumber')}`);
+  lines.push(`# - ${translateGenerator(language, 'docker-compose:generator.support.discord')}: ${translateGenerator(language, 'docker-compose:generator.support.discordLink')}`);
+  lines.push(`# - ${translateGenerator(language, 'docker-compose:generator.support.assistance')}`);
+  lines.push(`# - ${translateGenerator(language, 'docker-compose:generator.support.share')}`);
   lines.push('');
 
   return lines;
@@ -478,7 +478,7 @@ export function buildAppService(
   }
 
   // Runtime provider configuration (Claude/Codex can both be enabled).
-  const providerEnvVars = buildProviderEnvVars(config, providerConfig);
+  const providerEnvVars = buildProviderEnvVars(config, providerConfig, language);
   lines.push(...providerEnvVars);
   lines.push(...buildCodeServerEnvVars(config, language));
 
@@ -541,14 +541,14 @@ export function buildAppService(
  * @param config The configuration object
  * @returns Caddyfile content as string
  */
-export function buildCaddyfile(config: DockerComposeConfig): string {
+export function buildCaddyfile(config: DockerComposeConfig, language: string = 'zh-CN'): string {
   const host = config.lanIp || '127.0.0.1';
   const httpsPort = config.httpsPort || '443';
   const httpsListener = httpsPort === '443' ? host : `${host}:${httpsPort}`;
 
   const lines = [
-    '# Auto-generated Caddyfile for Hagicode HTTPS',
-    '# Copy this content to ./Caddyfile next to docker-compose.yml',
+    `# ${translateGenerator(language, 'docker-compose:generator.caddyfile.title')}`,
+    `# ${translateGenerator(language, 'docker-compose:generator.caddyfile.copyHint')}`,
     '',
     `${httpsListener} {`,
     '  tls internal',
