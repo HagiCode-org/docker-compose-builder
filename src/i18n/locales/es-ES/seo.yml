@@ -1,17 +1,17 @@
 default:
   title: Hagicode Docker Compose Builder
-  description: A powerful visual tool for creating and managing Docker Compose configurations. Build, customize, and export your docker-compose.yml files with an intuitive interface.
+  description: Una poderosa herramienta visual para crear y administrar configuraciones Docker Compose. Cree, personalice y exporte sus archivos docker-compose.yml con una interfaz intuitiva.
   keywords:
-    - docker
-    - docker compose
+    - estibador
+    - ventana acoplable componer
     - docker-compose
-    - yaml generator
-    - docker builder
-    - container orchestration
-    - devops tools
-    - docker ui
-    - compose builder
+    - generador de yaml
+    - constructor de ventana acoplable
+    - orquestación de contenedores
+    - herramientas de desarrollo
+    - interfaz de usuario acoplable
+    - componer constructor
 pages:
   home:
     title: Hagicode Docker Compose Builder - Visual Docker Compose Generator
-    description: Create and manage Docker Compose configurations visually. Build docker-compose.yml files with an intuitive interface.
+    description: Cree y administre configuraciones Docker Compose visualmente. Cree archivos docker-compose.yml con una interfaz intuitiva.
