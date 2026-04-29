@@ -1,31 +1,31 @@
 providers:
   anthropic:
-    name: Anthropic Official
-    description: Official Anthropic API
-    notes: Uses official Claude models, and the model version stays user-selectable.
-    networkAdvice: Best for environments that can reach Anthropic directly.
+    name: Anthropic 공식
+    description: 공식 Anthropic API
+    notes: 공식 Claude 모델을 사용하며 모델 버전은 사용자가 선택할 수 있도록 유지됩니다.
+    networkAdvice: Anthropic에 직접 연결할 수 있는 환경에 가장 적합합니다.
   zai:
     name: Zhipu AI (ZAI)
-    description: Claude-compatible API service provided by Zhipu AI
-    notes: Requires an API key issued by the Zhipu AI platform.
-    networkAdvice: Best for users who want a Mainland China friendly Claude-compatible entry point.
+    description: Zhipu AI에서 제공하는 Claude 호환 API 서비스
+    notes: Zhipu AI 플랫폼에서 발급한 API 키가 필요합니다.
+    networkAdvice: 중국 본토 친화적인 Claude 호환 진입점을 원하는 사용자에게 가장 적합합니다.
   aliyun:
     name: Aliyun DashScope
-    description: Claude-compatible API service provided by Aliyun DashScope
-    notes: Uses the unified glm-4.7 model mapping across all tiers.
-    networkAdvice: Best for Mainland China deployments with stronger local connectivity to Aliyun.
+    description: Aliyun DashScope에서 제공하는 Claude 호환 API 서비스
+    notes: 모든 계층에 걸쳐 통합된 glm-4.7 모델 매핑을 사용합니다.
+    networkAdvice: Aliyun에 대한 로컬 연결이 더 강력한 중국 본토 배포에 가장 적합합니다.
   minimax:
     name: MiniMax
-    description: Claude-compatible API service provided by MiniMax
-    notes: Uses the unified MiniMax-M2.5 model across all tiers.
-    networkAdvice: Best for users who prefer the MiniMax Claude-compatible gateway.
+    description: MiniMax에서 제공하는 Claude 호환 API 서비스
+    notes: 모든 계층에서 통합 MiniMax-M2.5 모델을 사용합니다.
+    networkAdvice: MiniMax Claude 호환 게이트웨이를 선호하는 사용자에게 가장 적합합니다.
   volcengine:
     name: Volcengine Coding Plan
-    description: Claude-compatible API service provided by Volcengine
-    notes: Uses the unified glm-4.7 model mapping across all tiers.
-    networkAdvice: Best for deployments that prefer a Volcengine network entry point.
+    description: Volcengine에서 제공하는 Claude 호환 API 서비스
+    notes: 모든 계층에 걸쳐 통합된 glm-4.7 모델 매핑을 사용합니다.
+    networkAdvice: Volcengine 네트워크 진입점을 선호하는 배포에 가장 적합합니다.
   custom:
-    name: Custom API Endpoint
-    description: User-provided Claude / Anthropic-compatible API endpoint
-    notes: You must provide the endpoint URL and matching credentials manually.
-    networkAdvice: Best for self-hosted gateways or third-party Anthropic-compatible proxies.
+    name: 사용자 정의 API 끝점
+    description: 사용자 제공 Claude / Anthropic-compatible API 엔드포인트
+    notes: 엔드포인트 URL과 일치하는 자격 증명을 수동으로 제공해야 합니다.
+    networkAdvice: 자체 호스팅 게이트웨이 또는 타사 Anthropic-compatible 프록시에 가장 적합합니다.

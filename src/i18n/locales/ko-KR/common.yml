@@ -1,131 +1,131 @@
 common:
-  loading: Loading...
-  error: Error
-  success: Success
-  required: Required
-  recommended: Recommended
-  default: Default
+  loading: 로드 중...
+  error: 오류
+  success: 성공
+  required: 필수
+  recommended: 추천
+  default: 기본값
 header:
   title: Hagicode Docker Compose Builder
-  subtitle: Generate Docker Compose configurations for Hagicode
-  language: Language
-  languageLabel: "Language: "
+  subtitle: Hagicode에 대한 Docker Compose 구성 생성
+  language: 언어
+  languageLabel: '언어:'
   navigation:
-    officialSite: Hagicode Official Site
-    officialDocs: Deployment Docs
-    discord: Discord Community
-    githubRepo: GitHub Repository
-    qqGroup: "QQ Group: {{groupNumber}}"
-    joinQQGroup: Join QQ Group
-    copyGroupNumber: Copy group number
-    copied: Copied!
-    theme: Theme
-    language: Language
-    menuToggle: Toggle navigation menu
-    menu: Main navigation
+    officialSite: Hagicode 공식 사이트
+    officialDocs: 배포 문서
+    discord: Discord 커뮤니티
+    githubRepo: GitHub 저장소
+    qqGroup: 'QQ Group: {{groupNumber}}'
+    joinQQGroup: QQ Group에 가입하세요
+    copyGroupNumber: 그룹 번호 복사
+    copied: 복사되었습니다!
+    theme: 테마
+    language: 언어
+    menuToggle: 탐색 메뉴 전환
+    menu: 메인 네비게이션
 languageSwitcher:
-  selectLanguage: Select Language
+  selectLanguage: 언어 선택
 backToTop:
-  backToTop: Back to Top
-  ariaLabel: Scroll back to top of page
+  backToTop: 맨 위로 돌아가기
+  ariaLabel: 페이지 상단으로 다시 스크롤
 workspace:
-  headerSubtitle: Guide the setup with visible sections, status tracking, and a persistent preview rail.
-  introTitle: Build docker-compose.yml with a clearer workspace
-  introDescription: Work through grouped deployment sections, keep validation status visible, and open the YAML preview without losing your place.
-  navigationTitle: Section navigation
-  navigationDescription: Jump between visible modules and keep hidden branches out of the path.
-  previewShortcutTitle: Preview access
-  previewShortcutDescription: Use the preview rail or drawer to verify output while editing.
-  openPreview: Open preview
-  statusLegendTitle: Status legend
-  jumpToFirstError: Jump to first issue
-  resolveSection: Review section
-  mobilePreviewTrigger: Open YAML preview
-  mobilePreviewTitle: YAML preview
-  mobilePreviewDescription: Inspect the generated docker-compose.yml without leaving the current section.
-  repositoryHint: Repository mapping stays in this section
-  repositoryHintDescription: Keep the workspace mount close to permission settings so Linux deployments stay aligned.
-  licenseDescription: Choose the shared public key or provide a custom license for this deployment.
-  inlineErrorsTitle: "{{count}} issue needs attention in this section"
-  httpsPanelTitle: HTTPS runtime details
-  providersLoading: Loading provider configurations...
-  providersError: "Failed to load provider configurations: {{message}}"
-  exportReady: Export ready
-  exportBlocked: Export blocked
+  headerSubtitle: 표시되는 섹션, 상태 추적 및 지속적인 미리보기 레일을 통해 설정을 안내하세요.
+  introTitle: 더 명확한 작업 공간으로 docker-compose.yml을 구축하세요
+  introDescription: 그룹화된 배포 섹션을 통해 작업하고, 유효성 검사 상태를 계속 표시하고, 위치를 잃지 않고 YAML 미리 보기를 엽니다.
+  navigationTitle: 섹션 탐색
+  navigationDescription: 보이는 모듈 사이를 이동하고 숨겨진 분기를 경로에서 제외하세요.
+  previewShortcutTitle: 미리보기 액세스
+  previewShortcutDescription: 편집하는 동안 미리보기 레일이나 서랍을 사용하여 출력을 확인하세요.
+  openPreview: 미리보기 열기
+  statusLegendTitle: 상태 범례
+  jumpToFirstError: 첫 번째 호로 이동
+  resolveSection: 검토 섹션
+  mobilePreviewTrigger: YAML 미리보기 열기
+  mobilePreviewTitle: YAML 미리보기
+  mobilePreviewDescription: 현재 섹션을 떠나지 않고 생성된 docker-compose.yml을 검사합니다.
+  repositoryHint: 저장소 매핑은 이 섹션에 유지됩니다.
+  repositoryHintDescription: Linux 배포가 정렬된 상태로 유지되도록 작업 영역 마운트를 권한 설정에 가깝게 유지하세요.
+  licenseDescription: 공유 공개 키를 선택하거나 이 배포에 대한 사용자 지정 라이선스를 제공하세요.
+  inlineErrorsTitle: '{{count}} 문제는 이 섹션에서 주의가 필요합니다.'
+  httpsPanelTitle: HTTPS 런타임 세부정보
+  providersLoading: 제공업체 구성 로드 중...
+  providersError: '공급자 구성을 로드하지 못했습니다: {{message}}'
+  exportReady: 수출 준비 완료
+  exportBlocked: 수출이 차단되었습니다.
   metrics:
-    modules: Visible modules
-    modulesDetail: Current sections in the workspace
-    completed: Completed
-    completedDetail: Modules that are ready to export
-    errors: Validation issues
-    errorsPresent: Fix these before exporting
-    errorsClear: No blocking issues detected
-    export: Export status
-    exportReadyDetail: Copy and download are available
-    exportBlockedDetail: Preview is live, export stays disabled
+    modules: 보이는 모듈
+    modulesDetail: 작업공간의 현재 섹션
+    completed: 완료됨
+    completedDetail: 내보낼 준비가 된 모듈
+    errors: 유효성 검사 문제
+    errorsPresent: 내보내기 전에 이 문제를 해결하세요
+    errorsClear: 차단 문제가 감지되지 않았습니다.
+    export: 수출현황
+    exportReadyDetail: 복사 및 다운로드가 가능합니다.
+    exportBlockedDetail: 미리보기는 실시간이고 내보내기는 비활성화된 상태로 유지됩니다.
   status:
-    active: Active
-    complete: Ready
-    error: Needs fixes
-    pending: Pending
+    active: 활성
+    complete: 준비
+    error: 수정 필요
+    pending: 보류 중
   sections:
     profile:
-      title: Deployment mode
-      shortTitle: Mode
-      description: Choose quick start or full custom before editing deeper options.
+      title: 배포 모드
+      shortTitle: 모드
+      description: 더 자세한 옵션을 편집하기 전에 빠른 시작 또는 전체 사용자 정의를 선택하세요.
     base:
-      title: Base deployment
-      shortTitle: Base
-      description: Configure ports, image source, and baseline runtime details.
+      title: 기본 배포
+      shortTitle: 베이스
+      description: 포트, 이미지 소스 및 기본 런타임 세부 정보를 구성합니다.
     executors:
-      title: Executor capabilities
-      shortTitle: Executors
-      description: Enable runtime branches and fill the credentials each active branch needs.
+      title: 실행자 기능
+      shortTitle: 집행자
+      description: 런타임 분기를 활성화하고 각 활성 분기에 필요한 자격 증명을 입력합니다.
     https:
-      title: HTTPS access
+      title: HTTPS 액세스
       shortTitle: HTTPS
-      description: Expose the deployment through Caddy only when HTTPS is enabled.
+      description: HTTPS이 활성화된 경우에만 Caddy을 통해 배포를 노출합니다.
     database:
-      title: Database strategy
-      shortTitle: Database
-      description: Review the fixed SQLite runtime used by exported deployments.
+      title: 데이터베이스 전략
+      shortTitle: 데이터베이스
+      description: 내보낸 배포에서 사용되는 수정된 SQLite 런타임을 검토하세요.
     advanced:
-      title: Advanced setup
-      shortTitle: Advanced
-      description: Handle workspace mounts, permissions, and other deployment-level license settings.
-  executorItemsTitle: Enabled executor branches
+      title: 고급 설정
+      shortTitle: 고급
+      description: 작업 공간 마운트, 권한 및 기타 배포 수준 라이선스 설정을 처리합니다.
+  executorItemsTitle: 활성화된 실행자 분기
   executorItems:
     claude:
-      title: Claude credentials
-      description: Anthropic-compatible provider, endpoint, token, and Claude Code tuning settings.
+      title: Claude 자격 증명
+      description: Anthropic-compatible 공급자, 엔드포인트, 토큰 및 Claude Code 조정 설정.
     codex:
-      title: Codex runtime
-      description: CODEX_API_KEY and optional CODEX_BASE_URL.
+      title: Codex 런타임
+      description: CODEX_API_KEY 및 선택 사항인 CODEX_BASE_URL.
     opencode:
-      title: OpenCode runtime
-      description: Managed model selection plus config persistence mode.
+      title: OpenCode 런타임
+      description: 관리형 모델 선택과 구성 지속성 모드.
     codeServer:
-      title: Code Server defaults
-      description: Container host/port, auth mode, and optional host publishing for code-server.
+      title: 코드 서버 기본값
+      description: 컨테이너 호스트/port, 인증 모드 및 code-server에 대한 선택적 호스트 게시.
     eula:
-      title: Container EULA
-      description: Shared ACCEPT_EULA opt-in plus the docs agreement link.
+      title: 컨테이너 EULA
+      description: ACCEPT_EULA 수신 동의와 문서 계약 링크를 공유했습니다.
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
-  title: Public footer
-  description: Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, QQ, and Steam support actions.
-  relatedSites: Related sites
-  communitySupport: Community and support
+  title: 공개 바닥글
+  description: 공유 사이트 대상은 번들 스냅샷에서 나오는 반면 Builder는 자체 GitHub, Discord, QQ 및 Steam 지원 작업을 유지합니다.
+  relatedSites: 관련 사이트
+  communitySupport: 커뮤니티 및 지원
   qqGroup: QQ Group {{groupNumber}}
 promoBanner:
-  title: 🚀 Aliyun Qwen Coding Plan is live
-  description: Aliyun Qwen Coding Plan is now available for day-to-day development. Pair it with Hagicode for a smoother end-to-end workflow.
-  cta: Subscribe now →
-  ariaLabel: Visit the Aliyun Qwen Coding Plan page
+  title: 🚀 Aliyun Qwen Coding Plan이(가) 게시되었습니다
+  description: 이제 Aliyun Qwen Coding Plan을(를) 일상적인 개발에 사용할 수 있습니다. 보다 원활한 엔드투엔드 작업 흐름을 위해 Hagicode과 페어링하세요.
+  cta: 지금 구독하기 →
+  ariaLabel: Aliyun Qwen Coding Plan 페이지를 방문하세요.
 promoteCard:
-  badgeFallback: Promoted
-  dismiss: Dismiss promotion
-  sectionLabel: Promotion
-  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
+  badgeFallback: 승격됨
+  dismiss: 프로모션 닫기
+  sectionLabel: 프로모션
+  surfaceAriaLabel: '{{ctaLabel}}: {{title}}'
 themeToggle:
-  toggle: Toggle theme
+  toggle: 테마 전환
