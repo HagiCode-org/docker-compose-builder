@@ -1,131 +1,131 @@
 common:
-  loading: Loading...
-  error: Error
-  success: Success
-  required: Required
-  recommended: Recommended
-  default: Default
+  loading: Carregando...
+  error: Erro
+  success: Sucesso
+  required: Obrigatório
+  recommended: Recomendado
+  default: Padrão
 header:
   title: Hagicode Docker Compose Builder
-  subtitle: Generate Docker Compose configurations for Hagicode
-  language: Language
-  languageLabel: "Language: "
+  subtitle: Gere configurações Docker Compose para Hagicode
+  language: Idioma
+  languageLabel: 'Idioma:'
   navigation:
-    officialSite: Hagicode Official Site
-    officialDocs: Deployment Docs
-    discord: Discord Community
-    githubRepo: GitHub Repository
-    qqGroup: "QQ Group: {{groupNumber}}"
-    joinQQGroup: Join QQ Group
-    copyGroupNumber: Copy group number
-    copied: Copied!
-    theme: Theme
-    language: Language
-    menuToggle: Toggle navigation menu
-    menu: Main navigation
+    officialSite: Hagicode Site Oficial
+    officialDocs: Documentos de implantação
+    discord: Discord Comunidade
+    githubRepo: GitHub Repositório
+    qqGroup: 'QQ Group: {{groupNumber}}'
+    joinQQGroup: Junte-se a QQ Group
+    copyGroupNumber: Copiar número do grupo
+    copied: Copiado!
+    theme: Tema
+    language: Idioma
+    menuToggle: Alternar menu de navegação
+    menu: Navegação principal
 languageSwitcher:
-  selectLanguage: Select Language
+  selectLanguage: Selecione o idioma
 backToTop:
-  backToTop: Back to Top
-  ariaLabel: Scroll back to top of page
+  backToTop: Voltar ao topo
+  ariaLabel: Role de volta ao topo da página
 workspace:
-  headerSubtitle: Guide the setup with visible sections, status tracking, and a persistent preview rail.
-  introTitle: Build docker-compose.yml with a clearer workspace
-  introDescription: Work through grouped deployment sections, keep validation status visible, and open the YAML preview without losing your place.
-  navigationTitle: Section navigation
-  navigationDescription: Jump between visible modules and keep hidden branches out of the path.
-  previewShortcutTitle: Preview access
-  previewShortcutDescription: Use the preview rail or drawer to verify output while editing.
-  openPreview: Open preview
-  statusLegendTitle: Status legend
-  jumpToFirstError: Jump to first issue
-  resolveSection: Review section
-  mobilePreviewTrigger: Open YAML preview
-  mobilePreviewTitle: YAML preview
-  mobilePreviewDescription: Inspect the generated docker-compose.yml without leaving the current section.
-  repositoryHint: Repository mapping stays in this section
-  repositoryHintDescription: Keep the workspace mount close to permission settings so Linux deployments stay aligned.
-  licenseDescription: Choose the shared public key or provide a custom license for this deployment.
-  inlineErrorsTitle: "{{count}} issue needs attention in this section"
-  httpsPanelTitle: HTTPS runtime details
-  providersLoading: Loading provider configurations...
-  providersError: "Failed to load provider configurations: {{message}}"
-  exportReady: Export ready
-  exportBlocked: Export blocked
+  headerSubtitle: Guie a configuração com seções visíveis, rastreamento de status e um painel de visualização persistente.
+  introTitle: Crie docker-compose.yml com um espaço de trabalho mais claro
+  introDescription: Trabalhe nas seções de implantação agrupadas, mantenha o status de validação visível e abra a visualização YAML sem se perder.
+  navigationTitle: Navegação de seção
+  navigationDescription: Salte entre os módulos visíveis e mantenha os galhos ocultos fora do caminho.
+  previewShortcutTitle: Acesso de visualização
+  previewShortcutDescription: Use o trilho ou gaveta de visualização para verificar a saída durante a edição.
+  openPreview: Abrir visualização
+  statusLegendTitle: Legenda de status
+  jumpToFirstError: Ir para a primeira edição
+  resolveSection: Seção de revisão
+  mobilePreviewTrigger: Abra a visualização YAML
+  mobilePreviewTitle: YAML visualização
+  mobilePreviewDescription: Inspecione o docker-compose.yml gerado sem sair da seção atual.
+  repositoryHint: O mapeamento do repositório permanece nesta seção
+  repositoryHintDescription: Mantenha a montagem do espaço de trabalho próxima às configurações de permissão para que as implantações do Linux permaneçam alinhadas.
+  licenseDescription: Escolha a chave pública compartilhada ou forneça uma licença personalizada para esta implantação.
+  inlineErrorsTitle: O problema {{count}} precisa de atenção nesta seção
+  httpsPanelTitle: HTTPS detalhes do tempo de execução
+  providersLoading: Carregando configurações do provedor...
+  providersError: 'Falha ao carregar configurações do provedor: {{message}}'
+  exportReady: Pronto para exportação
+  exportBlocked: Exportação bloqueada
   metrics:
-    modules: Visible modules
-    modulesDetail: Current sections in the workspace
-    completed: Completed
-    completedDetail: Modules that are ready to export
-    errors: Validation issues
-    errorsPresent: Fix these before exporting
-    errorsClear: No blocking issues detected
-    export: Export status
-    exportReadyDetail: Copy and download are available
-    exportBlockedDetail: Preview is live, export stays disabled
+    modules: Módulos visíveis
+    modulesDetail: Seções atuais na área de trabalho
+    completed: Concluído
+    completedDetail: Módulos prontos para exportação
+    errors: Problemas de validação
+    errorsPresent: Corrija-os antes de exportar
+    errorsClear: Nenhum problema de bloqueio detectado
+    export: Status de exportação
+    exportReadyDetail: Copiar e baixar estão disponíveis
+    exportBlockedDetail: A visualização está ativa, a exportação permanece desativada
   status:
-    active: Active
-    complete: Ready
-    error: Needs fixes
-    pending: Pending
+    active: Ativo
+    complete: Pronto
+    error: Precisa de correções
+    pending: Pendente
   sections:
     profile:
-      title: Deployment mode
-      shortTitle: Mode
-      description: Choose quick start or full custom before editing deeper options.
+      title: Modo de implantação
+      shortTitle: Modo
+      description: Escolha início rápido ou personalização completa antes de editar opções mais profundas.
     base:
-      title: Base deployment
-      shortTitle: Base
-      description: Configure ports, image source, and baseline runtime details.
+      title: Implantação básica
+      shortTitle: base
+      description: Configure portas, origem de imagem e detalhes de tempo de execução de linha de base.
     executors:
-      title: Executor capabilities
-      shortTitle: Executors
-      description: Enable runtime branches and fill the credentials each active branch needs.
+      title: Capacidades do executor
+      shortTitle: Executores
+      description: Habilite ramificações de tempo de execução e preencha as credenciais que cada ramificação ativa precisa.
     https:
-      title: HTTPS access
+      title: HTTPS acesso
       shortTitle: HTTPS
-      description: Expose the deployment through Caddy only when HTTPS is enabled.
+      description: Exponha a implantação por meio de Caddy somente quando HTTPS estiver habilitado.
     database:
-      title: Database strategy
-      shortTitle: Database
-      description: Review the fixed SQLite runtime used by exported deployments.
+      title: Estratégia de banco de dados
+      shortTitle: Banco de dados
+      description: Revise o tempo de execução SQLite fixo usado pelas implantações exportadas.
     advanced:
-      title: Advanced setup
-      shortTitle: Advanced
-      description: Handle workspace mounts, permissions, and other deployment-level license settings.
-  executorItemsTitle: Enabled executor branches
+      title: Configuração avançada
+      shortTitle: Avançado
+      description: Lide com montagens de espaço de trabalho, permissões e outras configurações de licença em nível de implantação.
+  executorItemsTitle: Ramos de executor habilitados
   executorItems:
     claude:
-      title: Claude credentials
-      description: Anthropic-compatible provider, endpoint, token, and Claude Code tuning settings.
+      title: Claude credenciais
+      description: Anthropic-compatible provedor, endpoint, token e configurações de ajuste Claude Code.
     codex:
-      title: Codex runtime
-      description: CODEX_API_KEY and optional CODEX_BASE_URL.
+      title: Codex tempo de execução
+      description: CODEX_API_KEY e opcional CODEX_BASE_URL.
     opencode:
-      title: OpenCode runtime
-      description: Managed model selection plus config persistence mode.
+      title: OpenCode tempo de execução
+      description: Seleção de modelo gerenciado mais modo de persistência de configuração.
     codeServer:
-      title: Code Server defaults
-      description: Container host/port, auth mode, and optional host publishing for code-server.
+      title: Padrões do servidor de código
+      description: Modo de autenticação do host/port, do contêiner e publicação de host opcional para code-server.
     eula:
-      title: Container EULA
-      description: Shared ACCEPT_EULA opt-in plus the docs agreement link.
+      title: Contêiner EULA
+      description: Aceitação ACCEPT_EULA compartilhada mais o link do contrato de documentos.
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
-  title: Public footer
-  description: Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, QQ, and Steam support actions.
-  relatedSites: Related sites
-  communitySupport: Community and support
+  title: Rodapé público
+  description: Os destinos de sites compartilhados vêm do snapshot agrupado, enquanto o Builder mantém suas próprias ações de suporte GitHub, Discord, QQ e Steam.
+  relatedSites: Sites relacionados
+  communitySupport: Comunidade e suporte
   qqGroup: QQ Group {{groupNumber}}
 promoBanner:
-  title: 🚀 Aliyun Qwen Coding Plan is live
-  description: Aliyun Qwen Coding Plan is now available for day-to-day development. Pair it with Hagicode for a smoother end-to-end workflow.
-  cta: Subscribe now →
-  ariaLabel: Visit the Aliyun Qwen Coding Plan page
+  title: 🚀 Aliyun Qwen Coding Plan está ao vivo
+  description: Aliyun Qwen Coding Plan agora está disponível para desenvolvimento diário. Combine-o com Hagicode para um fluxo de trabalho mais suave de ponta a ponta.
+  cta: Inscreva-se agora →
+  ariaLabel: Visite a página Aliyun Qwen Coding Plan
 promoteCard:
-  badgeFallback: Promoted
-  dismiss: Dismiss promotion
-  sectionLabel: Promotion
-  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
+  badgeFallback: Promovido
+  dismiss: Dispensar promoção
+  sectionLabel: Promoção
+  surfaceAriaLabel: '{{ctaLabel}}: {{title}}'
 themeToggle:
-  toggle: Toggle theme
+  toggle: Alternar tema

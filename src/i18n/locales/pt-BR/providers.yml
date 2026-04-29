@@ -1,31 +1,31 @@
 providers:
   anthropic:
-    name: Anthropic Official
-    description: Official Anthropic API
-    notes: Uses official Claude models, and the model version stays user-selectable.
-    networkAdvice: Best for environments that can reach Anthropic directly.
+    name: Anthropic Oficial
+    description: Oficial Anthropic API
+    notes: Usa modelos Claude oficiais e a versão do modelo permanece selecionável pelo usuário.
+    networkAdvice: Melhor para ambientes que podem atingir Anthropic diretamente.
   zai:
     name: Zhipu AI (ZAI)
-    description: Claude-compatible API service provided by Zhipu AI
-    notes: Requires an API key issued by the Zhipu AI platform.
-    networkAdvice: Best for users who want a Mainland China friendly Claude-compatible entry point.
+    description: Serviço API compatível com Claude fornecido por Zhipu AI
+    notes: Requer uma chave API emitida pela plataforma Zhipu AI.
+    networkAdvice: Ideal para usuários que desejam um ponto de entrada compatível com Claude compatível com a China continental.
   aliyun:
     name: Aliyun DashScope
-    description: Claude-compatible API service provided by Aliyun DashScope
-    notes: Uses the unified glm-4.7 model mapping across all tiers.
-    networkAdvice: Best for Mainland China deployments with stronger local connectivity to Aliyun.
+    description: Serviço API compatível com Claude fornecido por Aliyun DashScope
+    notes: Usa o mapeamento de modelo glm-4.7 unificado em todas as camadas.
+    networkAdvice: Melhor para implantações na China continental com conectividade local mais forte para Aliyun.
   minimax:
     name: MiniMax
-    description: Claude-compatible API service provided by MiniMax
-    notes: Uses the unified MiniMax-M2.5 model across all tiers.
-    networkAdvice: Best for users who prefer the MiniMax Claude-compatible gateway.
+    description: Serviço API compatível com Claude fornecido por MiniMax
+    notes: Usa o modelo MiniMax-M2.5 unificado em todas as camadas.
+    networkAdvice: Melhor para usuários que preferem o gateway compatível com MiniMax Claude.
   volcengine:
     name: Volcengine Coding Plan
-    description: Claude-compatible API service provided by Volcengine
-    notes: Uses the unified glm-4.7 model mapping across all tiers.
-    networkAdvice: Best for deployments that prefer a Volcengine network entry point.
+    description: Serviço API compatível com Claude fornecido por Volcengine
+    notes: Usa o mapeamento de modelo glm-4.7 unificado em todas as camadas.
+    networkAdvice: Melhor para implantações que preferem um ponto de entrada de rede Volcengine.
   custom:
-    name: Custom API Endpoint
-    description: User-provided Claude / Anthropic-compatible API endpoint
-    notes: You must provide the endpoint URL and matching credentials manually.
-    networkAdvice: Best for self-hosted gateways or third-party Anthropic-compatible proxies.
+    name: Ponto final API personalizado
+    description: Endpoint Claude / Anthropic-compatible API fornecido pelo usuário
+    notes: Você deve fornecer o endpoint URL e as credenciais correspondentes manualmente.
+    networkAdvice: Melhor para gateways auto-hospedados ou proxies Anthropic-compatible de terceiros.

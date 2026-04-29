@@ -1,327 +1,327 @@
 configForm:
-  title: Docker Compose Configuration Generator
-  subtitle: Configure your Hagicode Docker Compose setup
-  profile: Profile
-  profileLabel: Configuration Mode
-  quickStart: Quick Start (Recommended for new users)
-  quickStartDescription: Get started quickly with SQLite, with no extra database setup required
-  fullCustom: Full Custom
-  fullCustomDescription: Complete control over all configuration options
-  profileHelp: Choose your configuration experience. You can switch modes at any time.
-  basicConfig: Basic Configuration
-  httpPort: HTTP Port
-  containerName: Container Name
-  imageTag: Image Tag
-  selectImageTag: Select image tag
-  hostOS: Host OS
-  selectHostOS: Select host OS
-  windows: Windows
+  title: Docker Compose Gerador de configuração
+  subtitle: Configure sua configuração Hagicode Docker Compose
+  profile: Perfil
+  profileLabel: Modo de configuração
+  quickStart: Início rápido (recomendado para novos usuários)
+  quickStartDescription: Comece rapidamente com SQLite, sem necessidade de configuração extra de banco de dados
+  fullCustom: Totalmente personalizado
+  fullCustomDescription: Controle total sobre todas as opções de configuração
+  profileHelp: Escolha sua experiência de configuração. Você pode alternar os modos a qualquer momento.
+  basicConfig: Configuração Básica
+  httpPort: HTTP Porta
+  containerName: Nome do contêiner
+  imageTag: Etiqueta de imagem
+  selectImageTag: Selecione a tag da imagem
+  hostOS: SO host
+  selectHostOS: Selecione o sistema operacional host
+  windows: Janelas
   linux: Linux
-  imageRegistry: Image Source
-  supportHint: Need help? Join QQ Group {{groupNumber}} or Discord.
-  selectImageRegistry: Select image source
+  imageRegistry: Fonte da imagem
+  supportHint: Precisa de ajuda? Junte-se a QQ Group {{groupNumber}} ou Discord.
+  selectImageRegistry: Selecione a fonte da imagem
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
   azureContainerRegistry: Azure Container Registry
-  aliyunAcr: Alibaba Cloud ACR
+  aliyunAcr: Nuvem Alibaba ACR
   aliyunAcrRecommended: Alibaba Cloud Container Registry
-  alternativeRegistry: Alternative Registry
-  dockerHubDescription: Docker official image registry, recommended
-  dockerHubNetworkAdvice: Suitable for users with Docker Hub mirror acceleration support
-  azureAcrDescription: Alternative image registry, synced with Docker Hub
-  azureAcrNetworkAdvice: Suitable for users who cannot access Docker Hub locally
-  aliyunAcrDescription: Alibaba Cloud Container Registry, recommended for users in China
-  aliyunAcrNetworkAdvice: Suitable for users in Mainland China, providing stable image acceleration services
-  imageLabel: Image
-  httpsSettings: HTTPS Security Settings
-  httpsEnabled: HTTPS Enabled
-  httpsDisabled: HTTPS Disabled
-  enableHttps: Enable HTTPS Proxy
-  enableHttpsHelp: Expose Hagicode through a Caddy reverse proxy with self-signed certificates.
-  httpsPort: HTTPS Port
-  httpsPortHelp: 'Valid range: 1-65535. Port 443 is recommended.'
-  lanIp: LAN IP Address
-  lanIpHelp: Use your LAN IPv4/IPv6 address for local network access.
-  lanIpExamples: 'Examples: 192.168.1.100, 10.0.0.12, fe80::1'
-  lanIpTooltipLabel: LAN IP usage help
-  lanIpTooltipText: Use the host machine address reachable by other devices in your local network.
-  accessUrl: Access URL
-  certificateTrustGuide: Certificate Trust Guide
-  troubleshooting: Troubleshooting
-  certificateGuideTitle: Certificate generation notes
-  certificateGuideDescription: Caddy auto-generates self-signed certificates with tls internal.
-  certificateGuideDetails: Show details
-  certificateStep1: 1. Caddy uses tls internal to create self-signed certificates.
-  certificateStep2: 2. Certificates are persisted in Docker volume caddy_data.
-  certificateStep3: 3. Trust the certificate in your browser on first visit.
-  privilegedPortWarning: Port below 1024 may require elevated privileges.
-  localhostLanWarning: localhost is not recommended for LAN HTTPS sharing.
-  caddyPreviewTitle: Caddyfile Preview
-  caddyPreviewCopy: Copy
-  caddyPreviewCopied: Copied
-  caddyPreviewRetryCopy: Retry Copy
-  caddyPreviewCopyError: Clipboard write failed, please retry.
-  caddyPreviewTlsHint: '`tls internal` is included for self-signed certificate management.'
-  resetHttps: Reset HTTPS defaults
-  databaseConfig: Database Configuration
-  databaseType: Database Type
-  databaseTypeFixed: SQLite only
-  sqliteDatabase: SQLite Database
-  sqliteDescription: Lightweight embedded database, no additional container needed, ideal for quick start and supported deployments.
-  sqliteDataLocation: Data storage location
-  sqliteOnlySupport: This builder now exports only the embedded SQLite deployment path. Legacy database modes and credentials are no longer configurable here.
-  licenseConfig: Hagicode License Configuration
-  licenseKeyType: License Key Type
-  selectLicenseType: Select license type
-  publicTestKey: Public Test Key (Recommended)
-  customKey: Custom Key
-  customLicenseKey: Custom License Key
-  aiProviderConfig: AI Provider Configuration
-  enabledExecutors: Parallel Enablement
-  parallelEnablementHint: Claude, Codex, and OpenCode can run in parallel. They are not mutually exclusive.
-  explicitExecutorHint: The generated compose file only exports enabled executor branches. Runtime selection must now be explicit.
-  communitySupportTitle: Other CLI tools are supported too
-  communitySupportDescription: HagiCode also supports other CLI tools, but the container integration documentation for them is not complete yet.
-  communityContributeBuilder: Contribute container configuration PRs in https://github.com/HagiCode-org/docker-compose-builder.
-  communityContributeRelease: Contribute release and runtime contract PRs in https://github.com/HagiCode-org/releases.
-  claudeConfiguration: Claude Configuration
-  codexConfiguration: Codex Configuration
-  codexDescription: Configure Codex runtime using CODEX_* environment variables
-  openCodeConfiguration: OpenCode Configuration
-  openCodeDescription: OpenCode uses the managed runtime contract baked into the unified image instead of a default-provider route.
-  openCodeModel: OpenCode Model
-  openCodeModelHint: Optional managed runtime model. The image ships the opencode command even though routing is configured explicitly.
-  openCodeTargetPathLabel: Target config file
-  openCodeTargetPathHint: OpenCode always reads and writes the same in-container opencode.json path.
-  openCodeConfigSource: Config source
-  openCodeConfigSourceHint: Choose whether Docker Compose should keep the OpenCode config in a managed volume or explicitly bind OpenCode files from the host.
-  openCodeConfigModeDefault: Default persistence
-  openCodeConfigModeDefaultHint: 'Recommended. Uses three named volumes: opencode-config-data, opencode-auth-data, and opencode-models-data, so config, auth, and cache directories survive restarts.'
-  openCodeConfigModeHostFile: Host file path
-  openCodeConfigModeHostFileHint: Bind a host opencode.json file and optionally add auth.json and models.json mounts.
-  openCodeConfigHostPath: Host file path
-  openCodeConfigHostPathHint: 'Enter the absolute path to opencode.json on the Docker host. Example: {{example}}'
-  openCodeAuthHostPath: Host auth path
-  openCodeAuthHostPathHint: 'Optional. To let the container reuse an existing login, enter the absolute path to host auth.json. Example: {{example}}'
-  openCodeModelsHostPath: Host models path
-  openCodeModelsHostPathHint: 'Optional. To reuse the host model cache, enter the absolute path to models.json. Example: {{example}}'
-  openCodeConfigBrowserLimitTitle: Manual path required
-  openCodeConfigBrowserLimitHint: Browsers cannot return a Docker-ready host bind path for you, so this field must be filled manually.
-  openCodeConfigManualPriorityHint: The exported compose file always uses the path you type here as the source of truth.
-  openCodeAdditionalHostFilesHint: If you fill auth.json or models.json host paths, Builder will export matching bind mounts too. Leave them empty to skip those mounts.
-  openCodeManagedVolumeTitle: Managed persistence enabled
-  openCodeManagedVolumeHint: No extra input is required. The builder will automatically mount opencode-config-data, opencode-auth-data, and opencode-models-data for config, auth, and model cache persistence.
-  openCodeRuntimePathTitle: hagicode path mapping
-  openCodeRuntimePathHint: All OpenCode runtime files inside the container live under the /home/hagicode/ prefix.
-  openCodeRuntimePathConfigLabel: Config file
-  openCodeRuntimePathAuthLabel: Auth file
-  openCodeRuntimePathModelsLabel: Model cache
-  openCodeConfigAuthWarningTitle: Config file is not the auth file
-  openCodeConfigAuthWarningHint: opencode.json, auth.json, and models.json are three separate files. Even in host-file mode, each path is configured independently.
-  openCodeConfigAuthMigrationHint: If you want to reuse an existing host login, either provide the host auth.json path explicitly or prepare it yourself at /home/hagicode/.local/share/opencode/auth.json. Builder will not copy it automatically.
-  standardTemplate: Standard Template
-  standardTemplateDescription: Default Hagicode application template
-  optional: optional
-  compatibilityAliasHint: Compatibility Alias Hint
-  codexCompatibilityDescription: You can also use OPENAI_* environment variables as compatibility aliases
-  claudeApiConfig: Claude API Configuration
-  unifiedUseOfToken: Unified use of ANTHROPIC_AUTH_TOKEN environment variable
-  apiProvider: API Provider
-  selectApiProvider: Select API provider
+  alternativeRegistry: Registro Alternativo
+  dockerHubDescription: Docker registro de imagem oficial, recomendado
+  dockerHubNetworkAdvice: Adequado para usuários com suporte para aceleração de espelho Docker Hub
+  azureAcrDescription: Registro de imagem alternativo, sincronizado com Docker Hub
+  azureAcrNetworkAdvice: Adequado para usuários que não podem acessar Docker Hub localmente
+  aliyunAcrDescription: Alibaba Cloud Container Registry, recomendado para usuários na China
+  aliyunAcrNetworkAdvice: Adequado para usuários na China Continental, fornecendo serviços estáveis de aceleração de imagem
+  imageLabel: Imagem
+  httpsSettings: HTTPS Configurações de segurança
+  httpsEnabled: HTTPS Habilitado
+  httpsDisabled: HTTPS Desativado
+  enableHttps: Habilitar proxy HTTPS
+  enableHttpsHelp: Exponha Hagicode por meio de um proxy reverso Caddy com certificados autoassinados.
+  httpsPort: HTTPS Porta
+  httpsPortHelp: 'Intervalo válido: 1-65535. A porta 443 é recomendada.'
+  lanIp: LAN Endereço IP
+  lanIpHelp: Use seu endereço LAN IPv4/IPv6 para acesso à rede local.
+  lanIpExamples: 'Exemplos: 192.168.1.100, 10.0.0.12, fe80::1'
+  lanIpTooltipLabel: LAN Ajuda sobre uso de IP
+  lanIpTooltipText: Use o endereço da máquina host acessível por outros dispositivos na sua rede local.
+  accessUrl: Acesse URL
+  certificateTrustGuide: Guia de confiança de certificado
+  troubleshooting: Solução de problemas
+  certificateGuideTitle: Notas de geração de certificado
+  certificateGuideDescription: Caddy gera automaticamente certificados autoassinados com tls internal.
+  certificateGuideDetails: Mostrar detalhes
+  certificateStep1: 1. Caddy usa tls internal para criar certificados autoassinados.
+  certificateStep2: 2. Os certificados são persistidos no volume Docker caddy_data.
+  certificateStep3: 3. Confie no certificado do seu navegador na primeira visita.
+  privilegedPortWarning: A porta abaixo de 1024 pode exigir privilégios elevados.
+  localhostLanWarning: localhost não é recomendado para compartilhamento LAN HTTPS.
+  caddyPreviewTitle: Caddyfile Visualização
+  caddyPreviewCopy: Copiar
+  caddyPreviewCopied: Copiado
+  caddyPreviewRetryCopy: Tentar copiar novamente
+  caddyPreviewCopyError: Falha na gravação da área de transferência. Tente novamente.
+  caddyPreviewTlsHint: '`tls internal` está incluído para gerenciamento de certificados autoassinados.'
+  resetHttps: Redefinir padrões de HTTPS
+  databaseConfig: Configuração do banco de dados
+  databaseType: Tipo de banco de dados
+  databaseTypeFixed: SQLite apenas
+  sqliteDatabase: SQLite Banco de dados
+  sqliteDescription: Banco de dados incorporado leve, sem necessidade de contêiner adicional, ideal para início rápido e implantações suportadas.
+  sqliteDataLocation: Local de armazenamento de dados
+  sqliteOnlySupport: Este construtor agora exporta apenas o caminho de implementação SQLite integrado. Os modos e credenciais do banco de dados legado não são mais configuráveis ​​aqui.
+  licenseConfig: Hagicode Configuração de licença
+  licenseKeyType: Tipo de chave de licença
+  selectLicenseType: Selecione o tipo de licença
+  publicTestKey: Chave de teste pública (recomendado)
+  customKey: Chave personalizada
+  customLicenseKey: Chave de licença personalizada
+  aiProviderConfig: Configuração do provedor de IA
+  enabledExecutors: Ativação Paralela
+  parallelEnablementHint: Claude, Codex e OpenCode podem ser executados em paralelo. Eles não são mutuamente exclusivos.
+  explicitExecutorHint: O arquivo de composição gerado exporta apenas ramificações do executor habilitadas. A seleção do tempo de execução agora deve ser explícita.
+  communitySupportTitle: Outras ferramentas CLI também são suportadas
+  communitySupportDescription: HagiCode também oferece suporte a outras ferramentas CLI, mas a documentação de integração de contêiner para elas ainda não está completa.
+  communityContributeBuilder: Contribuir com PRs de configuração de contêiner em https://github.com/HagiCode-org/docker-compose-builder.
+  communityContributeRelease: Contribuir com PRs de contrato de lançamento e tempo de execução em https://github.com/HagiCode-org/releases.
+  claudeConfiguration: Claude Configuração
+  codexConfiguration: Codex Configuração
+  codexDescription: Configure o tempo de execução Codex usando variáveis de ambiente CODEX_*
+  openCodeConfiguration: OpenCode Configuração
+  openCodeDescription: OpenCode usa o contrato de tempo de execução gerenciado incorporado à imagem unificada em vez de uma rota do provedor padrão.
+  openCodeModel: OpenCode Modelo
+  openCodeModelHint: Modelo de tempo de execução gerenciado opcional. A imagem envia o comando opencode mesmo que o roteamento esteja configurado explicitamente.
+  openCodeTargetPathLabel: Arquivo de configuração de destino
+  openCodeTargetPathHint: OpenCode sempre lê e grava o mesmo caminho opencode.json no contêiner.
+  openCodeConfigSource: Fonte de configuração
+  openCodeConfigSourceHint: Escolha se Docker Compose deve manter a configuração de OpenCode em um volume gerenciado ou vincular explicitamente os arquivos OpenCode do host.
+  openCodeConfigModeDefault: Persistência padrão
+  openCodeConfigModeDefaultHint: 'Recomendado. Usa três volumes nomeados: opencode-config-data, opencode-auth-data e opencode-models-data, para que os diretórios config, auth e cache sobrevivam às reinicializações.'
+  openCodeConfigModeHostFile: Caminho do arquivo host
+  openCodeConfigModeHostFileHint: Vincule um arquivo host opencode.json e, opcionalmente, adicione montagens auth.json e models.json.
+  openCodeConfigHostPath: Caminho do arquivo host
+  openCodeConfigHostPathHint: 'Insira o caminho absoluto para opencode.json no host Docker. Exemplo: {{example}}'
+  openCodeAuthHostPath: Caminho de autenticação do host
+  openCodeAuthHostPathHint: 'Opcional. Para permitir que o contêiner reutilize um login existente, insira o caminho absoluto para hospedar auth.json. Exemplo: {{example}}'
+  openCodeModelsHostPath: Caminho dos modelos de host
+  openCodeModelsHostPathHint: 'Opcional. Para reutilizar o cache do modelo host, insira o caminho absoluto para models.json. Exemplo: {{example}}'
+  openCodeConfigBrowserLimitTitle: Caminho manual obrigatório
+  openCodeConfigBrowserLimitHint: Os navegadores não podem retornar um caminho de ligação de host pronto para Docker para você, portanto, este campo deve ser preenchido manualmente.
+  openCodeConfigManualPriorityHint: O arquivo de composição exportado sempre usa o caminho digitado aqui como fonte da verdade.
+  openCodeAdditionalHostFilesHint: Se você preencher os caminhos de host auth.json ou models.json, o Builder também exportará montagens de ligação correspondentes. Deixe-os vazios para pular essas montagens.
+  openCodeManagedVolumeTitle: Persistência gerenciada habilitada
+  openCodeManagedVolumeHint: Nenhuma entrada extra é necessária. O construtor montará automaticamente opencode-config-data, opencode-auth-data e opencode-models-data para configuração, autenticação e persistência de cache de modelo.
+  openCodeRuntimePathTitle: mapeamento de caminho hagicode
+  openCodeRuntimePathHint: Todos os arquivos de tempo de execução OpenCode dentro do contêiner residem sob o prefixo /home/hagicode/.
+  openCodeRuntimePathConfigLabel: Arquivo de configuração
+  openCodeRuntimePathAuthLabel: Arquivo de autenticação
+  openCodeRuntimePathModelsLabel: Cache de modelo
+  openCodeConfigAuthWarningTitle: O arquivo de configuração não é o arquivo de autenticação
+  openCodeConfigAuthWarningHint: opencode.json, auth.json e models.json são três arquivos separados. Mesmo no modo host-file, cada caminho é configurado de forma independente.
+  openCodeConfigAuthMigrationHint: Se você quiser reutilizar um login de host existente, forneça o caminho do host auth.json explicitamente ou prepare-o você mesmo em /home/hagicode/.local/share/opencode/auth.json. O Builder não o copiará automaticamente.
+  standardTemplate: Modelo padrão
+  standardTemplateDescription: Modelo de aplicativo Hagicode padrão
+  optional: opcional
+  compatibilityAliasHint: Dica de alias de compatibilidade
+  codexCompatibilityDescription: Você também pode usar variáveis de ambiente OPENAI_* como aliases de compatibilidade
+  claudeApiConfig: Claude API Configuração
+  unifiedUseOfToken: Uso unificado da variável de ambiente ANTHROPIC_AUTH_TOKEN
+  apiProvider: API Provedor
+  selectApiProvider: Selecione o provedor API
   zhipuAI: Zhipu AI (ZAI)
   aliyunDashScope: Aliyun DashScope
-  anthropicOfficialApi: Anthropic Official API
-  customApiEndpoint: Custom API Endpoint
-  apiEndpointUrl: API Endpoint URL
+  anthropicOfficialApi: Anthropic Oficial API
+  customApiEndpoint: Ponto final API personalizado
+  apiEndpointUrl: API Ponto final URL
   apiToken: API Token
-  getApiToken: Get API Token →
-  enterApiToken: Enter your API Token
-  enterAnthropicApiToken: Enter your Anthropic API Token (sk-ant-...)
-  apiEndpointAutoSet: API Endpoint will be automatically set to
-  aliyunModelsSupported: Supported models
-  usingOfficialApi: Using Anthropic official API, no need to set ANTHROPIC_URL
-  usingCustomEndpoint: Using custom Anthropic-compatible API endpoint
-  claudeCodeExtendedConfig: Claude Code Extended Configuration
-  claudeCodeExtendedConfigDescription: Configure Claude Code model versions and experimental features (optional)
-  anthropicSonnetModel: Sonnet / GLM Model Version
-  anthropicSonnetModelHint: 'ZAI default: glm-4.7 | Anthropic example: claude-sonnet-4-20250514'
-  anthropicOpusModel: Opus / GLM Model Version
-  anthropicOpusModelHint: 'ZAI default: glm-5 | Anthropic example: claude-opus-4-20250514'
-  anthropicHaikuModel: Haiku / GLM-Air Model Version
-  anthropicHaikuModelHint: 'ZAI default: glm-4.5-air | Anthropic example: claude-haiku-4-20250514'
-  claudeCodeExperimentalAgentTeams: Enable Agent Teams Feature
-  claudeCodeExperimentalAgentTeamsHint: Enable experimental Agent Teams collaboration feature
-  volumeMounts: Volume Mounts
-  workdirDescription: Work directory points to a folder containing your code repositories. We will scan multiple repositories within this folder and it will be mapped to /app/workdir inside the container.
-  workdirRecommendation: '💡 Recommendation: Point to a parent folder that contains multiple repositories (e.g., /home/user/repos or C:\Users\YourName\source\repos). The application will scan all subfolders to detect repositories.'
-  workdirPath: Work Directory Path
-  workdirCreatedByRoot: Work directory created by root user
-  permissionIssueWarning: Permission Issue Warning
-  permissionIssueDescription: 'The work directory was created by root user, which will prevent the container from writing files. Please choose one of the following solutions:'
-  changeDirPermissions: 'Change directory permissions:'
-  createNonRootUser: Create a non-root user and use that user to create the directory
-  configureUserPermission: Configure User Permission Mapping
-  configureUserPermissionDescription: To solve file permission issues inside and outside the container, you need to configure PUID and PGID. Use the user ID and group ID of the user who created the work directory.
-  getCurrentUserId: 'Get current user ID:'
-  outputExample: 'Output example:'
-  puid: PUID (User ID)
-  pgid: PGID (Group ID)
-  permissionNotRequired: Permission Not Required
-  permissionNotRequiredDescription: When workdir is created by root, permission mapping is not required.
-  codeServerConfiguration: Code Server Configuration
-  codeServerDescription: Configure the managed browser IDE defaults exported only in full custom mode.
-  codeServerEnable: Enable code-server as the default browser IDE
-  codeServerEnableHint: When disabled, Builder keeps your saved values but exports code serve-web as the default implementation instead.
-  codeServerPrivateTitle: Private by default
-  codeServerPrivateHint: No dedicated host port is published until you explicitly enable host publishing below.
-  codeServerPersistenceTitle: Persistence stays shared
-  codeServerPersistenceHint: Builder now persists system-scoped assets under /app/data and save-scoped HagiCode runtime state under /app/saves/save0/..., while Code Server stays in the system root.
-  codeServerPersistencePathValue: 'System: hagicode_data:/app/data  ->  /app/data/code-server'
-  codeServerSaveStatePathValue: 'Save state: hagicode_saves:/app/saves  ->  /app/saves/save0/...'
-  codeServerHost: Listen Host
-  codeServerHostHint: 'Use 127.0.0.1 for private container-only access. Switch to 0.0.0.0 or :: before enabling host publishing.'
-  codeServerPort: Container Port
-  codeServerPortHint: 'Valid range: 1-65535. Port 36529 matches the HagiCode code-server default.'
-  codeServerAuthMode: Auth Mode
-  codeServerAuthModeNone: none
-  codeServerAuthModePassword: password
-  codeServerAuthModeHint: Use password when you want Builder to export a startup secret for code-server.
+  getApiToken: Obtenha o token API →
+  enterApiToken: Insira seu token API
+  enterAnthropicApiToken: Insira seu token Anthropic API (sk-ant-...)
+  apiEndpointAutoSet: API Endpoint será automaticamente definido como
+  aliyunModelsSupported: Modelos suportados
+  usingOfficialApi: Usando Anthropic oficial API, não há necessidade de definir ANTHROPIC_URL
+  usingCustomEndpoint: Usando endpoint Anthropic-compatible API personalizado
+  claudeCodeExtendedConfig: Claude Code Configuração Estendida
+  claudeCodeExtendedConfigDescription: Configurar versões do modelo Claude Code e recursos experimentais (opcional)
+  anthropicSonnetModel: Soneto / GLM Versão do modelo
+  anthropicSonnetModelHint: 'ZAI padrão: glm-4.7 | Anthropic exemplo: claude-sonnet-4-20250514'
+  anthropicOpusModel: Versão do modelo Opus / GLM
+  anthropicOpusModelHint: 'ZAI padrão: glm-5 | Anthropic exemplo: claude-opus-4-20250514'
+  anthropicHaikuModel: Haiku / GLM-Versão do modelo aéreo
+  anthropicHaikuModelHint: 'ZAI padrão: glm-4.5-air | Anthropic exemplo: claude-haiku-4-20250514'
+  claudeCodeExperimentalAgentTeams: Habilitar recurso de equipes de agentes
+  claudeCodeExperimentalAgentTeamsHint: Habilite o recurso experimental de colaboração de equipes de agentes
+  volumeMounts: Montagens de volume
+  workdirDescription: O diretório de trabalho aponta para uma pasta que contém seus repositórios de código. Iremos verificar vários repositórios dentro desta pasta e ele será mapeado para /app/workdir dentro do contêiner.
+  workdirRecommendation: '💡 Recomendação: Aponte para uma pasta pai que contenha vários repositórios (por exemplo, /home/user/repos ou C:\Users\YourName\source\repos). O aplicativo irá verificar todas as subpastas para detectar repositórios.'
+  workdirPath: Caminho do diretório de trabalho
+  workdirCreatedByRoot: Diretório de trabalho criado pelo usuário root
+  permissionIssueWarning: Aviso de problema de permissão
+  permissionIssueDescription: 'O diretório de trabalho foi criado pelo usuário root, o que impedirá que o contêiner grave arquivos. Escolha uma das seguintes soluções:'
+  changeDirPermissions: 'Altere as permissões do diretório:'
+  createNonRootUser: Crie um usuário não root e use esse usuário para criar o diretório
+  configureUserPermission: Configurar mapeamento de permissões de usuário
+  configureUserPermissionDescription: Para resolver problemas de permissão de arquivos dentro e fora do contêiner, você precisa configurar PUID e PGID. Use o ID do usuário e o ID do grupo do usuário que criou o diretório de trabalho.
+  getCurrentUserId: 'Obtenha o ID do usuário atual:'
+  outputExample: 'Exemplo de saída:'
+  puid: PUID (ID do usuário)
+  pgid: PGID (ID do grupo)
+  permissionNotRequired: Permissão não necessária
+  permissionNotRequiredDescription: Quando workdir é criado pelo root, o mapeamento de permissão não é necessário.
+  codeServerConfiguration: Configuração do servidor de código
+  codeServerDescription: Configure os padrões IDE do navegador gerenciado exportados apenas no modo totalmente customizado.
+  codeServerEnable: Habilite code-server como navegador padrão IDE
+  codeServerEnableHint: Quando desabilitado, o Builder mantém seus valores salvos, mas exporta code serve-web como a implementação padrão.
+  codeServerPrivateTitle: Privado por padrão
+  codeServerPrivateHint: Nenhuma porta de host dedicada será publicada até que você habilite explicitamente a publicação de host abaixo.
+  codeServerPersistenceTitle: A persistência permanece compartilhada
+  codeServerPersistenceHint: O Builder agora persiste os ativos com escopo do sistema em /app/data e o estado de tempo de execução do HagiCode com escopo de salvamento em /app/saves/save0/..., enquanto o Code Server permanece na raiz do sistema.
+  codeServerPersistencePathValue: 'Sistema: hagicode_data:/app/data -> /app/data/code-server'
+  codeServerSaveStatePathValue: 'Salvar estado: hagicode_saves:/app/saves -> /app/saves/save0/...'
+  codeServerHost: Ouvir anfitrião
+  codeServerHostHint: 'Use 127.0.0.1 para acesso somente a contêineres privados. Mude para 0.0.0.0 ou :: antes de ativar a publicação do host.'
+  codeServerPort: Porto de contêineres
+  codeServerPortHint: 'Intervalo válido: 1-65535. A porta 36529 corresponde ao padrão HagiCode code-server.'
+  codeServerAuthMode: Modo de autenticação
+  codeServerAuthModeNone: nenhum
+  codeServerAuthModePassword: senha
+  codeServerAuthModeHint: Use a senha quando quiser que o Builder exporte um segredo de inicialização para code-server.
   codeServerPassword: CODE_SERVER_PASSWORD
-  codeServerPasswordHint: This value is passed to the container bootstrap path and bridged to code-server without being echoed in comments.
-  codeServerPasswordSkippedHint: No password secret is exported while auth mode stays set to none.
-  codeServerPublishToHost: Publish Code Server to Host
-  codeServerPublishToHostHint: Adds a dedicated host-to-container port mapping for code-server while keeping the bind address fixed to host loopback.
-  codeServerPublishedPort: Published Host Port
-  codeServerPublishedPortHint: Builder emits a separate loopback-only mapping for this host port.
-  codeServerPublishBindTitle: Host bind address
-  codeServerPublishBindHint: Builder keeps the host-side bind fixed to loopback for the first publish step. Add a reverse proxy if you need wider exposure.
+  codeServerPasswordHint: Este valor é passado para o caminho de inicialização do contêiner e conectado a code-server sem ser repetido nos comentários.
+  codeServerPasswordSkippedHint: Nenhum segredo de senha é exportado enquanto o modo de autenticação permanece definido como nenhum.
+  codeServerPublishToHost: Publicar servidor de código no host
+  codeServerPublishToHostHint: Adiciona um mapeamento de porta host-para-contêiner dedicado para code-server enquanto mantém o endereço de ligação fixo no loopback do host.
+  codeServerPublishedPort: Porta de host publicada
+  codeServerPublishedPortHint: O Builder emite um mapeamento separado apenas de loopback para esta porta host.
+  codeServerPublishBindTitle: Endereço de ligação do host
+  codeServerPublishBindHint: O Builder mantém a ligação do lado do host fixa em loopback para a primeira etapa de publicação. Adicione um proxy reverso se precisar de uma exposição mais ampla.
   codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
-  codeServerDisabledTitle: code-server defaults are currently disabled
-  codeServerDisabledHint: Builder will export code serve-web as the active implementation until you re-enable code-server for this profile.
-  eulaConfiguration: Container EULA
-  eulaDescription: Review and confirm the runtime agreement shared across quick start and full custom.
-  acceptEula: Accept the container EULA before startup
-  acceptEulaHint: Builder exports ACCEPT_EULA=Y only when enabled, and the release entrypoint refuses startup until it sees an accepted opt-in value.
-  readEula: Read the EULA on docs
-  acceptEulaSharedStateHint: This selection is shared across quick start and full custom.
+  codeServerDisabledTitle: Os padrões code-server estão desativados no momento
+  codeServerDisabledHint: O Builder exportará code serve-web como a implementação ativa até que você reative code-server para este perfil.
+  eulaConfiguration: Contêiner EULA
+  eulaDescription: Revise e confirme o contrato de tempo de execução compartilhado entre início rápido e personalização completa.
+  acceptEula: Aceite o contêiner EULA antes da inicialização
+  acceptEulaHint: O Builder exporta ACCEPT_EULA=Y somente quando ativado e o ponto de entrada da versão recusa a inicialização até que veja um valor de aceitação aceito.
+  readEula: Leia o EULA nos documentos
+  acceptEulaSharedStateHint: Esta seleção é compartilhada entre início rápido e personalização completa.
 configPreview:
-  generatedConfiguration: Generated Configuration
-  copy: Copy
-  copied: Copied!
-  download: Download
-  yamlCopiedSuccess: YAML configuration copied to clipboard!
-  yamlCopiedError: Failed to copy to clipboard
-  downloadSuccess: docker-compose.yml downloaded successfully!
-  invalidConfigCannotExport: Please fix configuration errors before copy/download.
-  generatedAt: 'Generated at:'
-  basedOnSettings: This configuration is based on your settings above.
-  previewDescription: Live YAML output stays aligned with the visible workspace sections.
-  lines: lines
-  livePreview: Live preview
-  exportBlockedTitle: Export is unavailable until the highlighted sections are fixed.
-  exportBlockedDescription: Use the shortcuts below to return to the modules that still have validation issues.
-  exportReadyTitle: This configuration is ready to export.
-  exportReadyDescription: Copy or download the generated file whenever you are satisfied with the preview.
+  generatedConfiguration: Configuração gerada
+  copy: Copiar
+  copied: Copiado!
+  download: Baixar
+  yamlCopiedSuccess: Configuração YAML copiada para a área de transferência!
+  yamlCopiedError: Falha ao copiar para a área de transferência
+  downloadSuccess: docker-compose.yml baixado com sucesso!
+  invalidConfigCannotExport: Corrija os erros de configuração antes de copiar/download.
+  generatedAt: 'Gerado em:'
+  basedOnSettings: Esta configuração é baseada nas configurações acima.
+  previewDescription: A saída Live YAML permanece alinhada com as seções visíveis do espaço de trabalho.
+  lines: linhas
+  livePreview: Visualização ao vivo
+  exportBlockedTitle: A exportação não estará disponível até que as seções destacadas sejam corrigidas.
+  exportBlockedDescription: Use os atalhos abaixo para retornar aos módulos que ainda apresentam problemas de validação.
+  exportReadyTitle: Esta configuração está pronta para exportação.
+  exportReadyDescription: Copie ou baixe o arquivo gerado sempre que estiver satisfeito com a visualização.
 generator:
-  title: Hagicode Docker Compose Configuration
-  generatedBy: Auto-generated by Docker Compose Generator
-  generatedAtLabel: Generated at
+  title: Hagicode Docker Compose Configuração
+  generatedBy: Gerado automaticamente por Docker Compose Generator
+  generatedAtLabel: Gerado em
   support:
-    title: Support Information
-    description: 'If you encounter any issues or need technical support:'
-    qqGroup: Join our QQ group
+    title: Informações de suporte
+    description: 'Se você encontrar algum problema ou precisar de suporte técnico:'
+    qqGroup: Junte-se ao nosso grupo QQ
     qqNumber: '610394020'
-    discord: Join our Discord community
+    discord: Junte-se à nossa comunidade Discord
     discordLink: https://discord.gg/qY662sJK
-    assistance: We provide real-time assistance and solutions
-    share: Share your experiences and connect with other users
+    assistance: Fornecemos assistência e soluções em tempo real
+    share: Compartilhe suas experiências e conecte-se com outros usuários
   caddyfile:
-    title: Auto-generated Caddyfile for Hagicode HTTPS
-    copyHint: Copy this content to ./Caddyfile next to docker-compose.yml
+    title: Caddyfile gerado automaticamente para Hagicode HTTPS
+    copyHint: Copie este conteúdo para ./Caddyfile próximo a docker-compose.yml
   runtime:
     codex:
-      title: Codex Runtime Configuration
-      usesEnv: Uses CODEX_* environment variables
-      alias: OPENAI_* variables are accepted as compatibility aliases
-      baseUrlOptional: 'CODEX_BASE_URL: optional, uses default if not set'
+      title: Codex Configuração de tempo de execução
+      usesEnv: Usa variáveis de ambiente CODEX_*
+      alias: Variáveis OPENAI_* são aceitas como aliases de compatibilidade
+      baseUrlOptional: 'CODEX_BASE_URL: opcional, usa o padrão se não estiver definido'
     opencode:
-      title: OpenCode Runtime Configuration
-      managedContract: Uses the managed OpenCode runtime contract baked into the unified image
+      title: OpenCode Configuração de tempo de execução
+      managedContract: Usa o contrato de tempo de execução gerenciado OpenCode incorporado à imagem unificada
     claude:
-      title: Claude Runtime Configuration
-      usesToken: All providers use ANTHROPIC_AUTH_TOKEN
-      urlHint: ANTHROPIC_URL is set for ZAI, Aliyun, and custom providers
+      title: Claude Configuração de tempo de execução
+      usesToken: Todos os provedores usam ANTHROPIC_AUTH_TOKEN
+      urlHint: ANTHROPIC_URL está definido para ZAI, Aliyun e provedores personalizados
   providers:
     anthropic:
-      heading: Anthropic Official API
-      noUrlHint: No ANTHROPIC_URL needed; the default Anthropic endpoint is used
+      heading: Anthropic Oficial API
+      noUrlHint: Não é necessário ANTHROPIC_URL; o endpoint Anthropic padrão é usado
     zai:
-      heading: Zhipu AI (ZAI) - uses an Anthropic-compatible API
-      providerLabel: 'API Provider: Zhipu AI (ZAI)'
+      heading: Zhipu AI (ZAI) - usa um Anthropic-compatible API
+      providerLabel: 'API Provedor: Zhipu AI (ZAI)'
     aliyun:
-      heading: Aliyun DashScope - uses an Anthropic-compatible API
-      providerLabel: 'API Provider: Aliyun DashScope'
-      modelMapping: Model mapping (unified configuration)
-      unifiedModelHaiku: Haiku  -> glm-4.7  (Unified model for all tiers)
-      unifiedModelSonnet: Sonnet -> glm-4.7  (Unified model for all tiers)
-      unifiedModelOpus: Opus   -> glm-4.7  (Unified model for all tiers)
+      heading: Aliyun DashScope - usa um Anthropic-compatible API
+      providerLabel: 'API Provedor: Aliyun DashScope'
+      modelMapping: Mapeamento de modelo (configuração unificada)
+      unifiedModelHaiku: Haiku -> glm-4.7 (modelo unificado para todas as camadas)
+      unifiedModelSonnet: Soneto -> glm-4.7 (Modelo unificado para todas as camadas)
+      unifiedModelOpus: Opus -> glm-4.7 (Modelo unificado para todas as camadas)
     volcengine:
-      heading: Volcengine Coding Plan - uses an Anthropic-compatible API
-      providerLabel: 'API Provider: Volcengine Coding Plan'
-      modelMapping: Model mapping (unified configuration)
-      unifiedModelHaiku: Haiku  -> glm-4.7  (Unified model for all tiers)
-      unifiedModelSonnet: Sonnet -> glm-4.7  (Unified model for all tiers)
-      unifiedModelOpus: Opus   -> glm-4.7  (Unified model for all tiers)
+      heading: Volcengine Coding Plan - usa um Anthropic-compatible API
+      providerLabel: 'API Provedor: Volcengine Coding Plan'
+      modelMapping: Mapeamento de modelo (configuração unificada)
+      unifiedModelHaiku: Haiku -> glm-4.7 (modelo unificado para todas as camadas)
+      unifiedModelSonnet: Soneto -> glm-4.7 (Modelo unificado para todas as camadas)
+      unifiedModelOpus: Opus -> glm-4.7 (Modelo unificado para todas as camadas)
     custom:
-      heading: Custom Anthropic-compatible API
-      providerLabel: 'API Provider: Custom Endpoint'
+      heading: Anthropic-compatible API personalizado
+      providerLabel: 'API Provedor: endpoint personalizado'
     generic:
-      compatibleLabel: uses an Anthropic-compatible API
-      providerLabel: 'API Provider: {{displayName}}'
+      compatibleLabel: usa um Anthropic-compatible API
+      providerLabel: 'API Provedor: {{displayName}}'
   codeServer:
-    title: Code Server deployment defaults
-    privateHint: 'Private by default: no host port is published unless you explicitly enable it'
-    persistenceHint: System-scoped assets stay under hagicode_data:/app/data while save-scoped runtime state persists under hagicode_saves:/app/saves/save0/...
-    disabledHint: code-server is not the default implementation for this deployment; runtime falls back to code serve-web
-    publishHint: Host publishing is loopback-only at 127.0.0.1; add a reverse proxy explicitly if you need broader exposure
-    systemVolumeHint: System data volume; Code Server runtime state lives under /app/data/code-server
-    saveVolumeHint: Save-state volume; the main database and Orleans state live under /app/saves/save0/...
+    title: Padrões de implantação do Code Server
+    privateHint: 'Privado por padrão: nenhuma porta do host é publicada, a menos que você a habilite explicitamente'
+    persistenceHint: Os ativos com escopo do sistema permanecem em hagicode_data:/app/data enquanto o estado do tempo de execução com escopo de salvamento persiste em hagicode_saves:/app/saves/save0/...
+    disabledHint: code-server não é a implementação padrão para esta implantação; o tempo de execução volta para code serve-web
+    publishHint: A publicação do host é somente loopback em 127.0.0.1; adicione um proxy reverso explicitamente se precisar de uma exposição mais ampla
+    systemVolumeHint: Volume de dados do sistema; O estado de tempo de execução do Code Server reside em /app/data/code-server
+    saveVolumeHint: Volume de estado salvo; o banco de dados principal e o estado de Orleans vivem sob /app/saves/save0/...
 validation:
   fields:
-    openCodeConfigHostPath: OpenCode config host file path
-    openCodeAuthHostPath: OpenCode auth host file path
-    openCodeModelsHostPath: OpenCode models host file path
+    openCodeConfigHostPath: OpenCode caminho do arquivo host de configuração
+    openCodeAuthHostPath: OpenCode caminho do arquivo host de autenticação
+    openCodeModelsHostPath: OpenCode caminho do arquivo host dos modelos
   messages:
-    enabledExecutorsRequired: At least one executor must be enabled
-    httpPortInvalid: HTTP port must be a valid number
-    httpPortRange: HTTP port must be between 1 and 65535
-    httpsPortInvalid: HTTPS port must be a valid number
-    httpsPortRange: HTTPS port must be between 1 and 65535
-    lanIpInvalid: LAN IP must be a valid IPv4/IPv6 address
-    httpsPortConflict: HTTPS port cannot be the same as HTTP port
-    containerNameRequired: Container name is required
-    imageTagRequired: Image tag is required
-    customLicenseKeyRequired: Custom license key is required
-    anthropicAuthTokenRequired: API token is required when Claude executor is enabled
-    anthropicUrlRequired: API endpoint URL is required for custom Claude provider
-    codexApiKeyRequired: CODEX_API_KEY is required when Codex executor is enabled
-    hostFileRequired: '{{label}} is required when host-file mode is enabled'
-    hostFileMustBeJsonFile: '{{label}} must point to a .json file, not a directory'
-    hostFileMustEndWithJson: '{{label}} must end with .json'
-    hostFileMustBeAbsoluteWindows: '{{label}} must be an absolute Windows path such as C:\opencode\{{exampleFilename}}'
-    hostFileMustBeAbsoluteLinux: '{{label}} must be an absolute Linux path such as /srv/opencode/{{exampleFilename}}'
-    codeServerHostInvalid: Code Server listen host must be a valid IPv4/IPv6 address
-    codeServerHostNoPort: Code Server listen host must not include a port
-    codeServerPortInvalid: Code Server container port must be a valid number
-    codeServerPortRange: Code Server container port must be between 1 and 65535
-    codeServerPortConflict: Code Server container port cannot reuse the HagiCode app port 45000
-    codeServerAuthModeInvalid: Code Server auth mode must be none or password
-    codeServerPasswordRequired: Code Server password is required when auth mode is password
-    codeServerPublishedPortInvalid: Code Server published port must be a valid number
-    codeServerPublishedPortRange: Code Server published port must be between 1 and 65535
-    codeServerPublishedPortHttpConflict: Code Server published port cannot match the HagiCode HTTP port
-    codeServerPublishedPortHttpsConflict: Code Server published port cannot match the HTTPS proxy port
-    codeServerHostPublishConflict: 'Code Server listen host must be 0.0.0.0 or :: when host publishing is enabled'
-    workdirPathRequired: Work directory path is required
-    puidInvalid: PUID must be a valid number
-    pgidInvalid: PGID must be a valid number
+    enabledExecutorsRequired: Pelo menos um executor deve estar habilitado
+    httpPortInvalid: A porta HTTP deve ser um número válido
+    httpPortRange: A porta HTTP deve estar entre 1 e 65535
+    httpsPortInvalid: A porta HTTPS deve ser um número válido
+    httpsPortRange: A porta HTTPS deve estar entre 1 e 65535
+    lanIpInvalid: O IP LAN deve ser um endereço IPv4/IPv6 válido
+    httpsPortConflict: A porta HTTPS não pode ser igual à porta HTTP
+    containerNameRequired: O nome do contêiner é obrigatório
+    imageTagRequired: A tag da imagem é obrigatória
+    customLicenseKeyRequired: É necessária uma chave de licença personalizada
+    anthropicAuthTokenRequired: O token API é necessário quando o executor Claude está habilitado
+    anthropicUrlRequired: O endpoint API URL é necessário para o provedor Claude personalizado
+    codexApiKeyRequired: CODEX_API_KEY é necessário quando o executor Codex está habilitado
+    hostFileRequired: '{{label}} é necessário quando o modo de arquivo host está ativado'
+    hostFileMustBeJsonFile: '{{label}} deve apontar para um arquivo .json, não para um diretório'
+    hostFileMustEndWithJson: '{{label}} deve terminar com .json'
+    hostFileMustBeAbsoluteWindows: '{{label}} deve ser um caminho absoluto do Windows, como C:\opencode\{{exampleFilename}}'
+    hostFileMustBeAbsoluteLinux: '{{label}} deve ser um caminho Linux absoluto, como /srv/opencode/{{exampleFilename}}'
+    codeServerHostInvalid: O host de escuta do Code Server deve ser um endereço IPv4/IPv6 válido
+    codeServerHostNoPort: O host de escuta do Code Server não deve incluir uma porta
+    codeServerPortInvalid: A porta do contêiner do Code Server deve ser um número válido
+    codeServerPortRange: A porta do contêiner do Code Server deve estar entre 1 e 65535
+    codeServerPortConflict: A porta do contêiner do Code Server não pode reutilizar a porta 45000 do aplicativo HagiCode
+    codeServerAuthModeInvalid: O modo de autenticação do Code Server deve ser nenhum ou senha
+    codeServerPasswordRequired: A senha do Code Server é necessária quando o modo de autenticação é senha
+    codeServerPublishedPortInvalid: A porta publicada do Code Server deve ser um número válido
+    codeServerPublishedPortRange: A porta publicada do Code Server deve estar entre 1 e 65535
+    codeServerPublishedPortHttpConflict: A porta publicada do Code Server não pode corresponder à porta HagiCode HTTP
+    codeServerPublishedPortHttpsConflict: A porta publicada do Code Server não pode corresponder à porta proxy HTTPS
+    codeServerHostPublishConflict: 'O host de escuta do Code Server deve ser 0.0.0.0 ou :: quando a publicação do host estiver habilitada'
+    workdirPathRequired: O caminho do diretório de trabalho é obrigatório
+    puidInvalid: PUID deve ser um número válido
+    pgidInvalid: PGID deve ser um número válido
