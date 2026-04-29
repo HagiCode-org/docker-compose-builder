@@ -2,30 +2,30 @@ providers:
   anthropic:
     name: Anthropic 公式
     description: 公式 Anthropic API
-    notes: 公式の Claude モデルを使用し、モデルのバージョンはユーザーが選択可能なままです。
+    notes: 公式 Claude モデルを使用し、モデルのバージョンはユーザーが選択可能なままです。
     networkAdvice: Anthropic に直接アクセスできる環境に最適です。
   zai:
     name: Zhipu AI (ZAI)
-    description: Zhipu AI が提供する Claude 互換の API サービス
+    description: Zhipu AI によって提供される Claude 互換の API サービス
     notes: Zhipu AI プラットフォームによって発行された API キーが必要です。
-    networkAdvice: 中国本土向けの Claude 互換のエントリ ポイントを必要とするユーザーに最適です。
+    networkAdvice: 中国本土向けの Claude 互換エントリ ポイントを必要とするユーザーに最適です。
   aliyun:
     name: Aliyun DashScope
     description: Aliyun DashScope によって提供される Claude 互換の API サービス
-    notes: すべての層にわたって統合された glm-4.7 モデル マッピングを使用します。
-    networkAdvice: Aliyun への強力なローカル接続を備えた中国本土の展開に最適です。
+    notes: すべての層にわたって統一された glm-4.7 モデル マッピングを使用します。
+    networkAdvice: Aliyun へのローカル接続が強化されている中国本土の展開に最適です。
   minimax:
-    name: __トークン_0__
-    description: MiniMax が提供する Claude 互換の API サービス
+    name: MiniMax
+    description: MiniMax によって提供される Claude 互換の API サービス
     notes: すべての層にわたって統一された MiniMax-M2.5 モデルを使用します。
-    networkAdvice: MiniMax Claude 互換のゲートウェイを好むユーザーに最適です。
+    networkAdvice: MiniMax Claude 互換ゲートウェイを好むユーザーに最適です。
   volcengine:
-    name: Volcengine コーディング計画
-    description: MiniMax が提供する Claude 互換の API サービス
-    notes: すべての層にわたって統合された glm-4.7 モデル マッピングを使用します。
+    name: Volcengine Coding Plan
+    description: Volcengine によって提供される Claude 互換の API サービス
+    notes: すべての層にわたって統一された glm-4.7 モデル マッピングを使用します。
     networkAdvice: Volcengine ネットワーク エントリ ポイントを好む展開に最適です。
   custom:
     name: カスタム API エンドポイント
-    description: ユーザー提供の Claude / Anthropic 互換の API エンドポイント
+    description: ユーザー提供の Claude / Anthropic-compatible API エンドポイント
     notes: エンドポイント URL と一致する資格情報を手動で指定する必要があります。
-    networkAdvice: セルフホスト型ゲートウェイまたはサードパーティの Anthropic 互換プロキシに最適です。
+    networkAdvice: セルフホスト型ゲートウェイまたはサードパーティの Anthropic-compatible プロキシに最適です。

@@ -4,10 +4,10 @@ configForm:
   profile: プロフィール
   profileLabel: 設定モード
   quickStart: クイック スタート (新規ユーザーに推奨)
-  quickStartDescription: SQLite をすぐに使い始めましょう。追加のデータベース設定は必要ありません。
+  quickStartDescription: SQLite をすぐに使い始めましょう。追加のデータベース設定は必要ありません
   fullCustom: フルカスタム
   fullCustomDescription: すべての構成オプションを完全に制御
-  profileHelp: 構成エクスペリエンスを選択してください。 いつでもモードを切り替えることができます。
+  profileHelp: 構成エクスペリエンスを選択してください。いつでもモードを切り替えることができます。
   basicConfig: 基本構成
   httpPort: HTTP ポート
   containerName: コンテナ名
@@ -18,16 +18,16 @@ configForm:
   windows: 窓
   linux: Linux
   imageRegistry: 画像ソース
-  supportHint: 助けが必要ですか? QQ グループ {{groupNumber}} または Discord に参加します。
+  supportHint: 助けが必要ですか? QQ Group {{groupNumber}} または Discord に参加します。
   selectImageRegistry: 画像ソースの選択
-  dockerHub: __トークン_0__
-  dockerOfficialRegistry: Docker 公式レジストリ
-  azureContainerRegistry: Azure コンテナー レジストリ
+  dockerHub: Docker Hub
+  dockerOfficialRegistry: Docker Official Registry
+  azureContainerRegistry: Azure Container Registry
   aliyunAcr: アリババクラウド ACR
-  aliyunAcrRecommended: Alibaba Cloud コンテナ レジストリ
+  aliyunAcrRecommended: Alibaba Cloud Container Registry
   alternativeRegistry: 代替レジストリ
   dockerHubDescription: Docker 公式イメージ レジストリ、推奨
-  dockerHubNetworkAdvice: Docker Hub ミラー アクセラレーションをサポートするユーザーに適しています
+  dockerHubNetworkAdvice: Docker Hub ミラー加速サポートを備えたユーザーに適しています
   azureAcrDescription: 代替イメージ レジストリ、Docker Hub と同期
   azureAcrNetworkAdvice: Docker Hub にローカルでアクセスできないユーザーに適しています
   aliyunAcrDescription: Alibaba Cloud Container Registry、中国のユーザーに推奨
@@ -38,38 +38,38 @@ configForm:
   httpsDisabled: HTTPS 無効
   enableHttps: HTTPS プロキシを有効にする
   enableHttpsHelp: 自己署名証明書を使用して Caddy リバース プロキシを介して Hagicode を公開します。
-  httpsPort: HTTP ポート
-  httpsPortHelp: "有効な範囲: 1-65535。 ポート 443 が推奨されます。"
+  httpsPort: HTTPS ポート
+  httpsPortHelp: '有効な範囲: 1 ～ 65535。ポート 443 が推奨されます。'
   lanIp: LAN IP アドレス
   lanIpHelp: ローカル ネットワーク アクセスには、LAN IPv4/IPv6 アドレスを使用します。
-  lanIpExamples: "例: 192.168.1.100、10.0.0.12、fe80::1"
+  lanIpExamples: '例: 192.168.1.100、10.0.0.12、fe80::1'
   lanIpTooltipLabel: LAN IP 使用法のヘルプ
   lanIpTooltipText: ローカル ネットワーク内の他のデバイスから到達可能なホスト マシン アドレスを使用します。
   accessUrl: URL にアクセス
   certificateTrustGuide: 証明書信頼ガイド
   troubleshooting: トラブルシューティング
   certificateGuideTitle: 証明書生成メモ
-  certificateGuideDescription: Caddy は内部 TLS を使用して自己署名証明書を自動生成します。
+  certificateGuideDescription: Caddy は、tls internal を使用して自己署名証明書を自動生成します。
   certificateGuideDetails: 詳細を表示
-  certificateStep1: 1. Caddy は内部 TLS を使用して自己署名証明書を作成します。
+  certificateStep1: 1. Caddy は tls internal を使用して自己署名証明書を作成します。
   certificateStep2: 2. 証明書は Docker ボリューム caddy_data に保存されます。
   certificateStep3: 3. 最初のアクセス時にブラウザの証明書を信頼します。
-  privilegedPortWarning: 1024 より下のポートには、高い権限が必要な場合があります。
-  localhostLanWarning: localhost は LAN HTTPS の共有には推奨されません。
+  privilegedPortWarning: 1024 未満のポートには、高い権限が必要な場合があります。
+  localhostLanWarning: localhost は LAN HTTPS 共有には推奨されません。
   caddyPreviewTitle: Caddyfile プレビュー
   caddyPreviewCopy: コピー
   caddyPreviewCopied: コピーされました
   caddyPreviewRetryCopy: コピーを再試行します
   caddyPreviewCopyError: クリップボードへの書き込みに失敗しました。再試行してください。
-  caddyPreviewTlsHint: "`tls internal` は、自己署名証明書の管理のために含まれています。"
+  caddyPreviewTlsHint: '`tls internal` は、自己署名証明書の管理のために含まれています。'
   resetHttps: HTTPS をデフォルトにリセット
   databaseConfig: データベース構成
   databaseType: データベースの種類
-  databaseTypeFixed: SQLite のみ
+  databaseTypeFixed: SQLiteのみ
   sqliteDatabase: SQLite データベース
   sqliteDescription: 軽量の組み込みデータベースであり、追加のコンテナーは必要ありません。クイック スタートとサポートされている展開に最適です。
   sqliteDataLocation: データの保存場所
-  sqliteOnlySupport: このビルダーは、埋め込まれた SQLite デプロイメント パスのみをエクスポートするようになりました。 従来のデータベース モードと資格情報はここでは構成できなくなりました。
+  sqliteOnlySupport: このビルダーは、埋め込み SQLite デプロイメント パスのみをエクスポートするようになりました。従来のデータベース モードと資格情報はここでは構成できなくなりました。
   licenseConfig: Hagicode ライセンス構成
   licenseKeyType: ライセンスキーの種類
   selectLicenseType: ライセンスの種類を選択してください
@@ -78,47 +78,47 @@ configForm:
   customLicenseKey: カスタムライセンスキー
   aiProviderConfig: AI プロバイダーの構成
   enabledExecutors: 並列有効化
-  parallelEnablementHint: Claude、Codex、および OpenCode は並行して実行できます。 これらは相互に排他的ではありません。
-  explicitExecutorHint: 生成された構成ファイルは、有効なエグゼキュータ ブランチのみをエクスポートします。 ランタイムの選択は明示的に行う必要があります。
-  communitySupportTitle: 他の CLI ツールもサポートされています
+  parallelEnablementHint: Claude、Codex、および OpenCode は並列実行できます。これらは相互に排他的ではありません。
+  explicitExecutorHint: 生成された構成ファイルは、有効なエグゼキュータ ブランチのみをエクスポートします。ランタイムの選択は明示的に行う必要があります。
+  communitySupportTitle: 他のCLIツールもサポートされています
   communitySupportDescription: HayaCode は他の CLI ツールもサポートしていますが、それらのコンテナ統合ドキュメントはまだ完成していません。
   communityContributeBuilder: https://github.com/HagiCode-org/docker-compose-builder. でコンテナー構成 PR を提供する
-  communityContributeRelease: https://github.com/HagiCode-org/releases. でリリースおよびランタイム コントラクト PR を提供する
+  communityContributeRelease: https://github.com/HagiCode-org/releases. でリリースおよびランタイム契約 PR を提供する
   claudeConfiguration: Claude 構成
-  codexConfiguration: Claude 構成
+  codexConfiguration: Codex 構成
   codexDescription: CODEX_* 環境変数を使用して Codex ランタイムを構成する
-  openCodeConfiguration: Claude 構成
+  openCodeConfiguration: OpenCode 構成
   openCodeDescription: OpenCode は、デフォルトのプロバイダー ルートの代わりに、統合イメージに焼き付けられたマネージド ランタイム コントラクトを使用します。
   openCodeModel: OpenCode モデル
-  openCodeModelHint: オプションのマネージド ランタイム モデル。 ルーティングが明示的に構成されている場合でも、イメージには opencode コマンドが含まれています。
+  openCodeModelHint: オプションのマネージド ランタイム モデル。ルーティングが明示的に構成されている場合でも、イメージには opencode コマンドが含まれています。
   openCodeTargetPathLabel: ターゲット設定ファイル
   openCodeTargetPathHint: OpenCode は常に同じコンテナ内の opencode.json パスの読み取りと書き込みを行います。
   openCodeConfigSource: 設定ソース
   openCodeConfigSourceHint: Docker Compose が管理対象ボリュームに OpenCode 構成を保持するか、ホストから OpenCode ファイルを明示的にバインドするかを選択します。
   openCodeConfigModeDefault: デフォルトの永続性
-  openCodeConfigModeDefaultHint: 推奨。 opencode-config-data、opencode-auth-data、opencode-models-data の 3 つの名前付きボリュームを使用するため、config、auth、およびキャッシュ ディレクトリは再起動後も存続します。
+  openCodeConfigModeDefaultHint: おすすめです。 opencode-config-data、opencode-auth-data、opencode-models-data の 3 つの名前付きボリュームを使用するため、config、auth、およびキャッシュ ディレクトリは再起動後も存続します。
   openCodeConfigModeHostFile: ホストファイルのパス
   openCodeConfigModeHostFileHint: ホスト opencode.json ファイルをバインドし、オプションで auth.json および models.json マウントを追加します。
   openCodeConfigHostPath: ホストファイルのパス
-  openCodeConfigHostPathHint: "Docker ホスト上の opencode.json への絶対パスを入力します。 例: {{example}}"
+  openCodeConfigHostPathHint: 'Docker ホスト上の opencode.json への絶対パスを入力します。例: {{example}}'
   openCodeAuthHostPath: ホスト認証パス
-  openCodeAuthHostPathHint: "オプション。 コンテナーが既存のログインを再利用できるようにするには、ホスト auth.json への絶対パスを入力します。 例: {{example}}"
+  openCodeAuthHostPathHint: 'オプション。コンテナーで既存のログインを再利用できるようにするには、ホスト auth.json への絶対パスを入力します。例: {{example}}'
   openCodeModelsHostPath: ホストモデルのパス
-  openCodeModelsHostPathHint: "オプション。 ホスト モデル キャッシュを再利用するには、models.json への絶対パスを入力します。 例: {{example}}"
+  openCodeModelsHostPathHint: 'オプション。ホスト モデル キャッシュを再利用するには、models.json への絶対パスを入力します。例: {{example}}'
   openCodeConfigBrowserLimitTitle: 手動パスが必要です
-  openCodeConfigBrowserLimitHint: ブラウザーは Docker 対応のホスト バインド パスを返すことができないため、このフィールドは手動で入力する必要があります。
+  openCodeConfigBrowserLimitHint: ブラウザは Docker 対応のホスト バインド パスを返すことができないため、このフィールドは手動で入力する必要があります。
   openCodeConfigManualPriorityHint: エクスポートされた作成ファイルは、ここに入力したパスを常に信頼できる情報源として使用します。
-  openCodeAdditionalHostFilesHint: auth.json または models.json ホスト パスを入力すると、Builder は一致するバインド マウントもエクスポートします。 これらのマウントをスキップするには、空のままにしておきます。
+  openCodeAdditionalHostFilesHint: auth.json または models.json ホスト パスを入力すると、Builder は一致するバインド マウントもエクスポートします。これらのマウントをスキップするには、空のままにしておきます。
   openCodeManagedVolumeTitle: 管理された永続性が有効になっています
-  openCodeManagedVolumeHint: 追加の入力は必要ありません。 ビルダーは、構成、認証、およびモデルのキャッシュ永続性のために、opencode-config-data、opencode-auth-data、および opencode-models-data を自動的にマウントします。
+  openCodeManagedVolumeHint: 追加の入力は必要ありません。ビルダーは、構成、認証、およびモデルのキャッシュ永続性のために、opencode-config-data、opencode-auth-data、および opencode-models-data を自動的にマウントします。
   openCodeRuntimePathTitle: ハギコードパスマッピング
   openCodeRuntimePathHint: コンテナ内のすべての OpenCode ランタイム ファイルは、/home/hagicode/ プレフィックスの下に存在します。
   openCodeRuntimePathConfigLabel: 設定ファイル
   openCodeRuntimePathAuthLabel: 認証ファイル
   openCodeRuntimePathModelsLabel: モデルキャッシュ
   openCodeConfigAuthWarningTitle: 設定ファイルは認証ファイルではありません
-  openCodeConfigAuthWarningHint: opencode.json、auth.json、および models.json は 3 つの別個のファイルです。 ホストファイルモードでも、各パスは独立して構成されます。
-  openCodeConfigAuthMigrationHint: 既存のホスト ログインを再利用する場合は、ホストの auth.json パスを明示的に指定するか、/home/hagicode/.local/share/opencode/auth.json. で自分で準備します。Builder では自動的にコピーされません。
+  openCodeConfigAuthWarningHint: opencode.json、auth.json、および models.json は 3 つの別個のファイルです。ホストファイルモードでも、各パスは独立して構成されます。
+  openCodeConfigAuthMigrationHint: 既存のホスト ログインを再利用する場合は、ホスト auth.json パスを明示的に指定するか、/home/hagicode/.local/share/opencode/auth.json で自分で準備します。Builder では自動的にコピーされません。
   standardTemplate: 標準テンプレート
   standardTemplateDescription: デフォルトの Hagicode アプリケーション テンプレート
   optional: オプション
@@ -127,7 +127,7 @@ configForm:
   claudeApiConfig: Claude API 構成
   unifiedUseOfToken: ANTHROPIC_AUTH_TOKEN 環境変数の統一された使用
   apiProvider: API プロバイダー
-  selectApiProvider: API プロバイダーを選択してください
+  selectApiProvider: APIプロバイダーを選択してください
   zhipuAI: Zhipu AI (ZAI)
   aliyunDashScope: Aliyun DashScope
   anthropicOfficialApi: Anthropic 公式 API
@@ -136,68 +136,68 @@ configForm:
   apiToken: API トークン
   getApiToken: API トークンを取得 →
   enterApiToken: API トークンを入力してください
-  enterAnthropicApiToken: Anthropic API トークンを入力してください (sk-ant-...)
-  apiEndpointAutoSet: API エンドポイントは自動的に次のように設定されます。
+  enterAnthropicApiToken: Anthropic API トークン (sk-ant-...) を入力してください
+  apiEndpointAutoSet: API エンドポイントは自動的に次のように設定されます
   aliyunModelsSupported: 対応機種
-  usingOfficialApi: Anthropic 公式 API を使用するため、ANTHROPIC_URL を設定する必要はありません
-  usingCustomEndpoint: カスタム Anthropic 互換の API エンドポイントの使用
+  usingOfficialApi: Anthropic 公式 API を使用すると、ANTHROPIC_URL を設定する必要はありません
+  usingCustomEndpoint: カスタム Anthropic-compatible API エンドポイントの使用
   claudeCodeExtendedConfig: Claude Code 拡張構成
   claudeCodeExtendedConfigDescription: Claude Code モデルのバージョンと実験的機能を構成する (オプション)
   anthropicSonnetModel: ソネット / GLM モデル バージョン
-  anthropicSonnetModelHint: "ZAI デフォルト: glm-4.7 | Anthropic 例: クロード-ソネット-4-20250514"
-  anthropicOpusModel: Opus / GLM モデルのバージョン
-  anthropicOpusModelHint: "ZAI デフォルト: glm-5 | Anthropic 例: クロード-opus-4-20250514"
-  anthropicHaikuModel: Haiku / GLM-Air Model バージョン
-  anthropicHaikuModelHint: "ZAI デフォルト: glm-4.5-air | Anthropic 例: クロード-俳句-4-20250514"
+  anthropicSonnetModelHint: 'ZAI デフォルト: glm-4.7 | Anthropic 例: claude-sonnet-4-20250514'
+  anthropicOpusModel: Opus / GLM モデル バージョン
+  anthropicOpusModelHint: 'ZAI デフォルト: glm-5 | Anthropic 例: claude-opus-4-20250514'
+  anthropicHaikuModel: Haiku / GLM-航空モデルバージョン
+  anthropicHaikuModelHint: 'ZAI デフォルト: glm-4.5-air | Anthropic 例: claude-haiku-4-20250514'
   claudeCodeExperimentalAgentTeams: エージェントチーム機能を有効にする
   claudeCodeExperimentalAgentTeamsHint: 試験的なエージェント チームのコラボレーション機能を有効にする
   volumeMounts: ボリュームマウント
-  workdirDescription: 作業ディレクトリは、コード リポジトリを含むフォルダーを指します。 このフォルダー内の複数のリポジトリをスキャンし、コンテナー内の /app/workdir にマッピングします。
-  workdirRecommendation: "💡 推奨事項: 複数のリポジトリ (/home/user/repos または C:\\Users\\YourName\\source\\repos). など) を含む親フォルダーを指定します。アプリケーションはすべてのサブフォルダーをスキャンしてリポジトリを検出します。"
+  workdirDescription: 作業ディレクトリは、コード リポジトリを含むフォルダーを指します。このフォルダー内の複数のリポジトリをスキャンし、コンテナー内の /app/workdir にマッピングします。
+  workdirRecommendation: '💡 推奨事項: 複数のリポジトリを含む親フォルダー (/home/user/repos または C:\Users\YourName\source\repos). など) を指定します。アプリケーションはすべてのサブフォルダーをスキャンしてリポジトリーを検出します。'
   workdirPath: 作業ディレクトリのパス
   workdirCreatedByRoot: rootユーザーが作成した作業ディレクトリ
   permissionIssueWarning: 権限の問題の警告
-  permissionIssueDescription: 作業ディレクトリは root ユーザーによって作成されているため、コンテナーはファイルを書き込むことができません。 次の解決策のいずれかを選択してください。
+  permissionIssueDescription: 作業ディレクトリは root ユーザーによって作成されているため、コンテナーはファイルを書き込むことができません。次の解決策のいずれかを選択してください。
   changeDirPermissions: ディレクトリの権限を変更します。
   createNonRootUser: 非 root ユーザーを作成し、そのユーザーを使用してディレクトリを作成します
   configureUserPermission: ユーザー権限マッピングの構成
-  configureUserPermissionDescription: コンテナ内外のファイル権限の問題を解決するには、PUID と PGID を構成する必要があります。 作業ディレクトリを作成したユーザーのユーザーIDとグループIDを使用します。
+  configureUserPermissionDescription: コンテナ内外のファイル権限の問題を解決するには、PUID と PGID を構成する必要があります。作業ディレクトリを作成したユーザーのユーザーIDとグループIDを使用します。
   getCurrentUserId: 現在のユーザー ID を取得します。
-  outputExample: "出力例:"
+  outputExample: '出力例:'
   puid: PUID (ユーザーID)
   pgid: PGID (グループID)
-  permissionNotRequired: 許可は不要です
+  permissionNotRequired: 許可は必要ありません
   permissionNotRequiredDescription: workdir が root で作成される場合、権限マッピングは必要ありません。
   codeServerConfiguration: コードサーバー構成
   codeServerDescription: フル カスタム モードでのみエクスポートされるマネージド ブラウザー IDE のデフォルトを構成します。
   codeServerEnable: code-server をデフォルトのブラウザ IDE として有効にする
-  codeServerEnableHint: 無効にすると、Builder は保存された値を保持しますが、代わりにコードserve-webをデフォルトの実装としてエクスポートします。
+  codeServerEnableHint: 無効にすると、Builder は保存された値を保持しますが、代わりに code serve-web をデフォルトの実装としてエクスポートします。
   codeServerPrivateTitle: デフォルトでは非公開
   codeServerPrivateHint: 以下で明示的にホスト公開を有効にするまで、専用ホスト ポートは公開されません。
   codeServerPersistenceTitle: 永続性は共有されたままになります
-  codeServerPersistenceHint: Builder は、システム スコープのアセットを /app/data に保持し、保存スコープのHagiCode ランタイム状態を /app/saves/save0/... に保持しますが、コード サーバーはシステム ルートに残ります。
-  codeServerPersistencePathValue: "システム: hagicode_data:/app/data -> /app/data/code-server"
-  codeServerSaveStatePathValue: "状態の保存: hagicode_saves:/app/saves -> /app/saves/save0/..."
+  codeServerPersistenceHint: Builder は、コード サーバーがシステム ルートに留まりながら、システム スコープのアセットを /app/data に保持し、保存スコープのHagiCode ランタイム状態を /app/saves/save0/..., に保持するようになりました。
+  codeServerPersistencePathValue: 'システム: hagicode_data:/app/data -> /app/data/code-server'
+  codeServerSaveStatePathValue: '状態の保存: hagicode_saves:/app/saves -> /app/saves/save0/...'
   codeServerHost: リッスンホスト
-  codeServerHostHint: "プライベートコンテナのみのアクセスには 127.0.0.1 を使用します。 ホスト公開を有効にする前に、0.0.0.0 または :: に切り替えてください。"
+  codeServerHostHint: 'プライベートコンテナのみのアクセスには 127.0.0.1 を使用します。ホスト公開を有効にする前に、0.0.0.0 または :: に切り替えてください。'
   codeServerPort: コンテナ港
-  codeServerPortHint: "有効な範囲: 1-65535。 ポート 36529 は、HagiCode code-server のデフォルトと一致します。"
+  codeServerPortHint: '有効な範囲: 1 ～ 65535。ポート 36529 は、HagiCode code-server のデフォルトと一致します。'
   codeServerAuthMode: 認証モード
   codeServerAuthModeNone: なし
   codeServerAuthModePassword: パスワード
   codeServerAuthModeHint: Builder に code-server の起動シークレットをエクスポートさせる場合は、パスワードを使用します。
-  codeServerPassword: __トークン_0__
+  codeServerPassword: CODE_SERVER_PASSWORD
   codeServerPasswordHint: この値はコンテナーのブートストラップ パスに渡され、コメントにエコーされることなく code-server にブリッジされます。
   codeServerPasswordSkippedHint: 認証モードが none に設定されている間は、パスワード シークレットはエクスポートされません。
   codeServerPublishToHost: コードサーバーをホストに公開
-  codeServerPublishToHostHint: バインド アドレスをホスト ループバックに固定したまま、code-server の専用のホストからコンテナーへのポート マッピングを追加します。
+  codeServerPublishToHostHint: バインド アドレスをホスト ループバックに固定したまま、code-server の専用のホストからコンテナへのポート マッピングを追加します。
   codeServerPublishedPort: 公開されたホストポート
   codeServerPublishedPortHint: Builder は、このホスト ポートに対して別のループバック専用マッピングを発行します。
   codeServerPublishBindTitle: ホストバインドアドレス
-  codeServerPublishBindHint: Builder は、最初の公開ステップでホスト側のバインドをループバックに固定したままにします。 より広範囲に公開する必要がある場合は、リバース プロキシを追加します。
-  codeServerPublishBindValue: 127.0.0.1:<公開ポート>:<コンテナ ポート>
-  codeServerDisabledTitle: code-server のデフォルトは現在無効になっています
-  codeServerDisabledHint: このプロファイルに対して code-server を再度有効にするまで、Builder はコードserve-webをアクティブな実装としてエクスポートします。
+  codeServerPublishBindHint: Builder は、最初の公開ステップでホスト側のバインドをループバックに固定したままにします。より広範囲に公開する必要がある場合は、リバース プロキシを追加します。
+  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerDisabledTitle: code-server デフォルトは現在無効になっています
+  codeServerDisabledHint: このプロファイルに対して code-server を再度有効にするまで、Builder は code serve-web をアクティブな実装としてエクスポートします。
   eulaConfiguration: コンテナ EULA
   eulaDescription: クイック スタートとフル カスタムにわたって共有されるランタイム アグリーメントを確認してください。
   acceptEula: 起動前にコンテナ EULA を受け入れます
@@ -212,8 +212,8 @@ configPreview:
   yamlCopiedSuccess: YAML 構成がクリップボードにコピーされました。
   yamlCopiedError: クリップボードへのコピーに失敗しました
   downloadSuccess: docker-compose.yml が正常にダウンロードされました。
-  invalidConfigCannotExport: copy/download. する前に構成エラーを修正してください。
-  generatedAt: "生成場所:"
+  invalidConfigCannotExport: copy/download. する前に構成エラーを修正してください
+  generatedAt: '生成場所:'
   basedOnSettings: この構成は上記の設定に基づいています。
   previewDescription: ライブ YAML 出力は、表示されているワークスペース セクションと一致したままになります。
   lines: 行
@@ -224,15 +224,15 @@ configPreview:
   exportReadyDescription: プレビューに満足したら、生成されたファイルをコピーまたはダウンロードします。
 generator:
   title: Hagicode Docker Compose 構成
-  generatedBy: Docker Compose ジェネレーターによって自動生成
+  generatedBy: Docker Compose Generator によって自動生成
   generatedAtLabel: 生成場所
   support:
     title: サポート情報
-    description: "問題が発生した場合、または技術サポートが必要な場合:"
+    description: '問題が発生した場合、または技術サポートが必要な場合:'
     qqGroup: QQ グループに参加してください
-    qqNumber: "610394020"
+    qqNumber: '610394020'
     discord: Discord コミュニティに参加してください
-    discordLink: __トークン_0__
+    discordLink: https://discord.gg/qY662sJK
     assistance: リアルタイムのサポートとソリューションを提供します
     share: 経験を共有して他のユーザーとつながる
   caddyfile:
@@ -243,49 +243,49 @@ generator:
       title: Codex ランタイム構成
       usesEnv: CODEX_* 環境変数を使用します
       alias: OPENAI_* 変数は互換性エイリアスとして受け入れられます
-      baseUrlOptional: "CODEX_BASE_URL: オプション、設定されていない場合はデフォルトを使用します"
+      baseUrlOptional: 'CODEX_BASE_URL: オプション、設定されていない場合はデフォルトを使用します'
     opencode:
-      title: Codex ランタイム構成
+      title: OpenCode ランタイム構成
       managedContract: 統合イメージに焼き付けられたマネージド OpenCode ランタイム コントラクトを使用します
     claude:
-      title: Codex ランタイム構成
+      title: Claude ランタイム構成
       usesToken: すべてのプロバイダーは ANTHROPIC_AUTH_TOKEN を使用します
-      urlHint: ANTHROPIC_URL は ZAI、Aliyun、およびカスタム プロバイダー用に設定されています
+      urlHint: ANTHROPIC_URL は ZAI、Aliyun、およびカスタム プロバイダーに設定されます
   providers:
     anthropic:
       heading: Anthropic 公式 API
-      noUrlHint: ANTHROPIC_URL は必要ありません。 デフォルトの Anthropic エンドポイントが使用されます
+      noUrlHint: ANTHROPIC_URL は必要ありません。デフォルトの Anthropic エンドポイントが使用されます
     zai:
-      heading: Zhipu AI (ZAI) - Anthropic 互換の API を使用します
-      providerLabel: "API プロバイダー: Zhipu AI (ZAI)"
+      heading: Zhipu AI (ZAI) - Anthropic-compatible API を使用します
+      providerLabel: 'API プロバイダー: Zhipu AI (ZAI)'
     aliyun:
-      heading: Aliyun DashScope - Anthropic 互換の API を使用します
-      providerLabel: "API プロバイダー: Aliyun DashScope"
+      heading: Aliyun DashScope - Anthropic-compatible API を使用します
+      providerLabel: 'API プロバイダー: Aliyun DashScope'
       modelMapping: モデルマッピング（統合構成）
-      unifiedModelHaiku: Haiku -> glm-4.7 (全層の統一モデル)
+      unifiedModelHaiku: Haiku -> glm-4.7 (すべての層の統一モデル)
       unifiedModelSonnet: Sonnet -> glm-4.7 (すべての層の統合モデル)
       unifiedModelOpus: Opus -> glm-4.7 (すべての層の統合モデル)
     volcengine:
-      heading: Volcengine コーディング プラン - Anthropic 互換の API を使用します
-      providerLabel: "API プロバイダー: Volcengine コーディング プラン"
+      heading: Volcengine Coding Plan - Anthropic-compatible API を使用します
+      providerLabel: 'API プロバイダー: Volcengine Coding Plan'
       modelMapping: モデルマッピング（統合構成）
-      unifiedModelHaiku: Haiku -> glm-4.7 (全層の統一モデル)
+      unifiedModelHaiku: Haiku -> glm-4.7 (すべての層の統一モデル)
       unifiedModelSonnet: Sonnet -> glm-4.7 (すべての層の統合モデル)
       unifiedModelOpus: Opus -> glm-4.7 (すべての層の統合モデル)
     custom:
-      heading: カスタム Anthropic 互換の API
-      providerLabel: "API プロバイダー: カスタム エンドポイント"
+      heading: カスタム Anthropic-compatible API
+      providerLabel: 'API プロバイダー: カスタム エンドポイント'
     generic:
-      compatibleLabel: Anthropic 互換の API を使用します
-      providerLabel: "API プロバイダー: {{displayName}}"
+      compatibleLabel: Anthropic-compatible API を使用します
+      providerLabel: 'API プロバイダー: {{displayName}}'
   codeServer:
     title: コードサーバーのデプロイメントのデフォルト
-    privateHint: "デフォルトではプライベート: 明示的に有効にしない限り、ホスト ポートは公開されません。"
+    privateHint: 'デフォルトではプライベート: 明示的に有効にしない限り、ホスト ポートは公開されません。'
     persistenceHint: システム スコープのアセットは hagicode_data:/app/data の下に残りますが、保存スコープのランタイム状態は hagicode_saves:/app/saves/save0/... の下に保持されます。
-    disabledHint: code-server は、このデプロイメントのデフォルト実装ではありません。 ランタイムはコードserve-webにフォールバックします
-    publishHint: ホスト公開は 127.0.0.1 でループバックのみです。 より広範囲に公開する必要がある場合は、リバース プロキシを明示的に追加します。
-    systemVolumeHint: システムデータ量。 コードサーバーのランタイム状態は /app/data/code-server の下で存続します
-    saveVolumeHint: セーブステートボリューム。 メインデータベースとオルレアン州は /app/saves/save0/... の下に存在します
+    disabledHint: code-server は、この展開のデフォルト実装ではありません。ランタイムは code serve-web に戻ります
+    publishHint: ホスト公開は 127.0.0.1 ではループバックのみです。より広範囲に公開する必要がある場合は、リバース プロキシを明示的に追加します。
+    systemVolumeHint: システムデータ量。コードサーバーのランタイム状態は /app/data/code-server の下に存在します
+    saveVolumeHint: セーブステートボリューム。メインデータベースとオルレアン州は /app/saves/save0/... の下に存在します
 validation:
   fields:
     openCodeConfigHostPath: OpenCode 構成ホスト ファイル パス
@@ -294,34 +294,34 @@ validation:
   messages:
     enabledExecutorsRequired: 少なくとも 1 つのエグゼキュータを有効にする必要があります
     httpPortInvalid: HTTP ポートは有効な番号でなければなりません
-    httpPortRange: HTTP ポートは 1 から 65535 の間である必要があります
-    httpsPortInvalid: HTTP ポートは有効な番号でなければなりません
-    httpsPortRange: HTTP ポートは 1 から 65535 の間である必要があります
+    httpPortRange: HTTP ポートは 1 ～ 65535 でなければなりません
+    httpsPortInvalid: HTTPS ポートは有効な番号でなければなりません
+    httpsPortRange: HTTPS ポートは 1 ～ 65535 でなければなりません
     lanIpInvalid: LAN IP は有効な IPv4/IPv6 アドレスである必要があります
     httpsPortConflict: HTTPS ポートは HTTP ポートと同じにすることはできません
     containerNameRequired: コンテナ名は必須です
     imageTagRequired: 画像タグは必須です
     customLicenseKeyRequired: カスタム ライセンス キーが必要です
-    anthropicAuthTokenRequired: Claude エグゼキューターが有効な場合は、API トークンが必要です
+    anthropicAuthTokenRequired: Claude エグゼキュータが有効な場合は、API トークンが必要です
     anthropicUrlRequired: API エンドポイント URL はカスタム Claude プロバイダーに必要です
-    codexApiKeyRequired: Codex エグゼキュータが有効な場合は、CODEX_API_KEY が必要です
+    codexApiKeyRequired: Codex エグゼキューターが有効な場合は、CODEX_API_KEY が必要です
     hostFileRequired: ホストファイルモードが有効な場合は、{{label}} が必要です
-    hostFileMustBeJsonFile: "{{label}} はディレクトリではなく .json ファイルを指している必要があります"
-    hostFileMustEndWithJson: "{{label}} は .json で終わる必要があります"
-    hostFileMustBeAbsoluteWindows: "{{label}} は、C:\\opencode\\{{exampleFilename}} などの絶対 Windows パスである必要があります。"
-    hostFileMustBeAbsoluteLinux: "{{label}} は、/srv/opencode/{{exampleFilename}} などの絶対 Linux パスである必要があります。"
+    hostFileMustBeJsonFile: '{{label}} はディレクトリではなく .json ファイルを指している必要があります'
+    hostFileMustEndWithJson: '{{label}} は .json で終わる必要があります'
+    hostFileMustBeAbsoluteWindows: '{{label}} は、C:\opencode\{{exampleFilename}} などの絶対 Windows パスである必要があります。'
+    hostFileMustBeAbsoluteLinux: '{{label}} は、/srv/opencode/{{exampleFilename}} などの Linux の絶対パスである必要があります。'
     codeServerHostInvalid: コード サーバーのリッスン ホストは有効な IPv4/IPv6 アドレスである必要があります
     codeServerHostNoPort: コードサーバーのリッスンホストにはポートが含まれていてはなりません
     codeServerPortInvalid: コードサーバーのコンテナポートは有効な番号である必要があります
-    codeServerPortRange: コード サーバーのコンテナ ポートは 1 から 65535 の間である必要があります
-    codeServerPortConflict: コード サーバーのコンテナ ポートは、HagiCode アプリのポート 45000 を再利用できません
+    codeServerPortRange: コードサーバーコンテナポートは1から65535の間でなければなりません
+    codeServerPortConflict: コードサーバーコンテナポートはHagiCodeアプリポート45000を再利用できません
     codeServerAuthModeInvalid: コードサーバーの認証モードはなしまたはパスワードでなければなりません
     codeServerPasswordRequired: 認証モードがパスワードの場合、コードサーバーのパスワードが必要です
     codeServerPublishedPortInvalid: コードサーバーの公開ポートは有効な番号である必要があります
-    codeServerPublishedPortRange: コード サーバーの公開ポートは 1 から 65535 の間である必要があります
+    codeServerPublishedPortRange: コード サーバーの公開ポートは 1 ～ 65535 でなければなりません
     codeServerPublishedPortHttpConflict: コードサーバーの公開ポートは、HagiCode HTTP ポートと一致できません
     codeServerPublishedPortHttpsConflict: コード サーバーの公開ポートは HTTPS プロキシ ポートと一致できません
-    codeServerHostPublishConflict: "ホスト公開が有効な場合、コード サーバーのリッスン ホストは 0.0.0.0 または :: である必要があります"
+    codeServerHostPublishConflict: 'ホスト公開が有効な場合、コード サーバーのリッスン ホストは 0.0.0.0 または :: である必要があります'
     workdirPathRequired: 作業ディレクトリのパスは必須です
     puidInvalid: PUID は有効な数値でなければなりません
-    pgidInvalid: PUID は有効な数値でなければなりません
+    pgidInvalid: PGID は有効な数値でなければなりません
