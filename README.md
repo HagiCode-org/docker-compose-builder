@@ -68,17 +68,14 @@ Expected behavior:
 
 ### Deploy to GitHub Pages
 
-#### Automatic Deployment (GitHub Actions)
+The authoritative production deployment path is GitHub Actions.
 
-The project is configured with GitHub Actions to automatically deploy to GitHub Pages when code is pushed to the `main` branch.
-
-#### Manual Deployment
-
-```bash
-npm run deploy
-```
-
-This will build the application and deploy it to the `gh-pages` branch.
+- Authoritative workflow: `.github/workflows/deploy-gh-pages.yml`
+- Production source of truth: the `gh-pages` branch, published only after CI validation succeeds
+- Published payload contract: branch root `esa.jsonc` plus `dist/` containing the validated Vite output
+- Required GitHub permissions: the deploy job needs `contents: write`; the build job stays read-only
+- Supported triggers: push to `main` and `workflow_dispatch`
+- Legacy path retired: local `gh-pages` CLI publication is no longer a supported production flow
 
 ### GitHub Pages Configuration
 
@@ -89,8 +86,10 @@ This will build the application and deploy it to the `gh-pages` branch.
    - Choose "gh-pages" branch and "/ (root)" folder
    - Click "Save"
 
-2. The application will be available at:
-   `https://<your-username>.github.io/docker-compose-builder/`
+2. Ensure the hosting layer reads `gh-pages/esa.jsonc` and serves `gh-pages/dist/`.
+
+3. The production site should remain available at:
+   `https://builder.hagicode.com`
 
 ### Deployment Troubleshooting
 
@@ -98,6 +97,8 @@ This will build the application and deploy it to the `gh-pages` branch.
 - **Assets not loading**: Check that `vite.config.ts` has the correct `base` configuration
 - **Build failures**: Verify dependencies are installed correctly with `npm ci`
 - **Permissions**: Ensure the GitHub Actions workflow has the necessary permissions
+- **First deploy checks**: Confirm the workflow uploaded `esa.jsonc` and `dist/`, then verify `https://builder.hagicode.com`
+- **Rollback**: Revert the source change or rerun the workflow from an older commit so CI republishes the previous snapshot
 
 ### Configuration Options
 

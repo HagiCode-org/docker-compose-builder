@@ -68,17 +68,14 @@ npm run dev
 
 ### 部署到 GitHub Pages
 
-#### 自动部署（GitHub Actions）
+唯一权威的生产部署路径是 GitHub Actions。
 
-项目配置了 GitHub Actions，当代码推送到 `main` 分支时自动部署到 GitHub Pages。
-
-#### 手动部署
-
-```bash
-npm run deploy
-```
-
-这将构建应用程序并部署到 `gh-pages` 分支。
+- 权威工作流：`.github/workflows/deploy-gh-pages.yml`
+- 生产 source of truth：`gh-pages` 分支，只在 CI 校验通过后发布
+- 发布 payload 契约：分支根目录保留 `esa.jsonc`，验证通过的 Vite 产物统一放在 `dist/`
+- 所需 GitHub 权限：deploy job 需要 `contents: write`，build job 保持只读
+- 支持触发方式：推送到 `main`，以及 `workflow_dispatch`
+- 旧路径已退役：本地 `gh-pages` CLI 发布不再是受支持的生产发布方式
 
 ### GitHub Pages 配置
 
@@ -89,8 +86,10 @@ npm run deploy
    - 选择 "gh-pages" 分支和 "/ (root)" 文件夹
    - 点击 "Save"
 
-2. 应用程序将在以下地址可用：
-   `https://<your-username>.github.io/docker-compose-builder/`
+2. 确保托管层读取 `gh-pages/esa.jsonc`，并把 `gh-pages/dist/` 作为站点目录。
+
+3. 生产站点地址保持为：
+   `https://builder.hagicode.com`
 
 ### 部署故障排除
 
@@ -98,6 +97,8 @@ npm run deploy
 - **资源未加载**：检查 `vite.config.ts` 是否有正确的 `base` 配置
 - **构建失败**：使用 `npm ci` 验证依赖是否正确安装
 - **权限**：确保 GitHub Actions 工作流具有必要的权限
+- **首次部署检查**：确认工作流上传了 `esa.jsonc` 与 `dist/`，然后验证 `https://builder.hagicode.com`
+- **回滚**：回退 source 提交，或从旧提交重新运行工作流，让 CI 重新发布上一份快照
 
 ### 配置选项
 
