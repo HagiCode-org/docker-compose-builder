@@ -5,7 +5,7 @@ import { resolveBuilderFooterSiteLinks } from '@/lib/footer-site-links';
 
 export function SiteFooter() {
   const { i18n, t } = useTranslation();
-  const locale = resolveBuilderLanguageCode(i18n.resolvedLanguage).startsWith('zh') ? 'zh-CN' : 'en-US';
+  const locale = resolveBuilderLanguageCode(i18n.resolvedLanguage);
   const relatedLinks = resolveBuilderFooterSiteLinks(locale);
 
   return (
