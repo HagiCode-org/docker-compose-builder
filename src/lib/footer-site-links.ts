@@ -44,7 +44,7 @@ function resolveLocalizedField(field: LocalizedFooterField, locale: BuilderLangu
 
   const resolutionChain = [locale, ...getBuilderLanguage(locale).fallbackCodes, DEFAULT_BUILDER_LANGUAGE];
   for (const candidate of resolutionChain) {
-    const value = field[candidate];
+    const value = field[candidate as BuilderLanguageCode];
     if (typeof value === 'string' && value.trim().length > 0) {
       return value;
     }
