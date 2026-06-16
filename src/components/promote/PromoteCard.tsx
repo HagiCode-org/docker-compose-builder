@@ -14,11 +14,6 @@ type PromoteCardProps = {
 const DEFAULT_FOOTER_SELECTOR = 'footer, [data-footer-root], .footer';
 const DISMISSED_PROMOTIONS_STORAGE_KEY = 'hagicode:promote-card:dismissed-signature';
 
-function platformLabel(platform: string | null, locale: string | undefined) {
-  if (platform) return platform;
-  return getBuilderMessage(locale, 'common:promoteCard.badgeFallback');
-}
-
 function closeLabel(locale: string | undefined) {
   return getBuilderMessage(locale, 'common:promoteCard.dismiss');
 }
@@ -123,7 +118,6 @@ export function PromoteCard({
           })}
         >
           <span className="promote-card__body">
-            <span className="promote-card__badge">{platformLabel(promotion.platform, locale)}</span>
             <span className="promote-card__title">{promotion.title}</span>
             <span className="promote-card__description">{promotion.description}</span>
           </span>

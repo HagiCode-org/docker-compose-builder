@@ -47,6 +47,7 @@ describe('PromoteCard', () => {
       ctaLabel: activePromotion.ctaLabel,
       title: activePromotion.title,
     })}"`);
+    expect(markup).not.toContain('promote-card__badge');
   });
 
   it('renders nothing when no active promotion exists', () => {
