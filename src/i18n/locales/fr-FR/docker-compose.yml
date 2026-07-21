@@ -22,14 +22,10 @@ configForm:
   selectImageRegistry: Sélectionnez la source de l'image
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
-  azureContainerRegistry: Azure Container Registry
   aliyunAcr: Alibaba Cloud ACR
   aliyunAcrRecommended: Alibaba Cloud Container Registry
-  alternativeRegistry: Registre alternatif
   dockerHubDescription: Registre d'images officiel Docker, recommandé
   dockerHubNetworkAdvice: Convient aux utilisateurs prenant en charge l'accélération du miroir Docker Hub
-  azureAcrDescription: Registre d'images alternatif, synchronisé avec Docker Hub
-  azureAcrNetworkAdvice: Convient aux utilisateurs qui ne peuvent pas accéder à Docker Hub localement
   aliyunAcrDescription: Alibaba Cloud Container Registry, recommandé pour les utilisateurs en Chine
   aliyunAcrNetworkAdvice: Convient aux utilisateurs de Chine continentale, fournissant des services d'accélération d'image stables
   imageLabel: Images
@@ -301,6 +297,7 @@ validation:
     httpsPortConflict: Le port HTTPS ne peut pas être identique au port HTTP
     containerNameRequired: Le nom du conteneur est obligatoire
     imageTagRequired: La balise d'image est requise
+    imageRegistryLegacyRemoved: "Valeur de registre héritée supprimée. Sélectionnez Docker Hub ou Alibaba Cloud ACR."
     customLicenseKeyRequired: Une clé de licence personnalisée est requise
     anthropicAuthTokenRequired: Le jeton API est requis lorsque l'exécuteur Claude est activé
     anthropicUrlRequired: Le point de terminaison API URL est requis pour le fournisseur Claude personnalisé

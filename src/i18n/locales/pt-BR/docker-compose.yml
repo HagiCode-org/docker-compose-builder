@@ -22,14 +22,10 @@ configForm:
   selectImageRegistry: Selecione a fonte da imagem
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
-  azureContainerRegistry: Azure Container Registry
   aliyunAcr: Nuvem Alibaba ACR
   aliyunAcrRecommended: Alibaba Cloud Container Registry
-  alternativeRegistry: Registro Alternativo
   dockerHubDescription: Docker registro de imagem oficial, recomendado
   dockerHubNetworkAdvice: Adequado para usuários com suporte para aceleração de espelho Docker Hub
-  azureAcrDescription: Registro de imagem alternativo, sincronizado com Docker Hub
-  azureAcrNetworkAdvice: Adequado para usuários que não podem acessar Docker Hub localmente
   aliyunAcrDescription: Alibaba Cloud Container Registry, recomendado para usuários na China
   aliyunAcrNetworkAdvice: Adequado para usuários na China Continental, fornecendo serviços estáveis de aceleração de imagem
   imageLabel: Imagem
@@ -301,6 +297,7 @@ validation:
     httpsPortConflict: A porta HTTPS não pode ser igual à porta HTTP
     containerNameRequired: O nome do contêiner é obrigatório
     imageTagRequired: A tag da imagem é obrigatória
+    imageRegistryLegacyRemoved: "Valor legado de registro removido. Selecione Docker Hub ou Alibaba Cloud ACR."
     customLicenseKeyRequired: É necessária uma chave de licença personalizada
     anthropicAuthTokenRequired: O token API é necessário quando o executor Claude está habilitado
     anthropicUrlRequired: O endpoint API URL é necessário para o provedor Claude personalizado

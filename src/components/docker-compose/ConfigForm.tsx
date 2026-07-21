@@ -235,7 +235,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               </div>
               <Select
                 value={config.imageRegistry}
-                onValueChange={(value: 'docker-hub' | 'azure-acr' | 'aliyun-acr') => updateConfig('imageRegistry', value)}
+                onValueChange={(value: 'docker-hub' | 'aliyun-acr') => updateConfig('imageRegistry', value)}
               >
                 <SelectTrigger id="imageRegistry">
                   <SelectValue placeholder={t('docker-compose:configForm.selectImageRegistry')} />
@@ -248,7 +248,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                     </div>
                   </SelectItem>
                   <SelectItem value="docker-hub">{t('docker-compose:configForm.dockerHub')}</SelectItem>
-                  <SelectItem value="azure-acr">{t('docker-compose:configForm.azureContainerRegistry')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -256,17 +255,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-950 dark:bg-blue-950/30">
                   <p className="font-medium">{t('docker-compose:configForm.dockerOfficialRegistry')}</p>
                   <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.dockerHubNetworkAdvice')}</p>
-                </div>
-              ) : null}
-
-              {config.imageRegistry === 'azure-acr' ? (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-800 dark:bg-slate-900/70">
-                  <p className="font-medium">{t('docker-compose:configForm.alternativeRegistry')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.azureAcrDescription')}</p>
-                  <p className="text-muted-foreground">{t('docker-compose:configForm.azureAcrNetworkAdvice')}</p>
-                  <p className="mt-2 text-xs font-mono">
-                    {t('docker-compose:configForm.imageLabel')}: {REGISTRIES['azure-acr'].imagePrefix}:{config.imageTag}
-                  </p>
                 </div>
               ) : null}
 
