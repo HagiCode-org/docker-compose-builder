@@ -94,6 +94,14 @@ export function validateConfig(
     });
   }
 
+  const supportedRegistries: DockerComposeConfig['imageRegistry'][] = ['docker-hub', 'aliyun-acr'];
+  // Validate image registry
+  if (!supportedRegistries.includes(config.imageRegistry)) {
+    errors.push({
+      field: 'imageRegistry',
+      message: getValidationMessage(language, 'docker-compose:validation.messages.imageRegistryLegacyRemoved'),
+    });
+  }
   // Validate HTTP port
   if (!config.httpPort || isNaN(parseInt(config.httpPort))) {
     errors.push({ field: 'httpPort', message: getValidationMessage(language, 'docker-compose:validation.messages.httpPortInvalid') });

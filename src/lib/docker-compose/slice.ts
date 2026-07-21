@@ -170,7 +170,7 @@ const getInitialConfig = (): DockerComposeConfig => {
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
-    if (savedRegistry && (savedRegistry === 'docker-hub' || savedRegistry === 'azure-acr' || savedRegistry === 'aliyun-acr')) {
+    if (savedRegistry && (savedRegistry === 'docker-hub' || savedRegistry === 'aliyun-acr')) {
       return {
         ...defaultConfig,
         imageRegistry: savedRegistry as DockerComposeConfig['imageRegistry']

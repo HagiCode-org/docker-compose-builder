@@ -701,6 +701,10 @@ export function generateYAML(
   language: string = 'zh-CN',
   now: Date = new Date()
 ): string {
+  if (!REGISTRIES[config.imageRegistry]) {
+    throw new Error(`Unsupported image registry \"${String(config.imageRegistry)}\". Legacy image registry value removed. Please select Docker Hub or Alibaba Cloud ACR.`);
+  }
+
   const lines: string[] = [];
 
   // Build header

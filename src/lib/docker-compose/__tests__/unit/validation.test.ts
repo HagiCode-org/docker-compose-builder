@@ -171,6 +171,20 @@ describe('validateConfig', () => {
     expect(zhErrors.find((error) => error.field === 'httpPort')?.message).toBe('HTTP 端口必须是有效数字');
     expect(zhErrors.find((error) => error.field === 'workdirPath')?.message).toBe('工作目录路径不能为空');
   });
+
+  it('rejects removed azure-acr registry values with migration guidance', () => {
+    const enErrors = validateConfig(createMockConfig({
+      imageRegistry: 'azure-acr' as never,
+    }), 'en-US');
+    const zhErrors = validateConfig(createMockConfig({
+      imageRegistry: 'azure-acr' as never,
+    }), 'zh-CN');
+
+    expect(enErrors.find((error) => error.field === 'imageRegistry')?.message)
+      .toBe('Legacy image registry value removed. Please select Docker Hub or Alibaba Cloud ACR.');
+    expect(zhErrors.find((error) => error.field === 'imageRegistry')?.message)
+      .toBe('旧版镜像来源已移除，请选择 Docker Hub 或阿里云 ACR。');
+  });
 });
 
 describe('isValidConfig', () => {

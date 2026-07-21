@@ -222,7 +222,6 @@ describe('generateYAML', () => {
   it('keeps the standard hagicode image tag fixed at 0 across supported registries', () => {
     const expectedImages = {
       'docker-hub': 'newbe36524/hagicode:0',
-      'azure-acr': 'hagicode.azurecr.io/hagicode:0',
       'aliyun-acr': 'registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:0',
     } as const;
 

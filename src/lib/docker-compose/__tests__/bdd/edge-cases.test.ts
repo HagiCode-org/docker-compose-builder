@@ -38,14 +38,12 @@ describe('Docker Compose Generation: Edge Cases', () => {
     const configs = [
       createMockConfig({ imageRegistry: 'docker-hub', imageTag: 'v1.2.3' }),
       createMockConfig({ imageRegistry: 'aliyun-acr', imageTag: 'v2.0.0' }),
-      createMockConfig({ imageRegistry: 'azure-acr', imageTag: 'latest' }),
     ];
 
     const results = configs.map((config) => generateYAML(config, undefined, 'zh-CN', FIXED_DATE));
 
     expect(results[0]).toContain('image: newbe36524/hagicode:v1.2.3');
     expect(results[1]).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:v2.0.0');
-    expect(results[2]).toContain('image: hagicode.azurecr.io/hagicode:latest');
 
     for (const result of results) {
       expect(result).not.toContain('bitnami/postgresql');

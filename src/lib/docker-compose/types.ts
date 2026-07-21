@@ -6,7 +6,7 @@
 export type DatabaseType = 'sqlite';
 export type HostOS = 'windows' | 'linux';
 export type LicenseKeyType = 'public' | 'custom';
-export type ImageRegistry = 'docker-hub' | 'azure-acr' | 'aliyun-acr';
+export type ImageRegistry = 'docker-hub' | 'aliyun-acr';
 export type OpenCodeConfigMode = 'default-managed' | 'host-file';
 export type CodeServerAuthMode = 'none' | 'password';
 
@@ -98,14 +98,6 @@ export const REGISTRIES: Record<ImageRegistry, RegistryConfig> = {
     imagePrefix: 'newbe36524/hagicode',
     recommended: false,
     networkAdvice: 'Suitable for users with Docker Hub mirror acceleration support'
-  },
-  'azure-acr': {
-    id: 'azure-acr',
-    name: 'Azure Container Registry',
-    description: 'Alternative image registry, synced with Docker Hub',
-    imagePrefix: 'hagicode.azurecr.io/hagicode',
-    recommended: false,
-    networkAdvice: 'Suitable for users who cannot access Docker Hub locally'
   }
 };
 
