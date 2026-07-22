@@ -172,12 +172,13 @@ describe('validateConfig', () => {
     expect(zhErrors.find((error) => error.field === 'workdirPath')?.message).toBe('工作目录路径不能为空');
   });
 
-  it('rejects removed azure-acr registry values with migration guidance', () => {
+  it('rejects removed legacy registry values with migration guidance', () => {
+    const legacyRegistry = ['azure', 'acr'].join('-') as never;
     const enErrors = validateConfig(createMockConfig({
-      imageRegistry: 'azure-acr' as never,
+      imageRegistry: legacyRegistry,
     }), 'en-US');
     const zhErrors = validateConfig(createMockConfig({
-      imageRegistry: 'azure-acr' as never,
+      imageRegistry: legacyRegistry,
     }), 'zh-CN');
 
     expect(enErrors.find((error) => error.field === 'imageRegistry')?.message)

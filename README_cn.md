@@ -107,7 +107,7 @@ npm run dev
 - **容器名称**：Docker 容器名称
 - **镜像标签**：要使用的 Docker 镜像标签
 - **主机操作系统**：目标操作系统（Windows/Linux）
-- **镜像 Registry**：Docker 镜像 Registry（Docker Hub/Azure ACR/阿里云 ACR）
+- **镜像 Registry**：Docker 镜像 Registry（Docker Hub/阿里云 ACR）
 
 #### 数据库
 - **仅 SQLite**：生成的部署始终将应用数据库持久化到 `/app/data/hagicode.db`

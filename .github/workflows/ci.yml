@@ -59,7 +59,12 @@ jobs:
       - name: Test
         run: npm test
 
-      # Step 7: Report test results with PR comment
+      # Step 7: Block Azure ACR reference regressions
+      - name: Guard banned Azure ACR tokens
+        run: |
+          ! rg -n "azurecr\\.io|azure-acr|Azure ACR|Azure Container Registry|AZURE_ACR_|NUGEX_AzureAcr|NUGEX_?AzureAcr|PushToAzureAcr|version-monitor-docker-azure|docker-build-azure-acr|AzureAcr|edgeacr|az acr" src README.md README_cn.md
+
+      # Step 8: Report test results with PR comment
       - name: Comment PR with test results
         if: always()
         uses: actions/github-script@v7

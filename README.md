@@ -107,7 +107,7 @@ The authoritative production deployment path is GitHub Actions.
 - **Container Name**: Name of the Docker container
 - **Image Tag**: Docker image tag to use
 - **Host OS**: Target operating system (Windows/Linux)
-- **Image Registry**: Docker image registry (Docker Hub/Azure ACR/Aliyun ACR)
+- **Image Registry**: Docker image registry (Docker Hub/Aliyun ACR)
 
 #### Database
 - **SQLite only**: Generated deployments persist the app database at `/app/data/hagicode.db`
