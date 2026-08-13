@@ -22,12 +22,8 @@ configForm:
   selectImageRegistry: 选择镜像来源
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker 官方注册表
-  aliyunAcr: 阿里云 ACR
-  aliyunAcrRecommended: 阿里云容器镜像服务
   dockerHubDescription: Docker 官方镜像注册表，推荐使用
   dockerHubNetworkAdvice: 适合有 Docker Hub 镜像加速支持的用户
-  aliyunAcrDescription: 阿里云容器镜像服务，国内用户推荐
-  aliyunAcrNetworkAdvice: 适合中国大陆用户，提供稳定的镜像加速服务
   imageLabel: 镜像
   httpsSettings: HTTPS 安全配置
   httpsEnabled: HTTPS 已启用
@@ -297,7 +293,7 @@ validation:
     httpsPortConflict: HTTPS 端口不能与 HTTP 端口相同
     containerNameRequired: 容器名称不能为空
     imageTagRequired: 镜像标签不能为空
-    imageRegistryLegacyRemoved: "旧版镜像来源已移除，请选择 Docker Hub 或阿里云 ACR。"
+    imageRegistryLegacyRemoved: "此镜像来源已不再支持，请选择 Docker Hub。"
     customLicenseKeyRequired: 自定义许可证密钥不能为空
     anthropicAuthTokenRequired: 启用 Claude 执行器时必须提供 API 令牌
     anthropicUrlRequired: 使用自定义 Claude 提供商时必须提供 API 端点 URL

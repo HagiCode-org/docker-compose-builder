@@ -60,6 +60,20 @@ describe('locale resource parity', () => {
       }
     }
   });
+
+  it('keeps image source copy Docker Hub-only in every locale', () => {
+    for (const locale of SUPPORTED_BUILDER_LANGUAGE_CODES) {
+      const source = readYamlLocale(locale, 'docker-compose');
+      const configForm = source.configForm as Record<string, unknown>;
+      const validation = source.validation as Record<string, Record<string, unknown>>;
+      const migrationGuidance = validation.messages.imageRegistryLegacyRemoved;
+
+      expect(configForm.dockerHub).toContain('Docker Hub');
+      expect(Object.keys(configForm).some((key) => key.startsWith('aliyunAcr'))).toBe(false);
+      expect(migrationGuidance).toContain('Docker Hub');
+      expect(migrationGuidance).not.toContain('ACR');
+    }
+  });
 });
 
 function listDirectoryNames(directory: string): string[] {

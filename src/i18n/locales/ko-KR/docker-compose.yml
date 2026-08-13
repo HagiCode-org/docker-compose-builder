@@ -22,12 +22,8 @@ configForm:
   selectImageRegistry: 이미지 소스 선택
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
-  aliyunAcr: 알리바바 클라우드 ACR
-  aliyunAcrRecommended: Alibaba Cloud Container Registry
   dockerHubDescription: Docker 공식 이미지 레지스트리, 권장
   dockerHubNetworkAdvice: Docker Hub 미러 가속을 지원하는 사용자에게 적합
-  aliyunAcrDescription: Alibaba Cloud Container Registry, 중국 사용자에게 권장됨
-  aliyunAcrNetworkAdvice: 중국 본토 사용자에게 적합하며 안정적인 이미지 가속 서비스를 제공합니다.
   imageLabel: 이미지
   httpsSettings: HTTPS 보안 설정
   httpsEnabled: HTTPS 활성화됨
@@ -297,7 +293,7 @@ validation:
     httpsPortConflict: HTTPS 포트는 HTTP 포트와 동일할 수 없습니다.
     containerNameRequired: 컨테이너 이름은 필수 항목입니다.
     imageTagRequired: 이미지 태그가 필요합니다
-    imageRegistryLegacyRemoved: "레거시 레지스트리 값이 제거되었습니다. Docker Hub 또는 Alibaba Cloud ACR을 선택하세요."
+    imageRegistryLegacyRemoved: "이 이미지 레지스트리는 더 이상 지원되지 않습니다. Docker Hub를 선택하세요."
     customLicenseKeyRequired: 맞춤 라이선스 키가 필요합니다.
     anthropicAuthTokenRequired: Claude 실행기가 활성화되면 API 토큰이 필요합니다.
     anthropicUrlRequired: 맞춤 Claude 공급자에는 API 엔드포인트 URL이 필요합니다.

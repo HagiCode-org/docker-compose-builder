@@ -22,12 +22,8 @@ configForm:
   selectImageRegistry: Выберите источник изображения
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
-  aliyunAcr: Облако Алибаба ACR
-  aliyunAcrRecommended: Alibaba Cloud Container Registry
   dockerHubDescription: Официальный реестр образов Docker, рекомендуется
   dockerHubNetworkAdvice: Подходит для пользователей с поддержкой ускорения зеркала Docker Hub.
-  aliyunAcrDescription: Alibaba Cloud Container Registry, рекомендуется для пользователей в Китае
-  aliyunAcrNetworkAdvice: Подходит для пользователей в материковом Китае и обеспечивает стабильное ускорение изображения.
   imageLabel: Изображение
   httpsSettings: HTTPS Настройки безопасности
   httpsEnabled: HTTPS Включено
@@ -297,7 +293,7 @@ validation:
     httpsPortConflict: Порт HTTPS не может совпадать с портом HTTP.
     containerNameRequired: Укажите имя контейнера.
     imageTagRequired: Требуется тег изображения.
-    imageRegistryLegacyRemoved: "Устаревшее значение реестра удалено. Выберите Docker Hub или Alibaba Cloud ACR."
+    imageRegistryLegacyRemoved: "Этот реестр образов больше не поддерживается. Выберите Docker Hub."
     customLicenseKeyRequired: Требуется специальный лицензионный ключ.
     anthropicAuthTokenRequired: Токен API требуется, когда исполнитель Claude включен.
     anthropicUrlRequired: Конечная точка API URL требуется для пользовательского поставщика Claude.

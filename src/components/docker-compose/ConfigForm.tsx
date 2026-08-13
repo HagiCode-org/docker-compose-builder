@@ -7,10 +7,7 @@ import {
   selectProvidersError,
   selectProviderById,
 } from '@/lib/docker-compose/slice';
-import type { DockerComposeConfig, ConfigProfile, ExecutorType } from '@/lib/docker-compose/types';
-import {
-  REGISTRIES,
-} from '@/lib/docker-compose/types';
+import type { DockerComposeConfig, ConfigProfile, ExecutorType, ImageRegistry } from '@/lib/docker-compose/types';
 import type { RootState } from '@/lib/store';
 import { localizeProviderPreset } from '@/lib/docker-compose/providerConfigLoader';
 import { Label } from '@/components/ui/label';
@@ -235,18 +232,12 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
               </div>
               <Select
                 value={config.imageRegistry}
-                onValueChange={(value: 'docker-hub' | 'aliyun-acr') => updateConfig('imageRegistry', value)}
+                onValueChange={(value: ImageRegistry) => updateConfig('imageRegistry', value)}
               >
                 <SelectTrigger id="imageRegistry">
                   <SelectValue placeholder={t('docker-compose:configForm.selectImageRegistry')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="aliyun-acr">
-                    <div className="flex items-center gap-2">
-                      <span>{t('docker-compose:configForm.aliyunAcr')}</span>
-                      <Badge variant="secondary">{t('common:common.recommended')}</Badge>
-                    </div>
-                  </SelectItem>
                   <SelectItem value="docker-hub">{t('docker-compose:configForm.dockerHub')}</SelectItem>
                 </SelectContent>
               </Select>
@@ -258,16 +249,6 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
                 </div>
               ) : null}
 
-              {config.imageRegistry === 'aliyun-acr' ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-950 dark:bg-emerald-950/25">
-                  <p className="font-medium">{t('docker-compose:configForm.aliyunAcrRecommended')}</p>
-                  <p className="mt-1 text-muted-foreground">{t('docker-compose:configForm.aliyunAcrDescription')}</p>
-                  <p className="text-muted-foreground">{t('docker-compose:configForm.aliyunAcrNetworkAdvice')}</p>
-                  <p className="mt-2 text-xs font-mono">
-                    {t('docker-compose:configForm.imageLabel')}: {REGISTRIES['aliyun-acr'].imagePrefix}/hagicode:{config.imageTag}
-                  </p>
-                </div>
-              ) : null}
             </div>
           </div>
         </ConfigSectionCard>

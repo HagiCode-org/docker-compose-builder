@@ -22,12 +22,8 @@ configForm:
   selectImageRegistry: 画像ソースの選択
   dockerHub: Docker Hub
   dockerOfficialRegistry: Docker Official Registry
-  aliyunAcr: アリババクラウド ACR
-  aliyunAcrRecommended: Alibaba Cloud Container Registry
   dockerHubDescription: Docker 公式イメージ レジストリ、推奨
   dockerHubNetworkAdvice: Docker Hub ミラー加速サポートを備えたユーザーに適しています
-  aliyunAcrDescription: Alibaba Cloud Container Registry、中国のユーザーに推奨
-  aliyunAcrNetworkAdvice: 中国本土のユーザーに適しており、安定した画像高速化サービスを提供します
   imageLabel: 画像
   httpsSettings: HTTPS セキュリティ設定
   httpsEnabled: HTTPS 有効
@@ -297,7 +293,7 @@ validation:
     httpsPortConflict: HTTPS ポートは HTTP ポートと同じにすることはできません
     containerNameRequired: コンテナ名は必須です
     imageTagRequired: 画像タグは必須です
-    imageRegistryLegacyRemoved: "旧レジストリ値は削除されました。Docker Hub または Alibaba Cloud ACR を選択してください。"
+    imageRegistryLegacyRemoved: "このイメージレジストリはサポートされていません。Docker Hub を選択してください。"
     customLicenseKeyRequired: カスタム ライセンス キーが必要です
     anthropicAuthTokenRequired: Claude エグゼキュータが有効な場合は、API トークンが必要です
     anthropicUrlRequired: API エンドポイント URL はカスタム Claude プロバイダーに必要です
