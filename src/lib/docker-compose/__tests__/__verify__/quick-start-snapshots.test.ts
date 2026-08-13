@@ -52,6 +52,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
     // 验证镜像（快速启动现在使用镜像标签 0）
     expect(getServiceImage(yaml, 'hagicode')).toBe('newbe36524/hagicode:0');
+    expect(yaml).not.toContain('registry.cn-hangzhou.aliyuncs.com');
 
     // 验证端口映射
     const ports = getServicePorts(yaml, 'hagicode');
@@ -91,6 +92,7 @@ describe('Quick Start Profiles - Complete File Verification with YAML Parsing', 
 
     // 验证注释内容（英文）
     expect(yaml).toContain(`# ${getBuilderMessage('en-US', 'docker-compose:generator.support.title')}`);
+    expect(yaml).not.toContain('registry.cn-hangzhou.aliyuncs.com');
 
     expect(yaml).toMatchSnapshot('quick-start-default-en-US');
   });

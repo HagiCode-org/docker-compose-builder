@@ -6,7 +6,7 @@
 export type DatabaseType = 'sqlite';
 export type HostOS = 'windows' | 'linux';
 export type LicenseKeyType = 'public' | 'custom';
-export type ImageRegistry = 'docker-hub' | 'aliyun-acr';
+export type ImageRegistry = 'docker-hub';
 export type OpenCodeConfigMode = 'default-managed' | 'host-file';
 export type CodeServerAuthMode = 'none' | 'password';
 
@@ -83,14 +83,6 @@ export interface RegistryConfig {
  * Image Registry Configuration Constants
  */
 export const REGISTRIES: Record<ImageRegistry, RegistryConfig> = {
-  'aliyun-acr': {
-    id: 'aliyun-acr',
-    name: '阿里云 ACR',
-    description: '阿里云容器镜像服务，国内用户推荐',
-    imagePrefix: 'registry.cn-hangzhou.aliyuncs.com/hagicode',
-    recommended: true,
-    networkAdvice: '适合中国大陆用户，提供稳定的镜像加速服务'
-  },
   'docker-hub': {
     id: 'docker-hub',
     name: 'Docker Hub',

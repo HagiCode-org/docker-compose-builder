@@ -34,21 +34,29 @@ describe('Docker Compose Generation: Edge Cases', () => {
     expect(result).toContain('License__Activation__LicenseKey: "ABCD-1234-EFGH-5678"');
   });
 
-  it('Given any retained image registry, When generating YAML, Then only the hagicode image should be previewed', () => {
-    const configs = [
+  it('Given the supported image registry, When generating YAML, Then only the Docker Hub image should be emitted', () => {
+    const result = generateYAML(
       createMockConfig({ imageRegistry: 'docker-hub', imageTag: 'v1.2.3' }),
-      createMockConfig({ imageRegistry: 'aliyun-acr', imageTag: 'v2.0.0' }),
-    ];
+      undefined,
+      'zh-CN',
+      FIXED_DATE,
+    );
 
-    const results = configs.map((config) => generateYAML(config, undefined, 'zh-CN', FIXED_DATE));
+    expect(result).toContain('image: newbe36524/hagicode:v1.2.3');
+    expect(result).not.toContain('registry.cn-hangzhou.aliyuncs.com');
+    expect(result).not.toContain('bitnami/postgresql');
+    expect(result).not.toContain('bitnami_postgresql');
+    expect(result).not.toContain('postgres:');
+  });
 
-    expect(results[0]).toContain('image: newbe36524/hagicode:v1.2.3');
-    expect(results[1]).toContain('image: registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:v2.0.0');
+  it('Given a legacy registry value, When generating YAML, Then migration to Docker Hub should be required', () => {
+    const legacyRegistry = ['aliyun', 'acr'].join('-') as never;
 
-    for (const result of results) {
-      expect(result).not.toContain('bitnami/postgresql');
-      expect(result).not.toContain('bitnami_postgresql');
-      expect(result).not.toContain('postgres:');
-    }
+    expect(() => generateYAML(
+      createMockConfig({ imageRegistry: legacyRegistry }),
+      undefined,
+      'en-US',
+      FIXED_DATE,
+    )).toThrow('Please select Docker Hub.');
   });
 });

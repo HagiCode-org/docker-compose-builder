@@ -12,6 +12,7 @@ import {
   buildVolumesSection,
   generateYAML,
 } from '../../generator';
+import { REGISTRIES } from '../../types';
 import {
   FIXED_DATE,
   createFullCustomConfig,
@@ -33,6 +34,10 @@ describe('buildHeader', () => {
 });
 
 describe('buildAppService', () => {
+  it('exposes only Docker Hub as an image registry', () => {
+    expect(Object.keys(REGISTRIES)).toEqual(['docker-hub']);
+  });
+
   it('does not emit the removed default-provider key', () => {
     const appService = buildAppService(createMockConfig()).join('\n');
 
@@ -219,20 +224,23 @@ describe('generateYAML', () => {
     expect(yaml).not.toContain('QODER_PERSONAL_ACCESS_TOKEN');
   });
 
-  it('keeps the standard hagicode image tag fixed at 0 across supported registries', () => {
-    const expectedImages = {
-      'docker-hub': 'newbe36524/hagicode:0',
-      'aliyun-acr': 'registry.cn-hangzhou.aliyuncs.com/hagicode/hagicode:0',
-    } as const;
+  it('generates only the Docker Hub hagicode image', () => {
+    const yaml = generateYAML(createMockConfig({
+      imageRegistry: 'docker-hub',
+      imageTag: '0',
+    }), undefined, 'en-US', FIXED_DATE);
 
-    (Object.keys(expectedImages) as Array<keyof typeof expectedImages>).forEach((imageRegistry) => {
-      const yaml = generateYAML(createMockConfig({
-        imageRegistry,
-        imageTag: '0',
-      }), undefined, 'en-US', FIXED_DATE);
+    expect(yaml).toContain('image: newbe36524/hagicode:0');
+    expect(yaml).not.toContain('registry.cn-hangzhou.aliyuncs.com');
+  });
 
-      expect(yaml).toContain(`image: ${expectedImages[imageRegistry]}`);
-    });
+  it('rejects the retired registry value with Docker Hub migration guidance', () => {
+    const legacyRegistry = ['aliyun', 'acr'].join('-') as never;
+
+    expect(() => generateYAML(createMockConfig({
+      imageRegistry: legacyRegistry,
+    }), undefined, 'en-US', FIXED_DATE))
+      .toThrow('This image registry is no longer supported. Please select Docker Hub.');
   });
 
   it('does not emit removed executor services or postgres image previews', () => {

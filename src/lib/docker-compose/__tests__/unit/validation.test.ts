@@ -173,7 +173,7 @@ describe('validateConfig', () => {
   });
 
   it('rejects removed legacy registry values with migration guidance', () => {
-    const legacyRegistry = ['azure', 'acr'].join('-') as never;
+    const legacyRegistry = ['aliyun', 'acr'].join('-') as never;
     const enErrors = validateConfig(createMockConfig({
       imageRegistry: legacyRegistry,
     }), 'en-US');
@@ -182,9 +182,9 @@ describe('validateConfig', () => {
     }), 'zh-CN');
 
     expect(enErrors.find((error) => error.field === 'imageRegistry')?.message)
-      .toBe('Legacy image registry value removed. Please select Docker Hub or Alibaba Cloud ACR.');
+      .toBe('This image registry is no longer supported. Please select Docker Hub.');
     expect(zhErrors.find((error) => error.field === 'imageRegistry')?.message)
-      .toBe('旧版镜像来源已移除，请选择 Docker Hub 或阿里云 ACR。');
+      .toBe('此镜像来源已不再支持，请选择 Docker Hub。');
   });
 });
 

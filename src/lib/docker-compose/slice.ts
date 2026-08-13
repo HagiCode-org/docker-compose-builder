@@ -4,7 +4,7 @@ import type { ProviderPreset } from '../../lib/docker-compose/providerConfigLoad
 import { defaultConfig } from '../../lib/docker-compose/defaultConfig';
 
 // Configuration version - increment to invalidate old localStorage caches
-const CONFIG_VERSION = '2.12';
+const CONFIG_VERSION = '2.13';
 const LEGACY_COPILOT_IMAGE_TAG_REGEX = /^v?\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?-copilot$/;
 
 const EXECUTOR_OPTIONS: readonly ExecutorType[] = [
@@ -127,6 +127,14 @@ const normalizeStandardImageTag = (config: DockerComposeConfig): DockerComposeCo
   };
 };
 
+const normalizePersistedImageRegistry = (config: DockerComposeConfig): DockerComposeConfig =>
+  config.imageRegistry === 'docker-hub'
+    ? config
+    : {
+      ...config,
+      imageRegistry: defaultConfig.imageRegistry
+    };
+
 interface DockerComposeState {
   config: DockerComposeConfig;
   isLoading: boolean;
@@ -146,8 +154,10 @@ const getInitialConfig = (): DockerComposeConfig => {
     const savedVersion = localStorage.getItem('docker-compose-config-version');
     const savedConfig = localStorage.getItem('docker-compose-config');
     if (savedConfig) {
-      const normalizedConfig = normalizeStandardImageTag(
-        normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig)
+      const normalizedConfig = normalizePersistedImageRegistry(
+        normalizeStandardImageTag(
+          normalizeExecutorConfig(JSON.parse(savedConfig) as LegacyDockerComposeConfig)
+        )
       );
 
       if (savedVersion !== CONFIG_VERSION) {
@@ -170,11 +180,14 @@ const getInitialConfig = (): DockerComposeConfig => {
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
-    if (savedRegistry && (savedRegistry === 'docker-hub' || savedRegistry === 'aliyun-acr')) {
+    if (savedRegistry === 'docker-hub') {
       return {
         ...defaultConfig,
-        imageRegistry: savedRegistry as DockerComposeConfig['imageRegistry']
+        imageRegistry: savedRegistry
       };
+    }
+    if (savedRegistry) {
+      localStorage.setItem('docker-compose-image-registry', defaultConfig.imageRegistry);
     }
   } catch (error) {
     console.warn('Failed to read from localStorage:', error);

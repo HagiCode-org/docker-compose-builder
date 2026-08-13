@@ -10,7 +10,7 @@ export const defaultConfig: DockerComposeConfig = {
   containerName: 'hagicode-app',
   imageTag: '0',
   hostOS: 'linux',
-  imageRegistry: 'aliyun-acr',
+  imageRegistry: 'docker-hub',
   aspNetEnvironment: 'Production',
   timezone: 'Asia/Shanghai',
   databaseType: 'sqlite',

@@ -448,14 +448,8 @@ export function buildAppService(
   const codeServerCopy = getCodeServerCommentCopy(language);
 
   lines.push('  hagicode:');
-  const imagePrefix = REGISTRIES[config.imageRegistry].imagePrefix;
-  let appImage: string;
-
-  if (config.imageRegistry === 'aliyun-acr') {
-    appImage = `${imagePrefix}/hagicode:${config.imageTag}`;
-  } else {
-    appImage = `${imagePrefix}:${config.imageTag}`;
-  }
+  const imagePrefix = getSupportedRegistryImagePrefix(config, language);
+  const appImage = `${imagePrefix}:${config.imageTag}`;
 
   lines.push(`    image: ${appImage}`);
   lines.push(`    container_name: ${config.containerName}`);
@@ -701,9 +695,7 @@ export function generateYAML(
   language: string = 'zh-CN',
   now: Date = new Date()
 ): string {
-  if (!REGISTRIES[config.imageRegistry]) {
-    throw new Error(`Unsupported image registry \"${String(config.imageRegistry)}\". Legacy image registry value removed. Please select Docker Hub or Alibaba Cloud ACR.`);
-  }
+  getSupportedRegistryImagePrefix(config, language);
 
   const lines: string[] = [];
 
@@ -724,4 +716,18 @@ export function generateYAML(
   lines.push(...networksLines);
 
   return lines.join('\n');
+}
+
+function getSupportedRegistryImagePrefix(
+  config: DockerComposeConfig,
+  language: string,
+): string {
+  if (config.imageRegistry !== 'docker-hub') {
+    throw new Error(getBuilderMessage(
+      language,
+      'docker-compose:validation.messages.imageRegistryLegacyRemoved',
+    ));
+  }
+
+  return REGISTRIES['docker-hub'].imagePrefix;
 }
