@@ -44,7 +44,21 @@ describe('docker compose slice sanitization', () => {
     expect(state.config.imageTag).toBe('0');
   });
 
-  it('normalizes legacy copilot tags and removes deleted executor fields during hydration', async () => {
+  it('defers saved configuration restoration until after initial render', async () => {
+    localStorage.setItem('docker-compose-config-version', '2.13');
+    localStorage.setItem('docker-compose-config', JSON.stringify({
+      enabledExecutors: ['claude'],
+      workdirPath: '/saved/workspace'
+    }));
+
+    const sliceModule = await import('../../slice');
+    const state = sliceModule.default(undefined, initAction);
+
+    expect(state.config.workdirPath).not.toBe('/saved/workspace');
+    expect(sliceModule.loadPersistedConfig()?.workdirPath).toBe('/saved/workspace');
+  });
+
+  it('normalizes legacy copilot tags and removes deleted executor fields during restoration', async () => {
     localStorage.setItem('docker-compose-config-version', '2.7');
     localStorage.setItem('docker-compose-config', JSON.stringify({
       enabledExecutors: ['claude', 'copilot-cli', 'codex', 'qodercli'],
@@ -55,12 +69,12 @@ describe('docker compose slice sanitization', () => {
     }));
 
     const sliceModule = await import('../../slice');
-    const state = sliceModule.default(undefined, initAction);
+    const config = sliceModule.loadPersistedConfig();
     const persistedConfig = JSON.parse(localStorage.getItem('docker-compose-config') ?? '{}') as Record<string, unknown>;
 
-    expect(state.config.enabledExecutors).toEqual(['claude', 'codex']);
-    expect(state.config.imageTag).toBe('0');
-    expect(state.config.workdirPath).toBe('/workspace/repos');
+    expect(config?.enabledExecutors).toEqual(['claude', 'codex']);
+    expect(config?.imageTag).toBe('0');
+    expect(config?.workdirPath).toBe('/workspace/repos');
     expect('codebuddyApiKey' in persistedConfig).toBe(false);
     expect('qoderPersonalAccessToken' in persistedConfig).toBe(false);
   });
@@ -83,10 +97,10 @@ describe('docker compose slice sanitization', () => {
     }));
 
     const sliceModule = await import('../../slice');
-    const state = sliceModule.default(undefined, initAction);
+    const config = sliceModule.loadPersistedConfig();
     const persistedConfig = JSON.parse(localStorage.getItem('docker-compose-config') ?? '{}') as Record<string, unknown>;
 
-    expect(state.config.databaseType).toBe('sqlite');
+    expect(config?.databaseType).toBe('sqlite');
     expect('externalDbHost' in persistedConfig).toBe(false);
     expect('externalDbPort' in persistedConfig).toBe(false);
     expect('postgresDatabase' in persistedConfig).toBe(false);
@@ -105,12 +119,12 @@ describe('docker compose slice sanitization', () => {
     }));
 
     const sliceModule = await import('../../slice');
-    const state = sliceModule.default(undefined, initAction);
+    const config = sliceModule.loadPersistedConfig();
 
-    expect(state.config.enabledExecutors).toEqual(['opencode']);
-    expect(state.config.openCodeModel).toBe('openai/gpt-5');
-    expect(state.config.openCodeConfigMode).toBe('default-managed');
-    expect(state.config.openCodeConfigHostPath).toBe('');
+    expect(config?.enabledExecutors).toEqual(['opencode']);
+    expect(config?.openCodeModel).toBe('openai/gpt-5');
+    expect(config?.openCodeConfigMode).toBe('default-managed');
+    expect(config?.openCodeConfigHostPath).toBe('');
     expect(localStorage.getItem('docker-compose-config-version')).toBe('2.13');
   });
 
@@ -122,10 +136,10 @@ describe('docker compose slice sanitization', () => {
     }));
 
     const sliceModule = await import('../../slice');
-    const state = sliceModule.default(undefined, initAction);
+    const config = sliceModule.loadPersistedConfig();
     const persistedConfig = JSON.parse(localStorage.getItem('docker-compose-config') ?? '{}') as Record<string, unknown>;
 
-    expect(state.config.imageRegistry).toBe('docker-hub');
+    expect(config?.imageRegistry).toBe('docker-hub');
     expect(persistedConfig.imageRegistry).toBe('docker-hub');
     expect(localStorage.getItem('docker-compose-image-registry')).toBe('docker-hub');
   });
@@ -135,9 +149,9 @@ describe('docker compose slice sanitization', () => {
     localStorage.setItem('docker-compose-image-registry', ['aliyun', 'acr'].join('-'));
 
     const sliceModule = await import('../../slice');
-    const state = sliceModule.default(undefined, initAction);
+    const config = sliceModule.loadPersistedConfig();
 
-    expect(state.config.imageRegistry).toBe('docker-hub');
+    expect(config?.imageRegistry).toBe('docker-hub');
     expect(localStorage.getItem('docker-compose-image-registry')).toBe('docker-hub');
   });
 });

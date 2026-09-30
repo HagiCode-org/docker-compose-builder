@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { getBuilderMessage } from '@/i18n/resources';
 import { loadFirstActivePromotion, type ActivePromotion } from '@/lib/promote-loader';
@@ -13,6 +13,8 @@ type PromoteCardProps = {
 
 const DEFAULT_FOOTER_SELECTOR = 'footer, [data-footer-root], .footer';
 const DISMISSED_PROMOTIONS_STORAGE_KEY = 'hagicode:promote-card:dismissed-signature';
+const PROMOTION_DISMISSED_EVENT = 'hagicode:promote-card:dismissed';
+let sessionDismissedSignature: string | null = null;
 
 function closeLabel(locale: string | undefined) {
   return getBuilderMessage(locale, 'common:promoteCard.dismiss');
@@ -21,19 +23,31 @@ function closeLabel(locale: string | undefined) {
 function readDismissedSignature(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return window.localStorage.getItem(DISMISSED_PROMOTIONS_STORAGE_KEY);
+    return sessionDismissedSignature ?? window.localStorage.getItem(DISMISSED_PROMOTIONS_STORAGE_KEY);
   } catch {
-    return null;
+    return sessionDismissedSignature;
   }
 }
 
 function writeDismissedSignature(signature: string): void {
   if (typeof window === 'undefined') return;
+  sessionDismissedSignature = signature;
   try {
     window.localStorage.setItem(DISMISSED_PROMOTIONS_STORAGE_KEY, signature);
   } catch {
     // Ignore unavailable storage; closing still works for this render.
   }
+  window.dispatchEvent(new Event(PROMOTION_DISMISSED_EVENT));
+}
+
+function subscribeToDismissedPromotions(onStoreChange: () => void) {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener('storage', onStoreChange);
+  window.addEventListener(PROMOTION_DISMISSED_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener('storage', onStoreChange);
+    window.removeEventListener(PROMOTION_DISMISSED_EVENT, onStoreChange);
+  };
 }
 
 function closeText(locale: string | undefined) {
@@ -49,7 +63,11 @@ export function PromoteCard({
 }: PromoteCardProps) {
   const [promotion, setPromotion] = useState<ActivePromotion | null>(initialPromotion);
   const [footerVisible, setFooterVisible] = useState(false);
-  const [dismissedSignature, setDismissedSignature] = useState<string | null>(() => readDismissedSignature());
+  const dismissedSignature = useSyncExternalStore(
+    subscribeToDismissedPromotions,
+    readDismissedSignature,
+    () => null,
+  );
 
   useEffect(() => {
     if (initialPromotion) return;
@@ -92,7 +110,6 @@ export function PromoteCard({
   const dismissPromotion = () => {
     if (!promotionSignature) return;
     writeDismissedSignature(promotionSignature);
-    setDismissedSignature(promotionSignature);
   };
 
   return (

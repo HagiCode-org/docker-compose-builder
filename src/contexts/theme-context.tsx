@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
@@ -8,6 +8,33 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const THEME_CHANGE_EVENT = "hagicode:theme-changed";
+let sessionTheme: Theme | null = null;
+
+function subscribeToTheme(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  const handleStorageChange = () => {
+    sessionTheme = null;
+    onStoreChange();
+  };
+  window.addEventListener("storage", handleStorageChange);
+  window.addEventListener(THEME_CHANGE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", handleStorageChange);
+    window.removeEventListener(THEME_CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function getStoredTheme(defaultTheme: Theme): Theme {
+  if (sessionTheme) return sessionTheme;
+  try {
+    const savedTheme = window.localStorage.getItem("theme");
+    return savedTheme === "light" || savedTheme === "dark" ? savedTheme : defaultTheme;
+  } catch {
+    return defaultTheme;
+  }
+}
 
 export function ThemeProvider({
   children,
@@ -16,22 +43,25 @@ export function ThemeProvider({
   children: React.ReactNode;
   defaultTheme?: Theme;
 }) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (savedTheme && ["light", "dark"].includes(savedTheme)) {
-      setTheme(savedTheme);
-    } else if (defaultTheme) {
-      setTheme(defaultTheme);
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    () => (typeof window === "undefined" ? defaultTheme : getStoredTheme(defaultTheme)),
+    () => defaultTheme,
+  );
+  const setTheme = useCallback((nextTheme: Theme) => {
+    sessionTheme = nextTheme;
+    try {
+      window.localStorage.setItem("theme", nextTheme);
+    } catch {
+      // Keep the in-memory theme if browser storage is unavailable.
     }
-  }, [defaultTheme]);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(theme);
-    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const value = {

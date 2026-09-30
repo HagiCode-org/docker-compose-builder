@@ -145,9 +145,9 @@ interface DockerComposeState {
   providersError: string | null;
 }
 
-const getInitialConfig = (): DockerComposeConfig => {
+export const loadPersistedConfig = (): DockerComposeConfig | null => {
   if (typeof window === 'undefined') {
-    return { ...defaultConfig };
+    return null;
   }
 
   try {
@@ -176,7 +176,7 @@ const getInitialConfig = (): DockerComposeConfig => {
       localStorage.setItem('docker-compose-config-version', CONFIG_VERSION);
       localStorage.setItem('docker-compose-image-registry', defaultConfig.imageRegistry);
       localStorage.removeItem('docker-compose-config');
-      return { ...defaultConfig };
+      return null;
     }
 
     const savedRegistry = localStorage.getItem('docker-compose-image-registry');
@@ -189,15 +189,17 @@ const getInitialConfig = (): DockerComposeConfig => {
     if (savedRegistry) {
       localStorage.setItem('docker-compose-image-registry', defaultConfig.imageRegistry);
     }
+
+    return { ...defaultConfig };
   } catch (error) {
     console.warn('Failed to read from localStorage:', error);
   }
 
-  return { ...defaultConfig };
+  return null;
 };
 
 const initialState: DockerComposeState = {
-  config: getInitialConfig(),
+  config: { ...defaultConfig },
   isLoading: false,
   error: null,
   providers: [],
