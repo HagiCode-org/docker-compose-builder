@@ -23,10 +23,11 @@ import {
 interface ConfigPreviewProps {
   sections: WorkspaceSection[];
   onSelectSection: (sectionId: WorkspaceSectionId) => void;
+  generatedAt: Date;
   className?: string;
 }
 
-export function ConfigPreview({ sections, onSelectSection, className }: ConfigPreviewProps) {
+export function ConfigPreview({ sections, onSelectSection, generatedAt, className }: ConfigPreviewProps) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const config = useSelector(selectConfig);
@@ -34,7 +35,10 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
 
   const providerConfig = useSelector((state: RootState) => selectProviderById(state, config.anthropicApiProvider));
 
-  const yaml = useMemo(() => generateYAML(config, providerConfig, i18n.language), [config, providerConfig, i18n.language]);
+  const yaml = useMemo(
+    () => generateYAML(config, providerConfig, i18n.language, generatedAt),
+    [config, generatedAt, providerConfig, i18n.language],
+  );
   const errorSections = useMemo(() => sections.filter((section) => section.errorCount > 0), [sections]);
   const exportDisabled = !isWorkspaceExportReady(sections);
   const darkMode = theme === 'dark';
@@ -158,7 +162,10 @@ export function ConfigPreview({ sections, onSelectSection, className }: ConfigPr
       </div>
 
       <div className="space-y-1 px-1 text-xs text-muted-foreground">
-        <p>{t('docker-compose:configPreview.generatedAt')} {new Date().toLocaleString()}</p>
+        <p>
+          {t('docker-compose:configPreview.generatedAt')}{" "}
+          {generatedAt.toLocaleString(i18n.resolvedLanguage ?? i18n.language, { timeZone: "UTC" })}
+        </p>
         <p>{t('docker-compose:configPreview.basedOnSettings')}</p>
         {exportDisabled ? <p>{t('docker-compose:configPreview.invalidConfigCannotExport')}</p> : null}
       </div>

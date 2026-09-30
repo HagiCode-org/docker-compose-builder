@@ -14,11 +14,12 @@ import { ShieldCheck, ShieldOff } from 'lucide-react';
 
 interface HttpsConfigPanelProps {
   config: DockerComposeConfig;
+  generatedAt: Date;
   updateConfig: <K extends keyof DockerComposeConfig>(field: K, value: DockerComposeConfig[K]) => void;
   validationErrors?: Record<string, string>;
 }
 
-export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }: HttpsConfigPanelProps) {
+export function HttpsConfigPanel({ config, generatedAt, updateConfig, validationErrors = {} }: HttpsConfigPanelProps) {
   const { t, i18n } = useTranslation();
   const caddyfile = useMemo(() => buildCaddyfile(config, i18n.resolvedLanguage), [config, i18n.resolvedLanguage]);
   const accessUrl = `https://${config.lanIp}:${config.httpsPort || '443'}`;
@@ -103,7 +104,7 @@ export function HttpsConfigPanel({ config, updateConfig, validationErrors = {} }
             docsLabel={t('docker-compose:configForm.certificateTrustGuide')}
           />
 
-          <CaddyfilePreview content={caddyfile} generatedAt={new Date()} serviceCount={1} />
+          <CaddyfilePreview content={caddyfile} generatedAt={generatedAt} serviceCount={1} />
 
           <Button
             type="button"

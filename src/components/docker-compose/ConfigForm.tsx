@@ -31,11 +31,12 @@ import { cn } from '@/lib/utils';
 interface ConfigFormProps {
   sections: WorkspaceSection[];
   onSelectSection: (sectionId: WorkspaceSectionId) => void;
+  generatedAt: Date;
 }
 
 const subSectionClass = 'scroll-mt-28 space-y-4 rounded-2xl border border-border/60 bg-muted/20 p-4 outline-none';
 
-export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
+export function ConfigForm({ sections, onSelectSection, generatedAt }: ConfigFormProps) {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const config = useSelector(selectConfig);
@@ -885,6 +886,7 @@ export function ConfigForm({ sections, onSelectSection }: ConfigFormProps) {
         >
           <HttpsConfigPanel
             config={config}
+            generatedAt={generatedAt}
             updateConfig={updateConfig}
             validationErrors={validationMap}
           />

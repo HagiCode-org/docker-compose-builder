@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useSelector } from 'react-redux';
 import { Dock, TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,9 @@ import { Button } from '@/components/ui/button';
 
 const toSectionElementId = (sectionId: WorkspaceSectionId) => `section-${sectionId}`;
 const stickyHeaderOffset = 112;
+const clientRenderTime = new Date().toISOString();
+const subscribeToRenderTime = () => () => {};
+const getClientRenderTime = () => clientRenderTime;
 
 function scrollToTarget(target: HTMLElement) {
   const top = window.scrollY + target.getBoundingClientRect().top - stickyHeaderOffset;
@@ -36,10 +39,16 @@ function scrollToTarget(target: HTMLElement) {
   });
 }
 
-export function DockerComposeGenerator() {
+export function DockerComposeGenerator({ initialRenderTime }: { initialRenderTime: string }) {
   const { t, i18n } = useTranslation();
   const config = useSelector(selectConfig);
   const [activeNavTargetId, setActiveNavTargetId] = useState<WorkspaceSectionId | WorkspaceSectionChildId | undefined>();
+  const renderedAt = useSyncExternalStore(
+    subscribeToRenderTime,
+    getClientRenderTime,
+    () => initialRenderTime,
+  );
+  const generatedAt = new Date(renderedAt);
 
   const validationErrors = useMemo(
     () => validateConfig(config, i18n.resolvedLanguage ?? i18n.language),
@@ -167,7 +176,7 @@ export function DockerComposeGenerator() {
 
   const previewPanel = (
     <div id="workspace-preview">
-      <ConfigPreview sections={sections} onSelectSection={handleSelectSection} />
+      <ConfigPreview sections={sections} onSelectSection={handleSelectSection} generatedAt={generatedAt} />
     </div>
   );
 
@@ -221,7 +230,7 @@ export function DockerComposeGenerator() {
               onOpenPreview={handleOpenPreview}
             />
           }
-          editor={<ConfigForm sections={sections} onSelectSection={handleSelectSection} />}
+          editor={<ConfigForm sections={sections} onSelectSection={handleSelectSection} generatedAt={generatedAt} />}
           preview={previewPanel}
         />
       </main>

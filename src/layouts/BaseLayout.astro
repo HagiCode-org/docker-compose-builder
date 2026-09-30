@@ -1,0 +1,106 @@
+---
+import {
+  DEFAULT_BUILDER_LANGUAGE,
+  SUPPORTED_BUILDER_LANGUAGE_CODES,
+} from "@/i18n/config";
+import {
+  buildDefaultSEOConfig,
+  siteConfig,
+} from "@/config/seo";
+import {
+  generateOrganizationSchema,
+  generateSoftwareApplicationSchema,
+  generateWebApplicationSchema,
+} from "@/lib/seo/schema-generator";
+import "../index.css";
+
+const seo = buildDefaultSEOConfig(DEFAULT_BUILDER_LANGUAGE);
+const basePath = import.meta.env.BASE_URL;
+const analyticsId = import.meta.env.VITE_51LA_ID || "L6b88a5yK4h2Xnci";
+const imageUrl = new URL(`${basePath}og-image.png`, siteConfig.siteUrl).href;
+const alternateLocales = SUPPORTED_BUILDER_LANGUAGE_CODES.filter(
+  (locale) => locale !== DEFAULT_BUILDER_LANGUAGE,
+);
+---
+
+<!doctype html>
+<html lang={DEFAULT_BUILDER_LANGUAGE} class="dark" data-51la-id={analyticsId}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <meta name="keywords" content={seo.keywords.join(", ")} />
+    <link rel="icon" type="image/x-icon" href={`${basePath}favicon.ico`} />
+    <link rel="canonical" href={siteConfig.siteUrl} />
+
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:url" content={siteConfig.siteUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={DEFAULT_BUILDER_LANGUAGE} />
+    <meta property="og:site_name" content={siteConfig.name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={seo.title} />
+    <meta name="twitter:description" content={seo.description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <link rel="alternate" hreflang={DEFAULT_BUILDER_LANGUAGE} href={`${siteConfig.siteUrl}?lang=${DEFAULT_BUILDER_LANGUAGE}`} />
+    <link rel="alternate" hreflang="en" href={`${siteConfig.siteUrl}?lang=en-US`} />
+    {
+      alternateLocales.map((locale) => (
+        <link
+          rel="alternate"
+          hreflang={locale}
+          href={`${siteConfig.siteUrl}?lang=${locale}`}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={siteConfig.siteUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(generateWebApplicationSchema())} />
+    <script type="application/ld+json" set:html={JSON.stringify(generateOrganizationSchema())} />
+    <script type="application/ld+json" set:html={JSON.stringify(generateSoftwareApplicationSchema())} />
+
+    <script is:inline charset="UTF-8" id="LA_COLLECT" src="https://sdk.51.la/js-sdk-pro.min.js"></script>
+    <script is:inline>
+      window.LA?.init({
+        id: document.documentElement.dataset["51laId"],
+        ck: document.documentElement.dataset["51laId"],
+        autoTrack: true,
+        hashMode: true,
+        screenRecord: true,
+      });
+    </script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-EN03FMT2Q4"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", "G-EN03FMT2Q4");
+    </script>
+  </head>
+  <body>
+    <slot />
+    <noscript>
+      <style>
+        .builder-workspace {
+          display: none !important;
+        }
+      </style>
+    </noscript>
+  </body>
+</html>
+
+<style is:global>
+  .builder-workspace {
+    visibility: hidden;
+  }
+
+  html.is-hydrated .builder-workspace {
+    visibility: visible;
+  }
+</style>

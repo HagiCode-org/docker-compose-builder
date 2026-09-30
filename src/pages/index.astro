@@ -1,0 +1,20 @@
+---
+import App from "@/App";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const initialRenderTime = new Date().toISOString();
+---
+
+<BaseLayout>
+  <noscript>
+    <section class="mx-auto max-w-5xl px-4 pb-12 sm:px-6 lg:px-8" aria-live="polite">
+      <p class="rounded-lg border border-border bg-muted p-4">
+        Docker Compose 配置编辑器需要启用 JavaScript。
+      </p>
+    </section>
+  </noscript>
+
+  <div class="builder-workspace" aria-label="Docker Compose configuration editor">
+    <App client:load initialRenderTime={initialRenderTime} />
+  </div>
+</BaseLayout>

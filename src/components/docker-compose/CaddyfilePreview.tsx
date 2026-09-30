@@ -14,7 +14,7 @@ interface CaddyfilePreviewProps {
 }
 
 export function CaddyfilePreview({ content, generatedAt, serviceCount }: CaddyfilePreviewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { theme } = useTheme();
@@ -38,7 +38,10 @@ export function CaddyfilePreview({ content, generatedAt, serviceCount }: Caddyfi
         <div>
           <p className="text-sm font-medium">{t('docker-compose:configForm.caddyPreviewTitle')}</p>
           <p className="text-xs text-muted-foreground">
-            {lineCount} lines · {serviceCount} service · {generatedAt.toLocaleString()}
+            {lineCount} lines · {serviceCount} service · {generatedAt.toLocaleString(
+              i18n.resolvedLanguage ?? i18n.language,
+              { timeZone: "UTC" },
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
