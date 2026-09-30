@@ -2,10 +2,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import {
+  DEFAULT_BUILDER_LANGUAGE,
   i18nConfig,
   persistBuilderLanguage,
   resolveBuilderLanguageCode,
-  resolveInitialBuilderLanguage,
 } from './config';
 import { builderI18nResources } from './resources';
 
@@ -14,16 +14,8 @@ void i18n
   .init({
     ...i18nConfig,
     resources: builderI18nResources,
-    lng: resolveInitialBuilderLanguage(),
+    lng: DEFAULT_BUILDER_LANGUAGE,
   });
-
-if (!i18n.isInitialized) {
-  i18n.on('initialized', () => {
-    persistBuilderLanguage(i18n.resolvedLanguage ?? i18n.language);
-  });
-} else {
-  persistBuilderLanguage(i18n.resolvedLanguage ?? i18n.language);
-}
 
 i18n.on('languageChanged', (nextLanguage) => {
   const normalizedLanguage = resolveBuilderLanguageCode(nextLanguage);

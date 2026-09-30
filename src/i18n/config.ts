@@ -273,7 +273,11 @@ function getSafeStorage(): Storage | undefined {
     return undefined;
   }
 
-  return window.localStorage;
+  try {
+    return window.localStorage;
+  } catch {
+    return undefined;
+  }
 }
 
 function getNavigatorLanguage(): string | null {
