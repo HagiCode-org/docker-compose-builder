@@ -4,7 +4,7 @@ This guide covers testing practices for the Docker Compose Builder project, incl
 
 ## Test Structure
 
-The project uses a comprehensive test suite split across three categories:
+The project uses a comprehensive test suite split across four categories:
 
 ### Unit Tests
 Location: `src/lib/docker-compose/__tests__/unit/`
@@ -26,9 +26,14 @@ Location: `src/lib/docker-compose/__tests__/__verify__/`
 - Full custom snapshots (6 tests)
 - Validate generated YAML output against committed snapshots
 
+### Hydration Integration Tests
+Location: `src/__tests__/`
+- Verify static React markup hydrates without mismatch
+- Exercise saved configuration, theme and language restoration, YAML preview, and export
+
 ## Running Tests
 
-Use Node.js `^20.19.0 || >=22.12.0` before running the commands below. This matches the Vite 8 runtime floor used by local development and CI.
+Use Node.js `>=22.12.0` before running the commands below. This is the runtime floor required by Astro and CI.
 
 ### Run All Tests
 ```bash
@@ -205,9 +210,10 @@ The `verify.config.json` file configures snapshot behavior:
 The CI pipeline (`.github/workflows/ci.yml`) includes:
 
 1. **Verify Snapshot Files** - Explicit check that snapshot files exist
-2. **Build** - TypeScript compilation
-3. **Test** - Full test suite including snapshot verification
-4. **PR Comment** - Automated test results on pull requests
+2. **Build** - Astro validation, React TypeScript compilation, and static generation
+3. **Static Output** - Root and subpath metadata, fallback, and island asset checks
+4. **Test** - Full Vitest suite including hydration and snapshot verification
+5. **PR Comment** - Automated test results on pull requests
 
 ### Snapshot Validation in CI
 
@@ -246,7 +252,7 @@ Current test counts:
 - Unit Tests: ~62 tests
 - BDD Tests: ~40 tests
 - Snapshot Tests: ~23 tests
-- **Total: ~125 tests**
+- **Total: 146 tests**
 
 Run coverage reports:
 ```bash

@@ -2,7 +2,7 @@
 
 [简体中文](./README_cn.md)
 
-A modern Docker Compose configuration generator for Hagicode, built with React + TypeScript + Vite + shadcn/ui.
+A modern Docker Compose configuration generator for Hagicode, built as a static Astro site with a hydrated React + TypeScript workspace and shadcn/ui.
 
 ## Features
 
@@ -24,7 +24,7 @@ A modern Docker Compose configuration generator for Hagicode, built with React +
 
 ### Installation
 
-Use Node.js `^20.19.0 || >=22.12.0` before installing dependencies. This applies to `npm run dev`, `npm run build`, and `npm test`.
+Use Node.js `>=22.12.0` before installing dependencies. This applies to `npm run dev`, `npm run build`, `npm run type-check`, and `npm test`.
 
 ```bash
 npm install
@@ -36,7 +36,7 @@ npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:5174`
+The application will be available at `http://localhost:4321`
 
 ### Build
 
@@ -56,15 +56,19 @@ Run these commands after dependency upgrades or CI/runtime changes:
 
 ```bash
 npm run build
+npm run type-check
 npm test
+npm run test:static-output
 npm run dev
 ```
 
 Expected behavior:
 
-- `npm run build` completes TypeScript compilation and writes assets to `dist/`
+- `npm run build` checks Astro and React TypeScript, builds the static page, and writes assets to `dist/`
+- `npm run type-check` checks Astro pages and React/TypeScript code
 - `npm test` completes the Vitest suite, including snapshot verification
-- `npm run dev` starts the Vite 8 dev server and keeps the app reachable on `http://localhost:5174`
+- `npm run test:static-output` checks generated metadata, no-script fallback, and island assets at root and subpath bases
+- `npm run dev` starts the Astro dev server at `http://localhost:4321`
 
 ### Deploy to GitHub Pages
 
@@ -72,7 +76,7 @@ The authoritative production deployment path is GitHub Actions.
 
 - Authoritative workflow: `.github/workflows/deploy-gh-pages.yml`
 - Production source of truth: the `gh-pages` branch, published only after CI validation succeeds
-- Published payload contract: branch root `esa.jsonc` plus `dist/` containing the validated Vite output
+- Published payload contract: branch root `esa.jsonc` plus `dist/` containing the validated Astro output
 - Required GitHub permissions: the deploy job needs `contents: write`; the build job stays read-only
 - Supported triggers: push to `main` and `workflow_dispatch`
 - Legacy path retired: local `gh-pages` CLI publication is no longer a supported production flow
@@ -94,7 +98,7 @@ The authoritative production deployment path is GitHub Actions.
 ### Deployment Troubleshooting
 
 - **404 Error**: Ensure GitHub Pages is properly configured and the `gh-pages` branch exists
-- **Assets not loading**: Check that `vite.config.ts` has the correct `base` configuration
+- **Assets not loading**: Check that `astro.config.mjs` has the correct `base` configuration
 - **Build failures**: Verify dependencies are installed correctly with `npm ci`
 - **Permissions**: Ensure the GitHub Actions workflow has the necessary permissions
 - **First deploy checks**: Confirm the workflow uploaded `esa.jsonc` and `dist/`, then verify `https://builder.hagicode.com`
@@ -253,7 +257,7 @@ The application integrates two analytics platforms for comprehensive user behavi
 - **Purpose**: Web analytics for Chinese users, tracking page views, traffic sources, and user behavior
 - **Analytics ID**: `26c9739b2f3cddbe36c649e0823ee2de` (default)
 - **Environment**: Production only
-- **Implementation**: Direct script embedding in `index.html`
+- **Implementation**: Initialized from `src/layouts/BaseLayout.astro`
 
 ### Configuration
 
@@ -285,7 +289,7 @@ To verify analytics integration in production:
 ## Technology Stack
 
 - **React 19.2.0** with TypeScript
-- **Vite 8** - Build tool and dev server
+- **Astro** - Static site generator and development server (Vite 8 powered)
 - **shadcn/ui** - Component library
 - **Tailwind CSS** - Styling
 - **Radix UI** - Headless UI primitives
@@ -297,13 +301,15 @@ To verify analytics integration in production:
 
 ```
 src/
+├── layouts/             # Static document shell and metadata
+├── pages/               # Astro routes
+│   └── index.astro      # Static home page and React workspace island
 ├── components/
 │   ├── ui/              # shadcn/ui components
 │   └── docker-compose/  # Docker Compose specific components
 ├── lib/
 │   ├── docker-compose/  # Type definitions, utils, and state management
 │   └── store.ts         # Redux store configuration
-├── pages/               # Main page components
 └── hooks/               # Custom React hooks
 ```
 

@@ -2,7 +2,7 @@
 
 [English](./README.md)
 
-一个为 HagiCode 构建的现代化 Docker Compose 配置生成器，使用 React + TypeScript + Vite + shadcn/ui。
+一个为 HagiCode 构建的现代化 Docker Compose 配置生成器，使用 Astro 静态站点和经过 hydration 的 React + TypeScript 工作区及 shadcn/ui。
 
 ## 功能特性
 
@@ -24,7 +24,7 @@
 
 ### 安装
 
-安装前请使用 Node.js `^20.19.0 || >=22.12.0`。这个要求同时适用于 `npm run dev`、`npm run build` 和 `npm test`。
+安装前请使用 Node.js `>=22.12.0`。这个要求同时适用于 `npm run dev`、`npm run build`、`npm run type-check` 和 `npm test`。
 
 ```bash
 npm install
@@ -36,7 +36,7 @@ npm install
 npm run dev
 ```
 
-应用程序可在 `http://localhost:5174` 访问
+应用程序可在 `http://localhost:4321` 访问
 
 ### 构建
 
@@ -56,15 +56,19 @@ npm run preview
 
 ```bash
 npm run build
+npm run type-check
 npm test
+npm run test:static-output
 npm run dev
 ```
 
 预期行为：
 
-- `npm run build` 完成 TypeScript 编译。并输出到 `dist/`
+- `npm run build` 检查 Astro 与 React TypeScript，生成静态页面并输出到 `dist/`
+- `npm run type-check` 检查 Astro 页面及 React/TypeScript 代码
 - `npm test` 完成全部 Vitest 用例。包含快照校验
-- `npm run dev` 成功启动 Vite 8 开发服务器。并可在 `http://localhost:5174` 访问
+- `npm run test:static-output` 检查根路径和子路径下的页面 metadata、无脚本回退及 island 资源
+- `npm run dev` 成功启动 Astro 开发服务器。并可在 `http://localhost:4321` 访问
 
 ### 部署到 GitHub Pages
 
@@ -72,7 +76,7 @@ npm run dev
 
 - 权威工作流：`.github/workflows/deploy-gh-pages.yml`
 - 生产 source of truth：`gh-pages` 分支，只在 CI 校验通过后发布
-- 发布 payload 契约：分支根目录保留 `esa.jsonc`，验证通过的 Vite 产物统一放在 `dist/`
+- 发布 payload 契约：分支根目录保留 `esa.jsonc`，验证通过的 Astro 产物统一放在 `dist/`
 - 所需 GitHub 权限：deploy job 需要 `contents: write`，build job 保持只读
 - 支持触发方式：推送到 `main`，以及 `workflow_dispatch`
 - 旧路径已退役：本地 `gh-pages` CLI 发布不再是受支持的生产发布方式
@@ -94,7 +98,7 @@ npm run dev
 ### 部署故障排除
 
 - **404 错误**：确保 GitHub Pages 正确配置且 `gh-pages` 分支存在
-- **资源未加载**：检查 `vite.config.ts` 是否有正确的 `base` 配置
+- **资源未加载**：检查 `astro.config.mjs` 是否有正确的 `base` 配置
 - **构建失败**：使用 `npm ci` 验证依赖是否正确安装
 - **权限**：确保 GitHub Actions 工作流具有必要的权限
 - **首次部署检查**：确认工作流上传了 `esa.jsonc` 与 `dist/`，然后验证 `https://builder.hagicode.com`
@@ -253,7 +257,7 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 - **用途**：针对中国用户的网络分析，跟踪页面浏览量、流量来源和用户行为
 - **分析 ID**：`26c9739b2f3cddbe36c649e0823ee2de`（默认）
 - **环境**：仅生产环境
-- **实现**：直接在 `index.html` 中嵌入脚本
+- **实现**：由 `src/layouts/BaseLayout.astro` 初始化
 
 ### 配置
 
@@ -285,7 +289,7 @@ BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
 ## 技术栈
 
 - **React 19.2.0** 配合 TypeScript
-- **Vite 8** - 构建工具和开发服务器
+- **Astro** - 静态站点生成器和开发服务器（由 Vite 8 驱动）
 - **shadcn/ui** - 组件库
 - **Tailwind CSS** - 样式
 - **Radix UI** - 无头 UI 原语
@@ -297,13 +301,15 @@ BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
 
 ```
 src/
+├── layouts/             # 静态文档 shell 与 metadata
+├── pages/               # Astro 路由
+│   └── index.astro      # 静态首页和 React workspace island
 ├── components/
 │   ├── ui/              # shadcn/ui 组件
 │   └── docker-compose/  # Docker Compose 特定组件
 ├── lib/
 │   ├── docker-compose/  # 类型定义、工具和状态管理
 │   └── store.ts         # Redux store 配置
-├── pages/               # 主页面组件
 └── hooks/               # 自定义 React hooks
 ```
 
