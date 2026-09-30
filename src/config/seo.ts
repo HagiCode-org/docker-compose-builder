@@ -34,7 +34,7 @@ export function buildDefaultSEOConfig(language: string | null | undefined = DEFA
     title: getBuilderMessage(locale, 'seo:default.title'),
     description: getBuilderMessage(locale, 'seo:default.description'),
     keywords: Array.isArray(keywords) ? keywords.filter((keyword): keyword is string => typeof keyword === 'string') : [],
-    image: '/og-image.png',
+    image: `${import.meta.env.BASE_URL}og-image.png`,
     url: 'https://builder.hagicode.com',
     type: 'web-application',
     locale,

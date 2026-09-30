@@ -103,15 +103,20 @@ export function updateSEO(
   }
 
   // Alternate language tags
-  if (fullConfig.alternateLocales && fullConfig.alternateLocales.length > 0) {
-    fullConfig.alternateLocales.forEach(locale => {
-      setLinkTag('alternate', `${fullConfig.url}?lang=${locale}`);
-      const lastLink = document.querySelector(`link[rel="alternate"]:last-child`) as HTMLLinkElement;
-      if (lastLink) {
-        lastLink.setAttribute('hreflang', locale);
-      }
-    });
-  }
+  document.querySelectorAll('link[rel="alternate"]').forEach((link) => link.remove());
+  const alternateLocales = new Set([fullConfig.locale, ...(fullConfig.alternateLocales ?? [])]);
+  alternateLocales.forEach((locale) => {
+    const link = document.createElement('link');
+    link.rel = 'alternate';
+    link.hreflang = locale;
+    link.href = `${fullConfig.url}?lang=${locale}`;
+    document.head.appendChild(link);
+  });
+  const defaultLanguageLink = document.createElement('link');
+  defaultLanguageLink.rel = 'alternate';
+  defaultLanguageLink.hreflang = 'x-default';
+  defaultLanguageLink.href = fullConfig.url;
+  document.head.appendChild(defaultLanguageLink);
 }
 
 export function updatePageSEO(pathname: string, language?: string | null, pageConfig?: PageSEOConfig) {
