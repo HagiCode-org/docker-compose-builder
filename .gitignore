@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.astro/
 *.local
 src/i18n/generated-locales/
 
