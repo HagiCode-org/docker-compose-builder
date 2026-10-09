@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: Публичный нижний колонтитул
-  description: Направления общего сайта берутся из связанного снимка, в то время как Builder сохраняет свои собственные GitHub, Discord, QQ и действия поддержки Steam.
+  description: "Сайты экосистемы, быстрые ссылки, ссылки сообщества и регистрационные данные берутся из общего каталога HagiCode; только ссылку на Steam добавляет сам Builder."
   relatedSites: Похожие сайты
   communitySupport: Сообщество и поддержка
   qqGroup: QQ Group {{groupNumber}}

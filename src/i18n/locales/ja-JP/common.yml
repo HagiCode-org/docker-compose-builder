@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: パブリックフッター
-  description: 共有サイトの宛先はバンドルされたスナップショットから取得されますが、Builder は独自の GitHub、Discord、QQ、および Steam サポート アクションを保持します。
+  description: エコシステムサイト、クイックリンク、コミュニティリンク、届出情報は HagiCode 共有カタログから取得され、Steam への導線のみ Builder が独自に追加します。
   relatedSites: 関連サイト
   communitySupport: コミュニティとサポート
   qqGroup: QQ Group {{groupNumber}}

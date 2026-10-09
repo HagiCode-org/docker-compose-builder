@@ -1,83 +1,31 @@
-import footerSitesSnapshot from '@/data/footer-sites.snapshot.json';
-import {
-  DEFAULT_BUILDER_LANGUAGE,
-  getBuilderLanguage,
-  resolveBuilderLanguageCode,
-  type BuilderLanguageCode,
-} from '@/i18n/config';
+import { resolveSiteLinks } from '@hagicode/hagilight-core/links';
 
-export interface FooterCatalogLink {
-  siteId: string;
-  label: string;
-  description: string;
-  href: string;
-}
-
-type LocalizedFooterField = string | Readonly<Record<BuilderLanguageCode, string>>;
-
-type FooterSnapshotEntry = {
-  id: string;
-  title: LocalizedFooterField;
-  description: LocalizedFooterField;
-  url: string;
-};
-
-const DEFAULT_RELATED_SITE_ORDER = [
-  'hagicode-main',
-  'hagicode-docs',
-  'newbe-blog',
-  'index-data',
-  'compose-builder',
-  'cost-calculator',
-  'status-page',
-  'awesome-design-gallery',
-  'soul-builder',
-  'trait-builder',
-] as const;
+import { siteConfig } from '@/config/seo';
+import { DEFAULT_BUILDER_LANGUAGE, resolveBuilderLanguageCode } from '@/i18n/config';
 
 const CURRENT_SITE_ID = 'compose-builder';
+const STEAM_URL = 'https://store.steampowered.com/app/4625540/Hagicode/';
 
-function resolveLocalizedField(field: LocalizedFooterField, locale: BuilderLanguageCode): string {
-  if (typeof field === 'string') {
-    return field;
-  }
-
-  const resolutionChain = [locale, ...getBuilderLanguage(locale).fallbackCodes, DEFAULT_BUILDER_LANGUAGE];
-  for (const candidate of resolutionChain) {
-    const value = field[candidate as BuilderLanguageCode];
-    if (typeof value === 'string' && value.trim().length > 0) {
-      return value;
-    }
-  }
-
-  for (const value of Object.values(field)) {
-    if (typeof value === 'string' && value.trim().length > 0) {
-      return value;
-    }
-  }
-
-  return '';
-}
-
-export function resolveBuilderFooterSiteLinks(locale: string | null | undefined): FooterCatalogLink[] {
+/**
+ * Resolve the footer link groups from the shared hagilight catalog so related
+ * sites, quick links, community links, and filings follow the active locale
+ * without a build-time network snapshot.
+ */
+export function resolveBuilderFooterLinks(locale: string | null | undefined) {
   const resolvedLocale = resolveBuilderLanguageCode(locale, DEFAULT_BUILDER_LANGUAGE);
-  const snapshotById = new Map<string, FooterSnapshotEntry>(
-    footerSitesSnapshot.entries.map((entry) => [entry.id, entry as FooterSnapshotEntry]),
-  );
+  const basePath = import.meta.env.BASE_URL;
 
-  return DEFAULT_RELATED_SITE_ORDER.flatMap((siteId) => {
-    const entry = snapshotById.get(siteId);
-    if (!entry || entry.id === CURRENT_SITE_ID) {
-      return [];
-    }
-
-    return [
-      {
-        siteId: entry.id,
-        label: resolveLocalizedField(entry.title, resolvedLocale),
-        description: resolveLocalizedField(entry.description, resolvedLocale),
-        href: entry.url,
-      },
-    ];
+  return resolveSiteLinks(resolvedLocale, {
+    siteId: CURRENT_SITE_ID,
+    siteUrl: siteConfig.siteUrl,
+    // `/rss.xml` is the English feed; other languages have `/rss.<language>.xml`.
+    rssFeedUrl: `${basePath}rss.xml`,
+    ...(resolvedLocale === 'en-US' ? {} : { rssLocaleFeedUrl: `${basePath}rss.${resolvedLocale}.xml` }),
+    overrides: {
+      sitemap: { href: `${basePath}sitemap-index.xml`, external: false },
+    },
+    extraLinks: {
+      community: [{ id: 'steam', label: 'Steam', href: STEAM_URL, external: true }],
+    },
   });
 }

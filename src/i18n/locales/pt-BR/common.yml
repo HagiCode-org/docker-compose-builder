@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: Rodapé público
-  description: Os destinos de sites compartilhados vêm do snapshot agrupado, enquanto o Builder mantém suas próprias ações de suporte GitHub, Discord, QQ e Steam.
+  description: "Os sites do ecossistema, os links rápidos, os links da comunidade e os registros vêm do catálogo compartilhado do HagiCode; o Builder adiciona apenas o seu link do Steam."
   relatedSites: Sites relacionados
   communitySupport: Comunidade e suporte
   qqGroup: QQ Group {{groupNumber}}

@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: Public footer
-  description: Shared site destinations come from the bundled snapshot while Builder keeps its own GitHub, Discord, QQ, and Steam support actions.
+  description: Ecosystem sites, quick links, community links, and filings come from the shared HagiCode catalog, while Builder adds its own Steam entry.
   relatedSites: Related sites
   communitySupport: Community and support
   qqGroup: QQ Group {{groupNumber}}

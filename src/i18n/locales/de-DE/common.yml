@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: Öffentliche Fußzeile
-  description: Gemeinsame Site-Ziele stammen aus dem gebündelten Snapshot, während Builder seine eigenen GitHub-, Discord-, QQ- und Steam-Supportaktionen beibehält.
+  description: "Ökosystem-Seiten, Schnellzugriffe, Community-Links und Registrierungsangaben stammen aus dem gemeinsamen HagiCode-Katalog; nur den Steam-Eintrag ergänzt Builder selbst."
   relatedSites: Verwandte Websites
   communitySupport: Gemeinschaft und Unterstützung
   qqGroup: QQ Group {{groupNumber}}

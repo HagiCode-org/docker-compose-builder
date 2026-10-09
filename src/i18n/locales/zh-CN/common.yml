@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: 公开页脚
-  description: 共享站点入口来自已签入 snapshot；Builder 自身的 GitHub、Discord、QQ 与 Steam 支持入口仍保留在本仓。
+  description: "生态站点、快速链接、社区入口与备案信息来自 HagiCode 共享目录;Steam 入口由 Builder 自行补充。"
   relatedSites: 生态站点
   communitySupport: 社区与支持
   qqGroup: QQ 群 {{groupNumber}}

@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: Pie de página público
-  description: Los destinos de sitios compartidos provienen de la instantánea incluida, mientras que Builder mantiene sus propias acciones de soporte GitHub, Discord, QQ y Steam.
+  description: "Los sitios del ecosistema, los enlaces rápidos, los enlaces de la comunidad y los registros provienen del catálogo compartido de HagiCode; Builder solo añade su propio enlace de Steam."
   relatedSites: Sitios relacionados
   communitySupport: Comunidad y apoyo
   qqGroup: QQ Group {{groupNumber}}

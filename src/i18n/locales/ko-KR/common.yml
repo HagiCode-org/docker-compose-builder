@@ -113,7 +113,7 @@ workspace:
 footer:
   eyebrow: DOCKER COMPOSE BUILDER
   title: 공개 바닥글
-  description: 공유 사이트 대상은 번들 스냅샷에서 나오는 반면 Builder는 자체 GitHub, Discord, QQ 및 Steam 지원 작업을 유지합니다.
+  description: 에코시스템 사이트, 빠른 링크, 커뮤니티 링크, 신고 정보는 HagiCode 공유 카탈로그에서 가져오며, Steam 링크만 Builder가 직접 추가합니다.
   relatedSites: 관련 사이트
   communitySupport: 커뮤니티 및 지원
   qqGroup: QQ Group {{groupNumber}}
