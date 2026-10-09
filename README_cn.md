@@ -243,7 +243,7 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 
 ## 分析配置
 
-应用程序集成了两个分析平台，用于全面的用户行为追踪：
+应用程序集成了多个分析平台，用于全面的用户行为追踪：
 
 ### Microsoft Clarity
 
@@ -252,29 +252,20 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 - **环境**：仅生产环境
 - **实现**：通过 `src/services/clarityService.ts` 的单例服务模式
 
-### 百度统计
+### 51LA 与 Google Analytics
 
-- **用途**：针对中国用户的网络分析，跟踪页面浏览量、流量来源和用户行为
-- **分析 ID**：`26c9739b2f3cddbe36c649e0823ee2de`（默认）
+- **用途**：页面访问分析（51LA 面向中国用户，GA4 面向全球流量）
+- **ID**：51LA `L6b88a5yK4h2Xnci`（默认）与 GA4 `G-EN03FMT2Q4`
 - **环境**：仅生产环境
-- **实现**：由 `src/layouts/BaseLayout.astro` 初始化
+- **实现**：使用 `@hagicode/hagilight-core` 提供的共享 `Analytics51LA` 与 `GoogleAnalytics` 组件，挂载于 `src/layouts/BaseLayout.astro`
 
 ### 配置
 
-分析 ID 可以通过环境变量配置：
+51LA ID 可在构建时覆盖：
 
 ```bash
-# 用于本地构建
-VITE_BAIDU_ANALYTICS_ID=your_analytics_id npm run build
-
-# 用于 GitHub Actions（在仓库 secrets 中配置）
-BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
+VITE_51LA_ID=your_51la_id npm run build
 ```
-
-**默认分析 ID**：
-- builder.hagicode.com: `26c9739b2f3cddbe36c649e0823ee2de`
-- docs.hagicode.com: `04ac03637b01a1f4cc0bdfa376387fe5`
-- hagicode.com: `43081dabdf7dd7249f20795e76c2f017`
 
 ### 验证
 
@@ -283,13 +274,25 @@ BAIDU_ANALYTICS_ID=26c9739b2f3cddbe36c649e0823ee2de
 1. 打开浏览器 DevTools（F12）
 2. 转到 Network 面板
 3. 检查以下请求：
-   - `https://hm.baidu.com/hm.js?`（百度统计）
+   - `https://sdk.51.la/js-sdk-pro.min.js`（51LA）
+   - `https://www.googletagmanager.com/gtag/js?id=G-EN03FMT2Q4`（Google Analytics）
 4. 验证 Clarity 正在 Clarity Dashboard 中记录会话
+
+## HagiLight 集成
+
+站点使用 HagiCode 共享包 `@hagicode/hagilight` 与 `@hagicode/hagilight-core`（两者固定为同一版本）：
+
+- `astro.config.mjs` 中的 `hagilight({ rss: { locales, getFeed } })` 生成 `sitemap-index.xml`、`robots.txt` 与 RSS 订阅源（均支持 base 子路径）。`/rss.xml` 是英文订阅源，其余 Builder 语言发布为 `/rss.<language>.xml`。`src/rss-feed.ts` 使用各语言的 SEO 标题/描述与 Docker Compose 安装指南链接生成订阅源；Builder 没有带日期的文章，因此条目不带发布时间。页面 head 声明 `/rss.xml`，页脚提供默认与当前语言的订阅入口。
+- 页脚（`src/components/Footer/SiteFooter.tsx`）通过 `@hagicode/hagilight-core/links` 的 `resolveSiteLinks()` 按语言解析生态站点、快速链接、社区入口与备案信息（见 `src/lib/footer-site-links.ts`），Builder 仅补充自己的 Steam 入口；不再依赖构建期网络 snapshot。
+- 统计脚本来自共享的 `Analytics51LA` 与 `GoogleAnalytics` 组件。
+
+升级目录或组件时，请同时升级两个包并运行 `npm run build`；`scripts/check-static-output.mjs` 会在 `/` 与子路径 base 下校验 robots、sitemap、统计脚本和页脚产物。
 
 ## 技术栈
 
 - **React 19.2.0** 配合 TypeScript
 - **Astro** - 静态站点生成器和开发服务器（由 Vite 8 驱动）
+- **HagiLight** - HagiCode 共享的 Astro 集成与组件（sitemap、robots、页脚目录、统计）
 - **shadcn/ui** - 组件库
 - **Tailwind CSS** - 样式
 - **Radix UI** - 无头 UI 原语
@@ -329,8 +332,8 @@ src/
 - **Open Graph**：在 Facebook、LinkedIn 等平台上增强的社交媒体分享
 - **Twitter Cards**：在 Twitter 上分享时优化的卡片显示
 - **结构化数据**：WebApplication、SoftwareApplication 和 Organization 的 JSON-LD Schema.org 标记
-- **站点地图**：用于搜索引擎爬虫的 XML 站点地图（`/sitemap.xml`）
-- **Robots.txt**：搜索引擎爬虫配置（`/robots.txt`）
+- **站点地图**：由 hagilight 生成 `/sitemap-index.xml`（仍保留旧的静态 `/sitemap.xml`）
+- **Robots.txt**：由 hagilight 生成，带绝对地址的 `Sitemap:`（`/robots.txt`）
 - **规范 URL**：防止重复内容问题
 - **Hreflang 标签**：多语言 SEO 支持
 
