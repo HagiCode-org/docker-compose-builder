@@ -283,7 +283,7 @@ VITE_51LA_ID=your_51la_id npm run build
 站点使用 HagiCode 共享包 `@hagicode/hagilight` 与 `@hagicode/hagilight-core`（两者固定为同一版本）：
 
 - `astro.config.mjs` 中的 `hagilight({ rss: { locales, getFeed } })` 生成 `sitemap-index.xml`、`robots.txt` 与 RSS 订阅源（均支持 base 子路径）。`/rss.xml` 是英文订阅源，其余 Builder 语言发布为 `/rss.<language>.xml`。`src/rss-feed.ts` 使用各语言的 SEO 标题/描述与 Docker Compose 安装指南链接生成订阅源；Builder 没有带日期的文章，因此条目不带发布时间。页面 head 声明 `/rss.xml`，页脚提供默认与当前语言的订阅入口。
-- 页脚（`src/components/Footer/SiteFooter.tsx`）通过 `@hagicode/hagilight-core/links` 的 `resolveSiteLinks()` 按语言解析生态站点、快速链接、社区入口与备案信息（见 `src/lib/footer-site-links.ts`），Builder 仅补充自己的 Steam 入口；不再依赖构建期网络 snapshot。
+- `src/components/SiteChrome.astro` 渲染 hagilight 默认的 `@hagicode/hagilight/Footer` 与 `@hagicode/hagilight-core` 的 `PromotoBanner`，Builder 仅补充自己的 Steam 入口。两者都在构建时本地化，因此页脚会为每种 Builder 语言各渲染一份（默认语言的页脚为实际元素，其余放在惰性的 `<template>` 中），`<html lang>` 变化时由一段小脚本替换页脚并让推广卡片按新语言重新加载。请保证页面上只有一个实际的 `<footer>`：推广卡片通过 `document.querySelector("footer")` 找到它，以便页脚进入视口时自动隐藏。Builder 主题通过 `src/index.css` 末尾的 `--sl-color-*` 与 `--hagilight-footer-*` 变量映射到这两个组件。
 - 统计脚本来自共享的 `Analytics51LA` 与 `GoogleAnalytics` 组件。
 
 升级目录或组件时，请同时升级两个包并运行 `npm run build`；`scripts/check-static-output.mjs` 会在 `/` 与子路径 base 下校验 robots、sitemap、统计脚本和页脚产物。

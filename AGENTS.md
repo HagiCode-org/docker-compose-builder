@@ -29,7 +29,7 @@ npm run lint
 - `src/lib/docker-compose/`: generator, validation, defaults, and core types
 - `src/lib/docker-compose/__tests__/`: unit, BDD, and snapshot coverage
 - `src/rss-feed.ts`: RSS feed content callback used by `hagilight()`; `/rss.xml` is always the English feed
-- `src/lib/footer-site-links.ts`: footer link catalog resolved from `@hagicode/hagilight-core/links`
+- `src/components/SiteChrome.astro`: hagilight default Footer + PromotoBanner (footer is pre-rendered per locale; keep exactly one live `<footer>`)
 - `scripts/`: repo-level helpers (`check-static-output.mjs` verifies the built Astro output)
 
 ## Agent Guidelines
