@@ -61,6 +61,18 @@ function checkOutput(base) {
   assert.ok(readFileSync(path.join(distDir, "sitemap-0.xml"), "utf8").includes(`<loc>${siteUrl}${base}</loc>`));
   assert.ok(html.includes(`href="${base}sitemap-index.xml"`), "Footer should link to the generated sitemap index");
   assert.ok(html.includes("beian.miit.gov.cn"), "Footer should render the shared filing links");
+  assert.ok(html.includes("Powered By hagilight@"), "Footer should be the hagilight default footer");
+  assert.ok(html.includes(`href="${siteUrl}${base}rss.xml"`), "Footer should link the generated RSS feed");
+  assert.ok(html.includes("<hagilight-promoto-banner"), "Expected the hagilight PromotoBanner");
+  const liveHtml = html.replace(/<template[\s\S]*?<\/template>/g, "");
+  assert.equal(
+    (liveHtml.match(/<footer\b/g) ?? []).length,
+    1,
+    "PromotoBanner tracks document.querySelector('footer'), so only one footer may be live",
+  );
+  for (const locale of ["en-US", "ja-JP", "ru-RU", "zh-Hant"]) {
+    assert.ok(html.includes(`<template data-footer-locale="${locale}">`), `Expected a ${locale} footer template`);
+  }
 
   for (const feed of ["rss.xml", "rss.en.xml", "rss.zh-CN.xml", "rss.ja-JP.xml"]) {
     const xml = readFileSync(path.join(distDir, feed), "utf8");
