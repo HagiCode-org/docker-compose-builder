@@ -1,0 +1,65 @@
+---
+import Footer from "@hagicode/hagilight/Footer";
+import PromotoBanner from "@hagicode/hagilight-core/PromotoBanner";
+
+import { siteConfig } from "@/config/seo";
+import { DEFAULT_BUILDER_LANGUAGE, SUPPORTED_BUILDER_LANGUAGE_CODES } from "@/i18n/config";
+
+// The builder switches language in the browser, while the hagilight Footer and
+// PromotoBanner are localized at build time. The default-locale footer is the
+// live element (the banner finds it with `document.querySelector("footer")`);
+// the other locales stay inert in <template> and are swapped in on `<html lang>`.
+const links = {
+  siteId: "compose-builder",
+  siteUrl: siteConfig.siteUrl,
+  extraLinks: {
+    community: [
+      { id: "steam", label: "Steam", href: "https://store.steampowered.com/app/4625540/Hagicode/", external: true },
+    ],
+  },
+};
+const otherLocales = SUPPORTED_BUILDER_LANGUAGE_CODES.filter((locale) => locale !== DEFAULT_BUILDER_LANGUAGE);
+---
+
+<div class="builder-chrome" data-builder-chrome data-default-locale={DEFAULT_BUILDER_LANGUAGE}>
+  <Footer locale={DEFAULT_BUILDER_LANGUAGE} links={links} />
+  {
+    otherLocales.map((locale) => (
+      <template data-footer-locale={locale}>
+        <Footer locale={locale} links={links} />
+      </template>
+    ))
+  }
+</div>
+<PromotoBanner locale={DEFAULT_BUILDER_LANGUAGE} />
+
+<script>
+  const root = document.documentElement;
+  const chrome = document.querySelector<HTMLElement>("[data-builder-chrome]");
+  const footer = chrome?.querySelector("footer");
+  const banner = document.querySelector<HTMLElement>("hagilight-promoto-banner");
+  const defaultLocale = chrome?.dataset.defaultLocale ?? root.lang;
+  const defaultFooter = footer?.innerHTML ?? "";
+  let current = defaultLocale;
+
+  function syncLocale() {
+    const lang = root.lang;
+    if (!lang || lang === current) return;
+    current = lang;
+
+    const localized = [...document.querySelectorAll<HTMLTemplateElement>("template[data-footer-locale]")]
+      .find((template) => template.dataset.footerLocale === lang)
+      ?.content.querySelector("footer");
+    if (footer && lang === defaultLocale) footer.innerHTML = defaultFooter;
+    else if (footer && localized) footer.innerHTML = localized.innerHTML;
+
+    if (banner) {
+      banner.dataset.locale = lang;
+      // PromotoBanner reloads in the new locale on this event (see its page-load handler).
+      document.dispatchEvent(new Event("astro:page-load"));
+    }
+  }
+
+  new MutationObserver(syncLocale).observe(root, { attributes: true, attributeFilter: ["lang"] });
+  syncLocale();
+</script>

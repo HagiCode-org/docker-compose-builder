@@ -110,22 +110,10 @@ workspace:
     eula:
       title: 容器 EULA
       description: 共享的 ACCEPT_EULA 同意开关，以及对应的 docs 协议入口。
-footer:
-  eyebrow: DOCKER COMPOSE BUILDER
-  title: 公开页脚
-  description: "生态站点、快速链接、社区入口与备案信息来自 HagiCode 共享目录;Steam 入口由 Builder 自行补充。"
-  relatedSites: 生态站点
-  communitySupport: 社区与支持
-  qqGroup: QQ 群 {{groupNumber}}
 promoBanner:
   title: 🚀 阿里云千问 Coding Plan 上线
   description: 阿里云千问 Coding Plan 已上线，满足开发日常需求。推荐搭配 Hagicode，一站式覆盖日常开发流程。
   cta: 立即订阅 →
   ariaLabel: 访问阿里云千问 Coding Plan 页面
-promoteCard:
-  badgeFallback: 推荐
-  dismiss: 关闭推广信息
-  sectionLabel: 推广信息
-  surfaceAriaLabel: "{{ctaLabel}}: {{title}}"
 themeToggle:
   toggle: 切换主题

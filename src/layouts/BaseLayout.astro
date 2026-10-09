@@ -14,6 +14,7 @@ import {
 } from "@/lib/seo/schema-generator";
 import Analytics51LA from "@hagicode/hagilight-core/Analytics51LA";
 import GoogleAnalytics from "@hagicode/hagilight-core/GoogleAnalytics";
+import SiteChrome from "@/components/SiteChrome.astro";
 import "../index.css";
 
 const seo = buildDefaultSEOConfig(DEFAULT_BUILDER_LANGUAGE);
@@ -74,10 +75,15 @@ const alternateLocales = SUPPORTED_BUILDER_LANGUAGE_CODES.filter(
   </head>
   <body>
     <slot />
+    <SiteChrome />
     <noscript>
       <style>
         .builder-workspace {
           display: none !important;
+        }
+
+        .builder-chrome {
+          visibility: visible !important;
         }
       </style>
     </noscript>
@@ -90,6 +96,15 @@ const alternateLocales = SUPPORTED_BUILDER_LANGUAGE_CODES.filter(
   }
 
   html.is-hydrated .builder-workspace {
+    visibility: visible;
+  }
+
+  /* The footer is localized after hydration; keep it hidden until then to avoid a language flash. */
+  .builder-chrome {
+    visibility: hidden;
+  }
+
+  html.is-hydrated .builder-chrome {
     visibility: visible;
   }
 </style>

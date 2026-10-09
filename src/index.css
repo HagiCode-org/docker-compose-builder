@@ -257,3 +257,21 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 }
+
+/* Map the builder theme onto the tokens used by the shared HagiLight Footer and PromotoBanner. */
+:root {
+  --hagilight-footer-border: var(--border);
+  --sl-color-accent: var(--primary);
+  --sl-color-accent-high: var(--primary);
+  --sl-color-accent-low: var(--muted);
+  --sl-color-bg: var(--card);
+  --sl-color-bg-nav: var(--card);
+  --sl-color-bg-sidebar: var(--muted);
+  --sl-color-text: var(--foreground);
+  --sl-color-text-high: var(--foreground);
+  --sl-color-gray-1: var(--foreground);
+  --sl-color-gray-5: var(--border);
+  --sl-color-black: oklch(0 0 0);
+  --sl-text-sm: 0.875rem;
+  --sl-text-xs: 0.75rem;
+}

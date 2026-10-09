@@ -110,22 +110,10 @@ workspace:
     eula:
       title: コンテナ EULA
       description: ACCEPT_EULA オプトインとドキュメント契約リンクを共有します。
-footer:
-  eyebrow: DOCKER COMPOSE BUILDER
-  title: パブリックフッター
-  description: エコシステムサイト、クイックリンク、コミュニティリンク、届出情報は HagiCode 共有カタログから取得され、Steam への導線のみ Builder が独自に追加します。
-  relatedSites: 関連サイト
-  communitySupport: コミュニティとサポート
-  qqGroup: QQ Group {{groupNumber}}
 promoBanner:
   title: 🚀 Aliyun Qwen Coding Plan はライブ中です
   description: Aliyun Qwen Coding Plan は日常の開発に利用できるようになりました。 Hagicode と組み合わせると、エンドツーエンドのワークフローがよりスムーズになります。
   cta: 今すぐ購読する→
   ariaLabel: Aliyun Qwen Coding Plan ページにアクセスしてください
-promoteCard:
-  badgeFallback: 昇格
-  dismiss: 昇進を却下する
-  sectionLabel: プロモーション
-  surfaceAriaLabel: '{{ctaLabel}}: {{title}}'
 themeToggle:
   toggle: テーマの切り替え
