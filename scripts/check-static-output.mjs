@@ -35,7 +35,10 @@ function checkOutput(base) {
   assert.ok(!html.includes("使用可视化表单配置服务、网络和持久化选项"));
   assert.ok(!html.includes(">Hagicode</p>"));
   assert.ok(noScriptContent.includes("Docker Compose 配置编辑器需要启用 JavaScript"));
-  assert.ok(html.includes(`data-51la-id="${process.env.VITE_51LA_ID || "L6b88a5yK4h2Xnci"}"`));
+  assert.ok(html.includes('src="https://sdk.51.la/js-sdk-pro.min.js"'), "Expected the shared 51LA script");
+  assert.ok(html.includes(`siteId = "${process.env.VITE_51LA_ID || "L6b88a5yK4h2Xnci"}"`), "Expected the 51LA site id");
+  assert.ok(html.includes("https://www.googletagmanager.com/gtag/js?id=G-EN03FMT2Q4"), "Expected the shared Google Analytics script");
+  assert.ok(!html.includes("data-51la-id"), "The inline 51LA bootstrap should be replaced by the shared component");
   assert.ok(stylesheets.includes(".builder-workspace{visibility:hidden}"));
   assert.ok(island, "Expected the server-rendered React workspace island");
   assert.ok(island.includes('client="load"'), "Expected a client:load island");
@@ -47,6 +50,30 @@ function checkOutput(base) {
   const ogImage = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
   assert.equal(ogImage, `${siteUrl}${base}og-image.png`);
   assert.ok(existsSync(path.join(distDir, "og-image.png")));
+
+  const robots = readFileSync(path.join(distDir, "robots.txt"), "utf8");
+  assert.ok(
+    robots.includes(`Sitemap: ${siteUrl}${base}sitemap-index.xml`),
+    "robots.txt should advertise the base-aware hagilight sitemap index",
+  );
+  const sitemapIndex = readFileSync(path.join(distDir, "sitemap-index.xml"), "utf8");
+  assert.ok(sitemapIndex.includes(`${siteUrl}${base}sitemap-0.xml`));
+  assert.ok(readFileSync(path.join(distDir, "sitemap-0.xml"), "utf8").includes(`<loc>${siteUrl}${base}</loc>`));
+  assert.ok(html.includes(`href="${base}sitemap-index.xml"`), "Footer should link to the generated sitemap index");
+  assert.ok(html.includes("beian.miit.gov.cn"), "Footer should render the shared filing links");
+
+  for (const feed of ["rss.xml", "rss.en.xml", "rss.zh-CN.xml", "rss.ja-JP.xml"]) {
+    const xml = readFileSync(path.join(distDir, feed), "utf8");
+    assert.ok(xml.includes("<channel>"), `${feed} should be an RSS channel`);
+    assert.ok((xml.match(/<item>/g) ?? []).length >= 1, `${feed} should not be empty`);
+    assert.ok(xml.includes(`<link>${siteUrl}${base}</link>`), `${feed} should link to the base-aware site root`);
+  }
+  assert.ok(readFileSync(path.join(distDir, "rss.xml"), "utf8").includes("<language>en-US</language>"));
+  assert.ok(readFileSync(path.join(distDir, "rss.zh-CN.xml"), "utf8").includes("<language>zh-CN</language>"));
+  assert.ok(
+    html.includes(`<link rel="alternate" type="application/rss+xml"`) && html.includes(`href="${base}rss.xml"`),
+    "Head should advertise the RSS feed",
+  );
 
   for (const attribute of ["component-url", "renderer-url"]) {
     const assetUrl = readAttribute(island, attribute);
