@@ -261,8 +261,9 @@
 /* Map the builder theme onto the tokens used by the shared HagiLight Footer and PromotoBanner. */
 :root {
   --hagilight-footer-border: var(--border);
-  --sl-color-accent: var(--primary);
-  --sl-color-accent-high: var(--primary);
+  /* The core CTA is white text on --sl-color-accent; --primary (lime-600) is only 3.06:1 against white. */
+  --sl-color-accent: oklch(0.532 0.157 131.589);
+  --sl-color-accent-high: oklch(0.453 0.124 130.933);
   --sl-color-accent-low: var(--muted);
   --sl-color-bg: var(--card);
   --sl-color-bg-nav: var(--card);
@@ -270,6 +271,7 @@
   --sl-color-text: var(--foreground);
   --sl-color-text-high: var(--foreground);
   --sl-color-gray-1: var(--foreground);
+  --sl-color-gray-2: var(--muted-foreground);
   --sl-color-gray-5: var(--border);
   --sl-color-black: oklch(0 0 0);
   --sl-text-sm: 0.875rem;
