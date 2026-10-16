@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { NAVIGATION_LINKS } from '@/config/navigationLinks';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
+import { getExternalLinkRel } from '@/lib/link-policy';
 
 interface NavigationLinksProps {
   className?: string;
@@ -75,7 +76,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
             key={link.labelKey}
             href={link.url ?? undefined}
             target="_blank"
-            rel="noopener noreferrer"
+            rel={getExternalLinkRel(link.url)}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer"
             aria-label={t(link.labelKey)}
           >
@@ -128,7 +129,7 @@ export function NavigationLinks({ className = '' }: NavigationLinksProps) {
                 key={link.labelKey}
                 href={link.url ?? undefined}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel={getExternalLinkRel(link.url)}
                 className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-accent rounded-xl transition-all duration-200 cursor-pointer"
                 onClick={() => setIsMenuOpen(false)}
               >
