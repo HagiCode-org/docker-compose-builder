@@ -1,5 +1,9 @@
 # Docker Compose 构建器
 
+[![license](https://img.shields.io/badge/license-AGPL--3.0-ffd43b)](./LICENSE)
+[![last commit](https://img.shields.io/github/last-commit/HagiCode-org/docker-compose-builder)](https://github.com/HagiCode-org/docker-compose-builder/commits/main)
+[![website](https://img.shields.io/website?url=https%3A%2F%2Fbuilder.hagicode.com%2F&label=website)](https://builder.hagicode.com/)
+
 [English](./README.md)
 
 一个为 HagiCode 构建的现代化 Docker Compose 配置生成器，使用 Astro 静态站点和经过 hydration 的 React + TypeScript 工作区及 shadcn/ui。

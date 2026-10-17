@@ -1,5 +1,9 @@
 # Docker Compose Builder
 
+[![license](https://img.shields.io/badge/license-AGPL--3.0-ffd43b)](./LICENSE)
+[![last commit](https://img.shields.io/github/last-commit/HagiCode-org/docker-compose-builder)](https://github.com/HagiCode-org/docker-compose-builder/commits/main)
+[![website](https://img.shields.io/website?url=https%3A%2F%2Fbuilder.hagicode.com%2F&label=website)](https://builder.hagicode.com/)
+
 [简体中文](./README_cn.md)
 
 A modern Docker Compose configuration generator for Hagicode, built as a static Astro site with a hydrated React + TypeScript workspace and shadcn/ui.
