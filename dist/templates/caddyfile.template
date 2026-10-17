@@ -1,0 +1,14 @@
+# Auto-generated Caddyfile for LAN HTTPS
+{{lanIp}}:{{port}} {
+  tls internal
+
+  handle /health {
+    respond "OK" 200
+  }
+
+  reverse_proxy {{serviceName}}:{{servicePort}} {
+    header_up Host {host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
