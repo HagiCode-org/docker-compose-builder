@@ -40,6 +40,7 @@ Requires Node.js `>=24`. `dev`, `build`, and `test` run `prepare:i18n` first. Te
 - `src/rss-feed.ts`: RSS feed content callback used by `hagilight()`; `/rss.xml` is always the English feed
 - `src/components/SiteChrome.astro`: hagilight default Footer + PromotoBanner (footer is pre-rendered per locale; keep exactly one live `<footer>`)
 - `scripts/`: repo-level helpers (`check-static-output.mjs` verifies the built Astro output)
+- `.github/workflows/deploy-gh-pages.yml`: on push to `main`, builds and publishes `dist/` plus `.github/gh-pages/esa.jsonc` to `gh-pages` (`builder.hagicode.com`); this workflow is the only supported production publication path
 
 ## Agent Guidelines
 
