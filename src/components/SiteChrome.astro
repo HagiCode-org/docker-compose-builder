@@ -2,16 +2,15 @@
 import Footer from "@hagicode/hagilight/Footer";
 import PromotoBanner from "@hagicode/hagilight-core/PromotoBanner";
 
-import { siteConfig } from "@/config/seo";
 import { DEFAULT_BUILDER_LANGUAGE, SUPPORTED_BUILDER_LANGUAGE_CODES } from "@/i18n/config";
 
 // The builder switches language in the browser, while the hagilight Footer and
 // PromotoBanner are localized at build time. The default-locale footer is the
 // live element (the banner finds it with `document.querySelector("footer")`);
 // the other locales stay inert in <template> and are swapped in on `<html lang>`.
+// siteUrl is omitted on purpose: the Footer falls back to Astro.site (astro.config.mjs `site`).
 const links = {
   siteId: "compose-builder",
-  siteUrl: siteConfig.siteUrl,
   extraLinks: {
     community: [
       { id: "steam", label: "Steam", href: "https://store.steampowered.com/app/4625540/Hagicode/", external: true },
