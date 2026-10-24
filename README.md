@@ -6,7 +6,7 @@
 
 [简体中文](./README_cn.md)
 
-A modern Docker Compose configuration generator for Hagicode, built as a static Astro site with a hydrated React + TypeScript workspace and shadcn/ui.
+A web form that generates a ready-to-use Docker Compose configuration for deploying HagiCode, so you get a correct `docker-compose.yml` without writing YAML by hand.
 
 ## Features
 
@@ -21,92 +21,18 @@ A modern Docker Compose configuration generator for Hagicode, built as a static 
 - **Local Storage Persistence**: Configuration saved to localStorage for convenience
 - **One-Click Copy/Download**: Copy generated YAML to clipboard or download as file
 - **Caddyfile Copy Workflow**: Preview and copy Caddyfile (no file download)
-- **SEO Optimized**: Full search engine optimization with meta tags, Open Graph, Twitter Cards, and structured data
 - **Multi-language Support**: Internationalization (i18n) with English and Chinese support
 
 ## Quick Start
 
-### Installation
-
-Use Node.js `>=22.12.0` before installing dependencies. This applies to `npm run dev`, `npm run build`, `npm run type-check`, and `npm test`.
-
-```bash
-npm install
-```
-
-### Development
+1. Open [builder.hagicode.com](https://builder.hagicode.com/).
+2. Fill in the form step by step: basic settings, license, executors, volume mounts and, if you want it, HTTPS.
+3. Copy or download the generated `docker-compose.yml`. If you enabled HTTPS, also copy the Caddyfile and save it as `Caddyfile` next to the compose file.
+4. In that folder, start HagiCode with Docker Compose:
 
 ```bash
-npm run dev
+docker compose up -d
 ```
-
-The application will be available at `http://localhost:4321`
-
-### Build
-
-```bash
-npm run build
-```
-
-### Preview
-
-```bash
-npm run preview
-```
-
-### Recommended Validation
-
-Run these commands after dependency upgrades or CI/runtime changes:
-
-```bash
-npm run build
-npm run type-check
-npm test
-npm run test:static-output
-npm run dev
-```
-
-Expected behavior:
-
-- `npm run build` checks Astro and React TypeScript, builds the static page, and writes assets to `dist/`
-- `npm run type-check` checks Astro pages and React/TypeScript code
-- `npm test` completes the Vitest suite, including snapshot verification
-- `npm run test:static-output` checks generated metadata, no-script fallback, and island assets at root and subpath bases
-- `npm run dev` starts the Astro dev server at `http://localhost:4321`
-
-### Deploy to GitHub Pages
-
-The authoritative production deployment path is GitHub Actions.
-
-- Authoritative workflow: `.github/workflows/deploy-gh-pages.yml`
-- Production source of truth: the `gh-pages` branch, published only after CI validation succeeds
-- Published payload contract: branch root `esa.jsonc` plus `dist/` containing the validated Astro output
-- Required GitHub permissions: the deploy job needs `contents: write`; the build job stays read-only
-- Supported triggers: push to `main` and `workflow_dispatch`
-- Legacy path retired: local `gh-pages` CLI publication is no longer a supported production flow
-
-### GitHub Pages Configuration
-
-1. Ensure your repository has GitHub Pages enabled:
-   - Go to your repository settings
-   - Navigate to "Pages" section
-   - Under "Build and deployment", select "Deploy from a branch"
-   - Choose "gh-pages" branch and "/ (root)" folder
-   - Click "Save"
-
-2. Ensure the hosting layer reads `gh-pages/esa.jsonc` and serves `gh-pages/dist/`.
-
-3. The production site should remain available at:
-   `https://builder.hagicode.com`
-
-### Deployment Troubleshooting
-
-- **404 Error**: Ensure GitHub Pages is properly configured and the `gh-pages` branch exists
-- **Assets not loading**: Check that `astro.config.mjs` has the correct `base` configuration
-- **Build failures**: Verify dependencies are installed correctly with `npm ci`
-- **Permissions**: Ensure the GitHub Actions workflow has the necessary permissions
-- **First deploy checks**: Confirm the workflow uploaded `esa.jsonc` and `dist/`, then verify `https://builder.hagicode.com`
-- **Rollback**: Revert the source change or rerun the workflow from an older commit so CI republishes the previous snapshot
 
 ### Configuration Options
 
@@ -142,9 +68,6 @@ The authoritative production deployment path is GitHub Actions.
 ##### Other CLI Tools
 
 HagiCode also supports other CLI tools, but the container integration documentation for them is not complete yet.
-
-- Contribute container configuration changes in `https://github.com/HagiCode-org/docker-compose-builder`
-- Contribute release and runtime contract changes in `https://github.com/HagiCode-org/releases`
 
 ##### OpenCode Notes
 
@@ -194,34 +117,6 @@ The application dynamically loads provider configurations from the docs reposito
 - **MiniMax**: MiniMax AI service with Anthropic-compatible API
 - **Custom**: Custom API endpoint with Anthropic-compatible interface
 
-##### Provider Configuration Fallback
-
-The application uses a three-tier fallback strategy for provider configurations:
-
-1. **Primary**: Fetch from docs repository (`https://docs.hagicode.com/presets/claude-code/providers/`)
-2. **Fallback**: Use embedded backup configuration (included in code)
-3. **Legacy**: Use hardcoded constants (for backward compatibility)
-
-This ensures the application always works, even if the docs repository is temporarily unavailable.
-
-##### Environment Variable Override
-
-For local development, you can override the docs repository URL:
-
-```bash
-# Override to use local docs repository
-VITE_PRESETS_BASE_URL=http://localhost:3000 npm run dev
-
-# Or specify a different remote URL
-VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
-```
-
-The default value is `https://docs.hagicode.com`.
-
-##### Embedded Backup Synchronization
-
-The embedded backup configuration (`src/lib/docker-compose/providerConfigLoader.ts`) is synchronized with the docs repository presets. When adding new providers or updating existing ones in the docs repository, update the `EMBEDDED_BACKUP` constant to include the latest data.
-
 #### Volume Mounts
 - **Work Directory**: Path to your code repository
 - **Root User Warning**: Detection and warning for root-owned directories
@@ -245,144 +140,12 @@ The generator creates a complete `docker-compose.yml` file with:
 - SQLite connection settings stored inside the `hagicode` service
 - Explicit Claude, Codex, and OpenCode executor branches when those capabilities are enabled
 
-## Analytics Configuration
-
-The application integrates analytics platforms for comprehensive user behavior tracking:
-
-### Microsoft Clarity
-
-- **Purpose**: User behavior analysis with heatmaps, session recordings, and user journeys
-- **Project ID**: `v6zgmrg1q7`
-- **Environment**: Production only
-- **Implementation**: Singleton service pattern via `src/services/clarityService.ts`
-
-### 51LA and Google Analytics
-
-- **Purpose**: Page-view analytics (51LA for Chinese users, GA4 for global traffic)
-- **IDs**: 51LA `L6b88a5yK4h2Xnci` (default) and GA4 `G-EN03FMT2Q4`
-- **Environment**: Production only
-- **Implementation**: The shared `Analytics51LA` and `GoogleAnalytics` components from `@hagicode/hagilight-core`, mounted in `src/layouts/BaseLayout.astro`
-
-### Configuration
-
-The 51LA id can be overridden at build time:
-
-```bash
-VITE_51LA_ID=your_51la_id npm run build
-```
-
-### Verification
-
-To verify analytics integration in production:
-
-1. Open browser DevTools (F12)
-2. Go to Network panel
-3. Check for requests to:
-   - `https://sdk.51.la/js-sdk-pro.min.js` (51LA)
-   - `https://www.googletagmanager.com/gtag/js?id=G-EN03FMT2Q4` (Google Analytics)
-4. Verify Clarity is recording sessions in the Clarity Dashboard
-
-## HagiLight Integration
-
-The site consumes the shared HagiCode packages `@hagicode/hagilight` and `@hagicode/hagilight-core` (pinned to the same version):
-
-- `hagilight({ rss: { locales, getFeed } })` in `astro.config.mjs` generates `sitemap-index.xml`, `robots.txt`, and RSS feeds (all base-path aware). `/rss.xml` is the English feed and every other builder language is published as `/rss.<language>.xml`. `src/rss-feed.ts` builds each feed from the localized SEO title/description plus the Docker Compose installation guide link; the builder has no dated posts, so items carry no publication date. The page head advertises `/rss.xml` and the footer links the default and current-language feeds.
-- `src/components/SiteChrome.astro` renders the default `@hagicode/hagilight/Footer` and the `PromotoBanner` from `@hagicode/hagilight-core`; the builder only adds its own Steam link. Both are localized at build time, so the footer is rendered for every builder language (the default-locale footer is live, the rest sit in inert `<template>`s) and a small script swaps it, and re-localizes the banner, when `<html lang>` changes. Keep exactly one live `<footer>`: the banner finds it with `document.querySelector("footer")` to hide itself while the footer is on screen. The builder theme is mapped onto the `--sl-color-*` and `--hagilight-footer-*` tokens at the end of `src/index.css`.
-- Analytics scripts come from the shared `Analytics51LA` and `GoogleAnalytics` components.
-
-To pick up catalog or component changes, bump both packages together and run `npm run build`; `scripts/check-static-output.mjs` verifies the generated robots, sitemap, analytics, and footer output for `/` and a sub-path base.
-
-## Technology Stack
-
-- **React 19.2.0** with TypeScript
-- **Astro** - Static site generator and development server (Vite 8 powered)
-- **HagiLight** - Shared HagiCode Astro integration and components (sitemap, robots, footer catalog, analytics)
-- **shadcn/ui** - Component library
-- **Tailwind CSS** - Styling
-- **Radix UI** - Headless UI primitives
-- **Redux Toolkit** - State management
-- **Sonner** - Toast notifications
-- **React Syntax Highlighter** - Code highlighting
-
-## Project Structure
-
-```
-src/
-├── layouts/             # Static document shell and metadata
-├── pages/               # Astro routes
-│   └── index.astro      # Static home page and React workspace island
-├── components/
-│   ├── ui/              # shadcn/ui components
-│   └── docker-compose/  # Docker Compose specific components
-├── lib/
-│   ├── docker-compose/  # Type definitions, utils, and state management
-│   └── store.ts         # Redux store configuration
-└── hooks/               # Custom React hooks
-```
-
 ## Browser Support
 
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
 
-## SEO Configuration
-
-The application includes comprehensive SEO (Search Engine Optimization) features:
-
-### Features
-
-- **Meta Tags**: Complete HTML meta tags for title, description, keywords
-- **Open Graph**: Enhanced social media sharing on Facebook, LinkedIn, etc.
-- **Twitter Cards**: Optimized card display when sharing on Twitter
-- **Structured Data**: JSON-LD Schema.org markup for WebApplication, SoftwareApplication, and Organization
-- **Sitemap**: Generated by hagilight as `/sitemap-index.xml` (a legacy static `/sitemap.xml` is still published)
-- **Robots.txt**: Generated by hagilight with an absolute `Sitemap:` URL (`/robots.txt`)
-- **Canonical URLs**: Prevents duplicate content issues
-- **Hreflang Tags**: Multi-language SEO support
-
-### Customization
-
-SEO configuration is centralized in `src/config/seo.ts`. You can customize:
-
-- Site title and description
-- Keywords
-- Social media images
-- Default locale and alternate languages
-- Organization information
-
-### Dynamic SEO Updates
-
-SEO tags can be dynamically updated using the utility functions in `src/lib/seo/utils.ts`:
-
-```typescript
-import { updateSEO } from './lib/seo/utils';
-
-// Update SEO for specific pages
-updateSEO({
-  title: 'Custom Page Title',
-  description: 'Custom description',
-  image: '/custom-image.png'
-});
-```
-
-### Validation Tools
-
-Test your SEO implementation with these online tools:
-
-- **Google Lighthouse**: Built into Chrome DevTools - Tests SEO performance
-- **Facebook Sharing Debugger**: https://developers.facebook.com/tools/debug/
-- **Twitter Card Validator**: https://cards-dev.twitter.com/validator
-- **Google Rich Results Test**: https://search.google.com/test/rich-results
-- **Schema Markup Validator**: https://validator.schema.org/
-
-### Adding a Custom Open Graph Image
-
-To add a custom OG image:
-
-1. Create an image at `public/og-image.png` (recommended size: 1200x630px)
-2. Update the `image` property in `src/config/seo.ts`
-
 ## License
 
-MIT
+AGPL-3.0. See [LICENSE](./LICENSE).

@@ -6,7 +6,7 @@
 
 [English](./README.md)
 
-一个为 HagiCode 构建的现代化 Docker Compose 配置生成器，使用 Astro 静态站点和经过 hydration 的 React + TypeScript 工作区及 shadcn/ui。
+一个用于生成可直接使用的 Docker Compose 配置的网页表单，用来部署 HagiCode，让你无需手写 YAML 就能得到正确的 `docker-compose.yml`。
 
 ## 功能特性
 
@@ -21,92 +21,18 @@
 - **本地存储持久化**：配置保存到 localStorage，方便使用
 - **一键复制/下载**：将生成的 YAML 复制到剪贴板或下载为文件
 - **Caddyfile 复制工作流**：预览和复制 Caddyfile（无需文件下载）
-- **SEO 优化**：完整的搜索引擎优化，包括 meta 标签、Open Graph、Twitter Cards 和结构化数据
 - **多语言支持**：国际化（i18n），支持英文和中文
 
 ## 快速开始
 
-### 安装
-
-安装前请使用 Node.js `>=22.12.0`。这个要求同时适用于 `npm run dev`、`npm run build`、`npm run type-check` 和 `npm test`。
-
-```bash
-npm install
-```
-
-### 开发
+1. 打开 [builder.hagicode.com](https://builder.hagicode.com/)。
+2. 按步骤填写表单：基本设置、许可证、执行器、卷挂载，以及按需启用的 HTTPS。
+3. 复制或下载生成的 `docker-compose.yml`。如果启用了 HTTPS，还需复制 Caddyfile，并将其保存为与 compose 文件并列的 `Caddyfile`。
+4. 在该目录下，使用 Docker Compose 启动 HagiCode：
 
 ```bash
-npm run dev
+docker compose up -d
 ```
-
-应用程序可在 `http://localhost:4321` 访问
-
-### 构建
-
-```bash
-npm run build
-```
-
-### 预览
-
-```bash
-npm run preview
-```
-
-### 推荐验证
-
-依赖升级后。或 CI 运行时变更后。建议执行：
-
-```bash
-npm run build
-npm run type-check
-npm test
-npm run test:static-output
-npm run dev
-```
-
-预期行为：
-
-- `npm run build` 检查 Astro 与 React TypeScript，生成静态页面并输出到 `dist/`
-- `npm run type-check` 检查 Astro 页面及 React/TypeScript 代码
-- `npm test` 完成全部 Vitest 用例。包含快照校验
-- `npm run test:static-output` 检查根路径和子路径下的页面 metadata、无脚本回退及 island 资源
-- `npm run dev` 成功启动 Astro 开发服务器。并可在 `http://localhost:4321` 访问
-
-### 部署到 GitHub Pages
-
-唯一权威的生产部署路径是 GitHub Actions。
-
-- 权威工作流：`.github/workflows/deploy-gh-pages.yml`
-- 生产 source of truth：`gh-pages` 分支，只在 CI 校验通过后发布
-- 发布 payload 契约：分支根目录保留 `esa.jsonc`，验证通过的 Astro 产物统一放在 `dist/`
-- 所需 GitHub 权限：deploy job 需要 `contents: write`，build job 保持只读
-- 支持触发方式：推送到 `main`，以及 `workflow_dispatch`
-- 旧路径已退役：本地 `gh-pages` CLI 发布不再是受支持的生产发布方式
-
-### GitHub Pages 配置
-
-1. 确保您的仓库已启用 GitHub Pages：
-   - 转到仓库设置
-   - 导航到 "Pages" 部分
-   - 在 "Build and deployment" 下，选择 "Deploy from a branch"
-   - 选择 "gh-pages" 分支和 "/ (root)" 文件夹
-   - 点击 "Save"
-
-2. 确保托管层读取 `gh-pages/esa.jsonc`，并把 `gh-pages/dist/` 作为站点目录。
-
-3. 生产站点地址保持为：
-   `https://builder.hagicode.com`
-
-### 部署故障排除
-
-- **404 错误**：确保 GitHub Pages 正确配置且 `gh-pages` 分支存在
-- **资源未加载**：检查 `astro.config.mjs` 是否有正确的 `base` 配置
-- **构建失败**：使用 `npm ci` 验证依赖是否正确安装
-- **权限**：确保 GitHub Actions 工作流具有必要的权限
-- **首次部署检查**：确认工作流上传了 `esa.jsonc` 与 `dist/`，然后验证 `https://builder.hagicode.com`
-- **回滚**：回退 source 提交，或从旧提交重新运行工作流，让 CI 重新发布上一份快照
 
 ### 配置选项
 
@@ -142,9 +68,6 @@ npm run dev
 ##### 其他 CLI 工具
 
 HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前还不完整。
-
-- 容器配置相关 PR 请提交到 `https://github.com/HagiCode-org/docker-compose-builder`
-- 发布与运行时契约相关 PR 请提交到 `https://github.com/HagiCode-org/releases`
 
 ##### OpenCode 说明
 
@@ -194,34 +117,6 @@ HagiCode 也支持其他 CLI 工具，但它们的容器集成说明文档目前
 - **MiniMax**：具有 Anthropic 兼容 API 的 MiniMax AI 服务
 - **Custom**：具有 Anthropic 兼容接口的自定义 API 端点
 
-##### Provider 配置回退
-
-应用程序使用三层回退策略获取 provider 配置：
-
-1. **主要**：从 docs 仓库获取（`https://docs.hagicode.com/presets/claude-code/providers/`）
-2. **回退**：使用嵌入式备份配置（包含在代码中）
-3. **遗留**：使用硬编码常量（为向后兼容）
-
-这确保应用程序始终可用，即使 docs 仓库暂时不可用。
-
-##### 环境变量覆盖
-
-对于本地开发，您可以覆盖 docs 仓库 URL：
-
-```bash
-# 覆盖以使用本地 docs 仓库
-VITE_PRESETS_BASE_URL=http://localhost:3000 npm run dev
-
-# 或指定不同的远程 URL
-VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
-```
-
-默认值为 `https://docs.hagicode.com`。
-
-##### 嵌入式备份同步
-
-嵌入式备份配置（`src/lib/docker-compose/providerConfigLoader.ts`）与 docs 仓库预设同步。当在 docs 仓库中添加新 provider 或更新现有 provider 时，更新 `EMBEDDED_BACKUP` 常量以包含最新数据。
-
 #### 卷挂载
 - **工作目录**：您的代码仓库路径
 - **根用户警告**：检测并警告 root 拥有的目录
@@ -245,144 +140,12 @@ VITE_PRESETS_BASE_URL=https://your-custom-docs-url.com npm run dev
 - `hagicode` 服务内的 SQLite 连接设置
 - 当这些能力启用时，显式的 Claude、Codex 和 OpenCode 执行器分支
 
-## 分析配置
-
-应用程序集成了多个分析平台，用于全面的用户行为追踪：
-
-### Microsoft Clarity
-
-- **用途**：用户行为分析，包括热图、会话录制和用户旅程
-- **项目 ID**：`v6zgmrg1q7`
-- **环境**：仅生产环境
-- **实现**：通过 `src/services/clarityService.ts` 的单例服务模式
-
-### 51LA 与 Google Analytics
-
-- **用途**：页面访问分析（51LA 面向中国用户，GA4 面向全球流量）
-- **ID**：51LA `L6b88a5yK4h2Xnci`（默认）与 GA4 `G-EN03FMT2Q4`
-- **环境**：仅生产环境
-- **实现**：使用 `@hagicode/hagilight-core` 提供的共享 `Analytics51LA` 与 `GoogleAnalytics` 组件，挂载于 `src/layouts/BaseLayout.astro`
-
-### 配置
-
-51LA ID 可在构建时覆盖：
-
-```bash
-VITE_51LA_ID=your_51la_id npm run build
-```
-
-### 验证
-
-在生产环境中验证分析集成：
-
-1. 打开浏览器 DevTools（F12）
-2. 转到 Network 面板
-3. 检查以下请求：
-   - `https://sdk.51.la/js-sdk-pro.min.js`（51LA）
-   - `https://www.googletagmanager.com/gtag/js?id=G-EN03FMT2Q4`（Google Analytics）
-4. 验证 Clarity 正在 Clarity Dashboard 中记录会话
-
-## HagiLight 集成
-
-站点使用 HagiCode 共享包 `@hagicode/hagilight` 与 `@hagicode/hagilight-core`（两者固定为同一版本）：
-
-- `astro.config.mjs` 中的 `hagilight({ rss: { locales, getFeed } })` 生成 `sitemap-index.xml`、`robots.txt` 与 RSS 订阅源（均支持 base 子路径）。`/rss.xml` 是英文订阅源，其余 Builder 语言发布为 `/rss.<language>.xml`。`src/rss-feed.ts` 使用各语言的 SEO 标题/描述与 Docker Compose 安装指南链接生成订阅源；Builder 没有带日期的文章，因此条目不带发布时间。页面 head 声明 `/rss.xml`，页脚提供默认与当前语言的订阅入口。
-- `src/components/SiteChrome.astro` 渲染 hagilight 默认的 `@hagicode/hagilight/Footer` 与 `@hagicode/hagilight-core` 的 `PromotoBanner`，Builder 仅补充自己的 Steam 入口。两者都在构建时本地化，因此页脚会为每种 Builder 语言各渲染一份（默认语言的页脚为实际元素，其余放在惰性的 `<template>` 中），`<html lang>` 变化时由一段小脚本替换页脚并让推广卡片按新语言重新加载。请保证页面上只有一个实际的 `<footer>`：推广卡片通过 `document.querySelector("footer")` 找到它，以便页脚进入视口时自动隐藏。Builder 主题通过 `src/index.css` 末尾的 `--sl-color-*` 与 `--hagilight-footer-*` 变量映射到这两个组件。
-- 统计脚本来自共享的 `Analytics51LA` 与 `GoogleAnalytics` 组件。
-
-升级目录或组件时，请同时升级两个包并运行 `npm run build`；`scripts/check-static-output.mjs` 会在 `/` 与子路径 base 下校验 robots、sitemap、统计脚本和页脚产物。
-
-## 技术栈
-
-- **React 19.2.0** 配合 TypeScript
-- **Astro** - 静态站点生成器和开发服务器（由 Vite 8 驱动）
-- **HagiLight** - HagiCode 共享的 Astro 集成与组件（sitemap、robots、页脚目录、统计）
-- **shadcn/ui** - 组件库
-- **Tailwind CSS** - 样式
-- **Radix UI** - 无头 UI 原语
-- **Redux Toolkit** - 状态管理
-- **Sonner** - Toast 通知
-- **React Syntax Highlighter** - 代码高亮
-
-## 项目结构
-
-```
-src/
-├── layouts/             # 静态文档 shell 与 metadata
-├── pages/               # Astro 路由
-│   └── index.astro      # 静态首页和 React workspace island
-├── components/
-│   ├── ui/              # shadcn/ui 组件
-│   └── docker-compose/  # Docker Compose 特定组件
-├── lib/
-│   ├── docker-compose/  # 类型定义、工具和状态管理
-│   └── store.ts         # Redux store 配置
-└── hooks/               # 自定义 React hooks
-```
-
 ## 浏览器支持
 
 - Chrome/Edge（最新版本）
 - Firefox（最新版本）
 - Safari（最新版本）
 
-## SEO 配置
-
-应用程序包含全面的 SEO（搜索引擎优化）功能：
-
-### 功能特性
-
-- **Meta 标签**：完整的 HTML meta 标签，包括标题、描述、关键词
-- **Open Graph**：在 Facebook、LinkedIn 等平台上增强的社交媒体分享
-- **Twitter Cards**：在 Twitter 上分享时优化的卡片显示
-- **结构化数据**：WebApplication、SoftwareApplication 和 Organization 的 JSON-LD Schema.org 标记
-- **站点地图**：由 hagilight 生成 `/sitemap-index.xml`（仍保留旧的静态 `/sitemap.xml`）
-- **Robots.txt**：由 hagilight 生成，带绝对地址的 `Sitemap:`（`/robots.txt`）
-- **规范 URL**：防止重复内容问题
-- **Hreflang 标签**：多语言 SEO 支持
-
-### 自定义
-
-SEO 配置集中在 `src/config/seo.ts`。您可以自定义：
-
-- 网站标题和描述
-- 关键词
-- 社交媒体图片
-- 默认语言环境和替代语言
-- 组织信息
-
-### 动态 SEO 更新
-
-可以使用 `src/lib/seo/utils.ts` 中的工具函数动态更新 SEO 标签：
-
-```typescript
-import { updateSEO } from './lib/seo/utils';
-
-// 更新特定页面的 SEO
-updateSEO({
-  title: '自定义页面标题',
-  description: '自定义描述',
-  image: '/custom-image.png'
-});
-```
-
-### 验证工具
-
-使用这些在线工具测试您的 SEO 实现：
-
-- **Google Lighthouse**：内置于 Chrome DevTools - 测试 SEO 性能
-- **Facebook Sharing Debugger**：https://developers.facebook.com/tools/debug/
-- **Twitter Card Validator**：https://cards-dev.twitter.com/validator
-- **Google Rich Results Test**：https://search.google.com/test/rich-results
-- **Schema Markup Validator**：https://validator.schema.org/
-
-### 添加自定义 Open Graph 图片
-
-添加自定义 OG 图片：
-
-1. 在 `public/og-image.png` 创建图片（推荐尺寸：1200x630px）
-2. 更新 `src/config/seo.ts` 中的 `image` 属性
-
 ## 许可证
 
-MIT
+AGPL-3.0。参见 [LICENSE](./LICENSE)。
