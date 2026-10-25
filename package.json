@@ -8,10 +8,10 @@
   },
   "scripts": {
     "dev": "npm run prepare:i18n && astro dev --host 0.0.0.0",
-    "build": "export NODE_ENV=\"${NODE_ENV:-production}\"; npm run prepare:i18n && astro check --tsconfig tsconfig.astro.json && tsc -b && astro build && node scripts/check-static-output.mjs",
+    "build": "export NODE_OPTIONS=\"${NODE_OPTIONS:-} --max-old-space-size=8192\"; export NODE_ENV=\"${NODE_ENV:-production}\"; npm run prepare:i18n && astro check --tsconfig tsconfig.astro.json && tsc -b && astro build && node scripts/check-static-output.mjs",
     "lint": "eslint .",
     "preview": "astro preview",
-    "type-check": "astro check --tsconfig tsconfig.astro.json && tsc -b --pretty false",
+    "type-check": "export NODE_OPTIONS=\"${NODE_OPTIONS:-} --max-old-space-size=8192\"; astro check --tsconfig tsconfig.astro.json && tsc -b --pretty false",
     "test": "npm run prepare:i18n && vitest",
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
@@ -83,7 +83,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@vitest/ui": "^4.1.1",
+    "@vitest/ui": "^5.0.5",
     "astro": "^7.3.8",
     "cookie": "^2.0.1",
     "eslint": "^9.39.1",
@@ -96,6 +96,6 @@
     "typescript-eslint": "^8.71.2",
     "verifyjs": "^0.0.2",
     "vite": "^8.0.0",
-    "vitest": "^4.1.1"
+    "vitest": "^5.0.5"
   }
 }

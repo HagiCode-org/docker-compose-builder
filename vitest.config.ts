@@ -5,6 +5,10 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Memory bound: cap the worker count and give every worker a V8 heap ceiling, so a leaking test file fails with an OOM
+    // instead of exhausting the machine.
+    maxWorkers: 4,
+    execArgv: ['--max-old-space-size=2048'],
     globals: true,
     environment: 'node',
     include: ['**/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
