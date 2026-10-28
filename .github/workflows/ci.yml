@@ -23,15 +23,26 @@ jobs:
         uses: actions/checkout@v4
 
       # Step 2: Setup Node.js supported by Astro
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: "npm"
+          cache: pnpm
 
-      # Step 3: Install dependencies using npm ci for clean, reproducible installs
+      # Step 3: Install dependencies using pnpm install --frozen-lockfile for clean, reproducible installs
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify install and lockfile stability
+        run: |
+          test -d node_modules
+          git diff --exit-code -- pnpm-lock.yaml
+
+      - name: Registry neutrality
+        run: pnpm run check:registry
 
       # Step 4: Verify snapshot files exist before running tests
       - name: Verify Snapshot Files
@@ -53,14 +64,14 @@ jobs:
 
       # Step 5: Build project and verify TypeScript compilation
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Verify root and subpath static output
-        run: npm run test:static-output
+        run: pnpm run test:static-output
 
       # Step 7: Run test suite using vitest
       - name: Test
-        run: npm test
+        run: pnpm test
 
       # Step 8: Block Azure ACR reference regressions
       - name: Guard banned Azure ACR tokens

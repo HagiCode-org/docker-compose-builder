@@ -140,7 +140,7 @@ async function verifyNoUnexpectedGeneratedArtifacts() {
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
       if (checkOnly) {
-        throw new Error('Generated locale resources are missing; rerun npm run i18n:generate');
+        throw new Error('Generated locale resources are missing; rerun pnpm run i18n:generate');
       }
       return;
     }
@@ -165,11 +165,11 @@ async function syncGeneratedArtifacts(artifacts) {
       try {
         const existingContent = await fs.readFile(outputPath, 'utf8');
         if (existingContent !== nextContent) {
-          errors.push(`${path.relative(repoRoot, outputPath)} is stale; rerun npm run i18n:generate`);
+          errors.push(`${path.relative(repoRoot, outputPath)} is stale; rerun pnpm run i18n:generate`);
         }
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
-          errors.push(`${path.relative(repoRoot, outputPath)} is missing; rerun npm run i18n:generate`);
+          errors.push(`${path.relative(repoRoot, outputPath)} is missing; rerun pnpm run i18n:generate`);
           continue;
         }
 
