@@ -32,32 +32,32 @@ Builder mirrors the Desktop language set:
 Run these from `repos/docker-compose-builder-web`:
 
 ```bash
-npm run i18n:audit
-npm run i18n:report
-npm run i18n:doctor
-npm run i18n:sync
-npm run i18n:sync:write
-npm run i18n:prune
-npm run i18n:prune:write
-npm run i18n:generate
-npm run i18n:check
+pnpm run i18n:audit
+pnpm run i18n:report
+pnpm run i18n:doctor
+pnpm run i18n:sync
+pnpm run i18n:sync:write
+pnpm run i18n:prune
+pnpm run i18n:prune:write
+pnpm run i18n:generate
+pnpm run i18n:check
 ```
 
 ## Dry-run vs write
 
-- `npm run i18n:sync` and `npm run i18n:prune` are dry-run commands.
-- `npm run i18n:sync:write` and `npm run i18n:prune:write` apply the reviewed mutations.
-- `npm run i18n:generate` rewrites the runtime JSON from YAML.
-- `npm run i18n:check` runs audit, doctor, generation, and a stale-artifact check.
+- `pnpm run i18n:sync` and `pnpm run i18n:prune` are dry-run commands.
+- `pnpm run i18n:sync:write` and `pnpm run i18n:prune:write` apply the reviewed mutations.
+- `pnpm run i18n:generate` rewrites the runtime JSON from YAML.
+- `pnpm run i18n:check` runs audit, doctor, generation, and a stale-artifact check.
 
 Recommended maintainer sequence:
 
 1. Edit `src/i18n/locales/en-US/*.yml` first.
 2. Update the matching keys for `zh-CN`, then the remaining Desktop-supported locales.
-3. Run `npm run i18n:audit` and `npm run i18n:doctor`.
-4. Use `npm run i18n:sync` or `npm run i18n:prune` if the locale tree needs structural repair.
-5. Regenerate runtime JSON with `npm run i18n:generate`.
-6. Finish with `npm run i18n:check`.
+3. Run `pnpm run i18n:audit` and `pnpm run i18n:doctor`.
+4. Use `pnpm run i18n:sync` or `pnpm run i18n:prune` if the locale tree needs structural repair.
+5. Regenerate runtime JSON with `pnpm run i18n:generate`.
+6. Finish with `pnpm run i18n:check`.
 
 ## Namespace layout
 

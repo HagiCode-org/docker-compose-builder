@@ -37,29 +37,29 @@ Use Node.js `>=22.12.0` before running the commands below. This is the runtime f
 
 ### Run All Tests
 ```bash
-npm test
+pnpm test
 ```
 
 ### Run Specific Test Categories
 ```bash
 # Unit tests only
-npm test -- src/lib/docker-compose/__tests__/unit/
+pnpm test -- src/lib/docker-compose/__tests__/unit/
 
 # BDD tests only
-npm test -- src/lib/docker-compose/__tests__/bdd/
+pnpm test -- src/lib/docker-compose/__tests__/bdd/
 
 # Snapshot verification tests only
-npm run test:verify
+pnpm run test:verify
 ```
 
 ### Run Tests with UI
 ```bash
-npm run test:ui
+pnpm run test:ui
 ```
 
 ### Run Tests with Coverage
 ```bash
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ## Snapshot Testing
@@ -95,12 +95,12 @@ src/lib/docker-compose/__tests__/__verify__/__snapshots__/
 1. Make your code changes
 2. Run snapshot tests to see differences:
    ```bash
-   npm run test:verify
+   pnpm run test:verify
    ```
 
 3. If the YAML structure intentionally changed, update snapshots:
    ```bash
-   npm run test:verify -- -u
+   pnpm run test:verify -u
    ```
 
 4. **Review ALL snapshot changes carefully** - Open each `.snap` file and verify:
@@ -199,7 +199,7 @@ The `verify.config.json` file configures snapshot behavior:
 
 **Solutions:**
 1. Check CI Node.js version matches local version
-2. Verify dependencies are installed correctly: `npm ci`
+2. Verify dependencies are installed correctly: `pnpm install`
 3. Review CI logs for specific differences
 4. Ensure snapshot files are present in the branch
 
@@ -240,7 +240,7 @@ CI automatically comments on PRs with test results:
 
 1. **Review Snapshot Changes**: Always review snapshot diffs before committing
 2. **Document Changes**: Include snapshot updates in commit messages
-3. **Run Full Suite**: Run `npm test` before pushing to ensure all tests pass
+3. **Run Full Suite**: Run `pnpm test` before pushing to ensure all tests pass
 4. **Check CI Results**: Monitor CI runs to catch environment-specific issues
 5. **Keep Scrubbers Updated**: Add scrubbers for any new dynamic content
 6. **Small Focused Changes**: Keep commits focused to make snapshot reviews easier
@@ -256,7 +256,7 @@ Current test counts:
 
 Run coverage reports:
 ```bash
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ## Resources

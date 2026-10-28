@@ -15,16 +15,16 @@ Run commands from `repos/docker-compose-builder-web/`.
 ## Key Commands
 
 ```bash
-npm install
-npm run dev
-npm run build
-npm run test
-npm run test:ui
-npm run test:verify          # snapshot verification tests (__verify__)
-npm run test:static-output   # build + check root and subpath static output (CI gate)
-npm run type-check
-npm run lint
-npm run i18n:check           # hagi18n audit + doctor + generated-resource check
+pnpm install
+pnpm run dev
+pnpm run build
+pnpm run test
+pnpm run test:ui
+pnpm run test:verify          # snapshot verification tests (__verify__)
+pnpm run test:static-output   # build + check root and subpath static output (CI gate)
+pnpm run type-check
+pnpm run lint
+pnpm run i18n:check           # hagi18n audit + doctor + generated-resource check
 ```
 
 Requires Node.js `>=24`. `dev`, `build`, and `test` run `prepare:i18n` first. Testing details: `TESTING.md`; i18n workflow: `docs/i18n-hagi18n.md`.
@@ -48,10 +48,17 @@ Requires Node.js `>=24`. `dev`, `build`, and `test` run `prepare:i18n` first. Te
 - Preserve the repo's i18n flow for all user-facing strings.
 - Treat generated YAML behavior as contract-like: update tests or snapshots when behavior changes intentionally.
 - Keep `@hagicode/hagilight` and `@hagicode/hagilight-core` on the same exact version; do not re-add inline analytics scripts or a hand-maintained `public/robots.txt` (hagilight generates robots and the sitemap index).
-- CI (`.github/workflows/ci.yml`, on PRs) runs `npm ci`, snapshot-file check, `npm run build`, `npm run test:static-output`, `npm test`, and a guard that bans Azure ACR tokens in `src`/READMEs; keep those passing.
+- CI (`.github/workflows/ci.yml`, on PRs) runs `pnpm install`, snapshot-file check, `pnpm run build`, `pnpm run test:static-output`, `pnpm test`, and a guard that bans Azure ACR tokens in `src`/READMEs; keep those passing.
 - Prefer composable UI changes on top of the existing React, Tailwind, and shadcn-style patterns.
 
 ## References
 
 - `README.md`
 - `src/lib/docker-compose/`
+
+## Package management
+
+- The repository uses pnpm, pinned in `package.json` `packageManager`. Run `corepack enable` once, then `pnpm install`. `pnpm-lock.yaml` is the only lockfile; do not commit `package-lock.json`.
+- Settings live in `pnpm-workspace.yaml`. `allowBuilds` lists the dependencies whose install scripts may run (reviewed individually, `false` means reviewed and denied); review any new dependency that has an install script and add it there.
+- A local registry mirror belongs in `~/.npmrc` only. Never commit a `registry=` line or a mirror URL; `pnpm run check:registry` (also run in CI) fails on any non-`registry.npmjs.org` `tarball` in the lockfile and on mirror hosts in tracked files.
+- Undeclared imports fail under pnpm's strict layout: declare the package instead of hoisting it.
