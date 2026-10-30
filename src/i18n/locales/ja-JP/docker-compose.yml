@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: Builder は、このホスト ポートに対して別のループバック専用マッピングを発行します。
   codeServerPublishBindTitle: ホストバインドアドレス
   codeServerPublishBindHint: Builder は、最初の公開ステップでホスト側のバインドをループバックに固定したままにします。より広範囲に公開する必要がある場合は、リバース プロキシを追加します。
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<公開ポート>:<コンテナポート>
   codeServerDisabledTitle: code-server デフォルトは現在無効になっています
   codeServerDisabledHint: このプロファイルに対して code-server を再度有効にするまで、Builder は code serve-web をアクティブな実装としてエクスポートします。
   eulaConfiguration: コンテナ EULA

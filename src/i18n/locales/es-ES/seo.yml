@@ -13,5 +13,5 @@ default:
     - componer constructor
 pages:
   home:
-    title: Hagicode Docker Compose Builder - Visual Docker Compose Generator
+    title: Hagicode Docker Compose Builder - Generador visual de Docker Compose
     description: Cree y administre configuraciones Docker Compose visualmente. Cree archivos docker-compose.yml con una interfaz intuitiva.

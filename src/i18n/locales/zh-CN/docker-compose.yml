@@ -175,8 +175,8 @@ configForm:
   codeServerPort: 容器端口
   codeServerPortHint: 有效范围：1-65535。36529 与 HagiCode 当前的 code-server 默认端口一致。
   codeServerAuthMode: 认证模式
-  codeServerAuthModeNone: none
-  codeServerAuthModePassword: password
+  codeServerAuthModeNone: 无
+  codeServerAuthModePassword: 密码
   codeServerAuthModeHint: 当你希望 Builder 一并导出 code-server 的启动密码时，请选择 password。
   codeServerPassword: CODE_SERVER_PASSWORD
   codeServerPasswordHint: 该值会交给容器启动引导桥接到 code-server，不会在注释里明文解释。

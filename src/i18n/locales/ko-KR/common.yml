@@ -15,7 +15,7 @@ header:
     officialDocs: 배포 문서
     discord: Discord 커뮤니티
     githubRepo: GitHub 저장소
-    qqGroup: 'QQ Group: {{groupNumber}}'
+    qqGroup: 'QQ 그룹: {{groupNumber}}'
     joinQQGroup: QQ Group에 가입하세요
     copyGroupNumber: 그룹 번호 복사
     copied: 복사되었습니다!

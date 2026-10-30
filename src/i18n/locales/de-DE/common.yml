@@ -15,7 +15,7 @@ header:
     officialDocs: Bereitstellungsdokumente
     discord: Discord Gemeinschaft
     githubRepo: GitHub-Repository
-    qqGroup: 'QQ Group: {{groupNumber}}'
+    qqGroup: 'QQ-Gruppe: {{groupNumber}}'
     joinQQGroup: Treten Sie QQ Group bei
     copyGroupNumber: Gruppennummer kopieren
     copied: Kopiert!

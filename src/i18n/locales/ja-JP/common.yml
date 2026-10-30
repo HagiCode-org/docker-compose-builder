@@ -15,7 +15,7 @@ header:
     officialDocs: 導入ドキュメント
     discord: Discord コミュニティ
     githubRepo: GitHub リポジトリ
-    qqGroup: 'QQ Group: {{groupNumber}}'
+    qqGroup: 'QQ グループ: {{groupNumber}}'
     joinQQGroup: QQ Group に参加する
     copyGroupNumber: コピーグループ番号
     copied: コピーしました！

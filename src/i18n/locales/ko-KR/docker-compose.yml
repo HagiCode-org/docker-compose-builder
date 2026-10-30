@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: Builder는 이 호스트 포트에 대해 별도의 루프백 전용 매핑을 내보냅니다.
   codeServerPublishBindTitle: 호스트 바인드 주소
   codeServerPublishBindHint: Builder는 첫 번째 게시 단계에서 루프백으로 고정된 호스트 측 바인딩을 유지합니다. 더 넓은 노출이 필요한 경우 역방향 프록시를 추가하세요.
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<게시-포트>:<컨테이너-포트>
   codeServerDisabledTitle: code-server 기본값은 현재 비활성화되어 있습니다.
   codeServerDisabledHint: Builder는 이 프로필에 대해 code-server을 다시 활성화할 때까지 code serve-web을 활성 구현으로 내보냅니다.
   eulaConfiguration: 컨테이너 EULA

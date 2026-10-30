@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: Builder создает отдельное сопоставление только для обратной связи для этого хост-порта.
   codeServerPublishBindTitle: Адрес привязки хоста
   codeServerPublishBindHint: Builder сохраняет привязку на стороне хоста фиксированной к петлевой проверке на первом этапе публикации. Добавьте обратный прокси-сервер, если вам нужно более широкое распространение.
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<опубликованный-порт>:<порт-контейнера>
   codeServerDisabledTitle: code-server значения по умолчанию в настоящее время отключены
   codeServerDisabledHint: Builder будет экспортировать code serve-web как активную реализацию, пока вы повторно не включите code-server для этого профиля.
   eulaConfiguration: Контейнер EULA

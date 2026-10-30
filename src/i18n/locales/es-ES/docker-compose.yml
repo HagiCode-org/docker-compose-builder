@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: Builder emite una asignación independiente de bucle invertido únicamente para este puerto de host.
   codeServerPublishBindTitle: Dirección de enlace del host
   codeServerPublishBindHint: Builder mantiene el enlace del lado del host fijo en bucle invertido para el primer paso de publicación. Agregue un proxy inverso si necesita una exposición más amplia.
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<puerto-publicado>:<puerto-contenedor>
   codeServerDisabledTitle: Los valores predeterminados de code-server están actualmente deshabilitados
   codeServerDisabledHint: Builder exportará code serve-web como implementación activa hasta que vuelva a habilitar code-server para este perfil.
   eulaConfiguration: Contenedor EULA

@@ -5,12 +5,12 @@ default:
     - docker
     - docker compose
     - docker-compose
-    - yaml generator
-    - docker builder
-    - container orchestration
-    - devops tools
-    - docker ui
-    - compose builder
+    - YAML 生成器
+    - Docker 构建器
+    - 容器编排
+    - DevOps 工具
+    - Docker 界面
+    - Compose 构建器
 pages:
   home:
     title: Hagicode Docker Compose Builder - 可视化 Docker Compose 生成器

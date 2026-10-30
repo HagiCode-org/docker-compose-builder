@@ -125,7 +125,7 @@ configForm:
   anthropicOfficialApi: Anthropic Oficial API
   customApiEndpoint: Ponto final API personalizado
   apiEndpointUrl: API Ponto final URL
-  apiToken: API Token
+  apiToken: Token de API
   getApiToken: Obtenha o token API →
   enterApiToken: Insira seu token API
   enterAnthropicApiToken: Insira seu token Anthropic API (sk-ant-...)
@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: O Builder emite um mapeamento separado apenas de loopback para esta porta host.
   codeServerPublishBindTitle: Endereço de ligação do host
   codeServerPublishBindHint: O Builder mantém a ligação do lado do host fixa em loopback para a primeira etapa de publicação. Adicione um proxy reverso se precisar de uma exposição mais ampla.
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<porta-publicada>:<porta-contêiner>
   codeServerDisabledTitle: Os padrões code-server estão desativados no momento
   codeServerDisabledHint: O Builder exportará code serve-web como a implementação ativa até que você reative code-server para este perfil.
   eulaConfiguration: Contêiner EULA

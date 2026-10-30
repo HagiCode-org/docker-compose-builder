@@ -187,7 +187,7 @@ configForm:
   codeServerPublishedPortHint: Builder gibt eine separate Nur-Loopback-Zuordnung für diesen Host-Port aus.
   codeServerPublishBindTitle: Host-Bind-Adresse
   codeServerPublishBindHint: Builder hält die hostseitige Bindung für den ersten Veröffentlichungsschritt auf Loopback fest. Fügen Sie einen Reverse-Proxy hinzu, wenn Sie eine größere Präsenz benötigen.
-  codeServerPublishBindValue: 127.0.0.1:<published-port>:<container-port>
+  codeServerPublishBindValue: 127.0.0.1:<veröffentlichter-port>:<container-port>
   codeServerDisabledTitle: Die Standardeinstellungen für code-server sind derzeit deaktiviert
   codeServerDisabledHint: Builder exportiert code serve-web als aktive Implementierung, bis Sie code-server für dieses Profil erneut aktivieren.
   eulaConfiguration: Behälter EULA
