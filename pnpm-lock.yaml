@@ -309,8 +309,8 @@ importers:
         specifier: ^9.39.1
         version: 9.39.4
       '@hagicode/hagi18n':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.3.0
+        version: 0.3.0
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -897,8 +897,8 @@ packages:
   '@fontsource/jetbrains-mono@5.2.8':
     resolution: {integrity: sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ==}
 
-  '@hagicode/hagi18n@0.2.0':
-    resolution: {integrity: sha512-IGSUQiSoaQukr2v/2uibWBhV2EQCtLrMmO7aELOaTpGMkEVkBq0b3upEd2DQJuurqxJFiC6PHElj7giJkred+g==}
+  '@hagicode/hagi18n@0.3.0':
+    resolution: {integrity: sha512-b3Adlxire3/IRulQJRobDzAGvGYXtR2Pw/Gbrzg+tFptgawWInqstIWNk2a4gp19FYrEbS+qjEz7MmDBfEEEtQ==}
     engines: {node: '>=24.0.0'}
     hasBin: true
 
@@ -5948,7 +5948,7 @@ snapshots:
 
   '@fontsource/jetbrains-mono@5.2.8': {}
 
-  '@hagicode/hagi18n@0.2.0':
+  '@hagicode/hagi18n@0.3.0':
     dependencies:
       '@types/js-yaml': 4.0.9
       commander: 14.0.3

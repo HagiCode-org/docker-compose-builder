@@ -80,7 +80,7 @@
     "@astrojs/check": "^0.9.10",
     "@astrojs/react": "^7.0.0",
     "@eslint/js": "^9.39.1",
-    "@hagicode/hagi18n": "^0.2.0",
+    "@hagicode/hagi18n": "^0.3.0",
     "@testing-library/react": "^16.3.3",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.1",

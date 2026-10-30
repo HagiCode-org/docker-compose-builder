@@ -11,6 +11,34 @@ targetLocales:
   - es-ES
   - pt-BR
   - ru-RU
+# 与英文基线相同、且在各语言里本就应当相同的值(品牌名、URL、技术标识、通用借词等),按「文件 → 键」逐条精确列出,每条写理由。
+# 名单对所有目标语言生效:只有在所有仍与英文相同的语言里英文写法都正确时才加入;其余一律翻译。
+auditIdenticalAllowlist:
+  common.yml:
+    - header.title # 产品名
+    - workspace.sections.https.shortTitle # 技术标识
+    - workspace.sections.profile.shortTitle # fr 通用词
+  docker-compose.yml:
+    - configForm.windows # 操作系统名
+    - configForm.linux # 操作系统名
+    - configForm.dockerHub # 产品名
+    - configForm.codeServerPassword # 环境变量名
+    - generator.support.qqNumber # QQ 群号
+    - generator.support.discordLink # URL
+    - configForm.dockerOfficialRegistry # 产品名
+    - configForm.zhipuAI # 品牌名
+    - configForm.aliyunDashScope # 品牌名
+    - configForm.optional # de 通用词
+  providers.yml:
+    - providers.minimax.name # 品牌名
+    - providers.zai.name # 品牌名
+    - providers.aliyun.name # 品牌名
+    - providers.volcengine.name # 品牌名
+  seo.yml:
+    - default.title # 产品名
+    - default.keywords.0 # 搜索技术词
+    - default.keywords.1 # 搜索技术词
+    - default.keywords.2 # 搜索技术词
 doctor:
   excludedDirectories:
     - .git
