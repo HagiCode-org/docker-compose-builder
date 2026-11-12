@@ -1,5 +1,10 @@
 # pnpm settings (pnpm 12 reads these here, not from package.json).
 
+# Replaces the npm `overrides` field.
+overrides:
+  # proxy-addr <2.0.8 is critical in `pnpm audit`; comes in via shadcn > @modelcontextprotocol/sdk.
+  proxy-addr: ^2.0.8
+
 # Dependency lifecycle scripts run only for approved packages. Reviewed from the old lockfile's
 # `hasInstallScript` entries:
 #   fsevents - macOS-only optional file watcher; ships a prebuilt binary, no script needed.
