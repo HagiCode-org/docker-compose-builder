@@ -26,3 +26,6 @@ src/i18n/generated-locales/
 *.sw?
 
 **/__pycache__/
+
+# Local deja session-rule export (auto-extracted from agent sessions; not committed)
+.deja/
