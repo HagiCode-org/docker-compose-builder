@@ -60,6 +60,7 @@ function checkOutput(base) {
   assert.ok(sitemapIndex.includes(`${siteUrl}${base}sitemap-0.xml`));
   assert.ok(readFileSync(path.join(distDir, "sitemap-0.xml"), "utf8").includes(`<loc>${siteUrl}${base}</loc>`));
   assert.ok(html.includes(`href="${base}sitemap-index.xml"`), "Footer should link to the generated sitemap index");
+  assert.ok(!existsSync(path.join(distDir, "sitemap.xml")), "A hand-written sitemap.xml would shadow the generated sitemap index");
   assert.ok(html.includes("beian.miit.gov.cn"), "Footer should render the shared filing links");
   assert.ok(html.includes("Powered By hagilight@"), "Footer should be the hagilight default footer");
   assert.ok(html.includes(`href="${siteUrl}${base}rss.xml"`), "Footer should link the generated RSS feed");
