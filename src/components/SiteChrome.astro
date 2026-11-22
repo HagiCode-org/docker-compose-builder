@@ -11,11 +11,6 @@ import { DEFAULT_BUILDER_LANGUAGE, SUPPORTED_BUILDER_LANGUAGE_CODES } from "@/i1
 // siteUrl is omitted on purpose: the Footer falls back to Astro.site (astro.config.mjs `site`).
 const links = {
   siteId: "compose-builder",
-  extraLinks: {
-    community: [
-      { id: "steam", label: "Steam", href: "https://store.steampowered.com/app/4625540/Hagicode/", external: true },
-    ],
-  },
 };
 const otherLocales = SUPPORTED_BUILDER_LANGUAGE_CODES.filter((locale) => locale !== DEFAULT_BUILDER_LANGUAGE);
 ---
