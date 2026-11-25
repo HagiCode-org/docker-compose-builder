@@ -3131,7 +3131,7 @@ packages:
       express: '>= 4.11'
 
   express@3.0.0-rc2:
-    resolution: {integrity: sha512-lp8LQWLzVBQHBp20GgpHp+ScBNwl70W1oYwbLZ8hcmq1OeqO3HnW2yTmFdrJIiXcE3i7487H10M929bhWBorHQ==, tarball: http://truenas.local:30451/repository/npm-proxy/express/-/express-3.0.0rc2.tgz}
+    resolution: {integrity: sha512-lp8LQWLzVBQHBp20GgpHp+ScBNwl70W1oYwbLZ8hcmq1OeqO3HnW2yTmFdrJIiXcE3i7487H10M929bhWBorHQ==, tarball: https://registry.npmjs.org/express/-/express-3.0.0rc2.tgz}
     deprecated: No longer maintained. Please upgrade to a stable version.
     hasBin: true
 
