@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://builder.hagicode.com/sitemap-index.xml
