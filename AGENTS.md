@@ -48,7 +48,7 @@ Requires Node.js `>=24`. `dev`, `build`, and `test` run `prepare:i18n` first. Te
 - Preserve the repo's i18n flow for all user-facing strings.
 - Treat generated YAML behavior as contract-like: update tests or snapshots when behavior changes intentionally.
 - Keep `@hagicode/hagilight` and `@hagicode/hagilight-core` on the same exact version; do not re-add inline analytics scripts or a hand-maintained `public/robots.txt` (hagilight generates robots and the sitemap index).
-- CI (`.github/workflows/ci.yml`, on PRs) runs `pnpm install`, snapshot-file check, `pnpm run build`, `pnpm run test:static-output`, `pnpm test`, and a guard that bans Azure ACR tokens in `src`/READMEs; keep those passing.
+- CI (`.github/workflows/ci.yml`, on PRs) runs `pnpm install`, `pnpm run check:registry`, snapshot-file check, `pnpm run build`, `pnpm run test:static-output`, `pnpm test`, and a guard that bans Azure ACR tokens in `src`/READMEs; keep those passing.
 - Prefer composable UI changes on top of the existing React, Tailwind, and shadcn-style patterns.
 
 ## References
